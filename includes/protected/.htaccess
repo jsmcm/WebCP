@@ -1,0 +1,10 @@
+<files key.private>
+order allow,deny
+deny from all
+</files>
+
+<files key.public>
+order allow,deny
+deny from all
+</files>
+

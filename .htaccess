@@ -1,0 +1,2 @@
+php_value session.save_path '/tmp/webcp/'
+ErrorDocument 404 /404.php

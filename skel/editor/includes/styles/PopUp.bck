@@ -1,0 +1,63 @@
+
+
+<style type="text/css">
+
+		.PopUp{
+
+			z-index:10;
+
+			}
+
+		.PopUp:hover{
+
+			position:relative;
+
+			z-index:100;
+
+			}			
+
+		.PopUp span{
+
+			display:none;
+
+			}
+
+		.PopUp:hover span{
+
+			display:block;
+
+			position:absolute;
+
+			float:left;
+
+			white-space:nowrap;
+
+			top:-2.2em;
+
+			left:.5em;
+
+			background:#f7ffc7;
+
+			border:1px solid #444;
+
+			color:#444;
+
+			padding:1px 5px;
+
+			z-index:10;	
+				
+			height:20px;
+
+			}			
+
+		
+
+	/* // goodnes  */
+
+
+
+/* // general */
+
+
+
+</style>

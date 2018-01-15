@@ -1,0 +1,130 @@
+2018-01-12 09:08:37 - DEBUG - In RecreateUserForwardFile, calling GenerateUserForwardFile(1)
+2018-01-12 09:12:59 - DEBUG - /domains/index.php...
+2018-01-12 09:12:59 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-01-12 09:15:47 - DEBUG - In RecreateUserForwardFile, calling GenerateUserForwardFile(7)
+2018-01-12 09:20:09 - DEBUG - In RecreateUserForwardFile, calling GenerateUserForwardFile(7)
+2018-01-12 09:25:35 - DEBUG - In RecreateUserForwardFile, calling GenerateUserForwardFile(7)
+2018-01-12 09:27:00 - DEBUG - /DoLogin.php -> CheckingLoginCredentials
+2018-01-12 09:27:18 - DEBUG - In RecreateUserForwardFile, calling GenerateUserForwardFile(7)
+2018-01-12 09:27:36 - DEBUG - In RecreateUserForwardFile, calling GenerateUserForwardFile(59)
+2018-01-12 09:28:33 - DEBUG - /DoLogin.php -> CheckingLoginCredentials
+2018-01-12 09:29:03 - DEBUG - /DoLogin.php -> CheckingLoginCredentials
+2018-01-12 09:29:03 - DEBUG - /DoLogin.php -> Log in suceeded, redirecting to /domains/index.php
+2018-01-12 09:29:03 - DEBUG - /domains/index.php...
+2018-01-12 09:29:03 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-01-12 09:29:43 - DEBUG - In RecreateUserForwardFile, calling GenerateUserForwardFile(7)
+2018-01-12 09:30:07 - DEBUG - In RecreateUserForwardFile, calling GenerateUserForwardFile(7)
+2018-01-12 09:32:02 - DEBUG - In RecreateUserForwardFile, calling GenerateUserForwardFile(7)
+2018-01-12 09:32:46 - DEBUG - /DoLogin.php -> CheckingLoginCredentials
+2018-01-12 09:51:29 - DEBUG - In RecreateUserForwardFile, calling GenerateUserForwardFile(59)
+2018-01-12 09:51:42 - DEBUG - In RecreateUserForwardFile, calling GenerateUserForwardFile(59)
+2018-01-12 09:53:34 - DEBUG - In RecreateUserForwardFile, calling GenerateUserForwardFile(7)
+2018-01-12 09:53:43 - DEBUG - In RecreateUserForwardFile, calling GenerateUserForwardFile(7)
+2018-01-12 09:55:02 - DEBUG - In RecreateUserForwardFile, calling GenerateUserForwardFile(7)
+2018-01-12 09:55:13 - DEBUG - In RecreateUserForwardFile, calling GenerateUserForwardFile(7)
+2018-01-12 09:56:46 - DEBUG - In RecreateUserForwardFile, calling GenerateUserForwardFile(7)
+2018-01-12 10:00:35 - DEBUG - In RecreateUserForwardFile, calling GenerateUserForwardFile(7)
+2018-01-12 10:00:44 - DEBUG - In RecreateUserForwardFile, calling GenerateUserForwardFile(7)
+2018-01-12 10:11:55 - ERROR - /class.Email.php -> AddSpamSubjectModifier(); Error = exception 'PDOException' with message 'SQLSTATE[HY000]: General error: 2053 ' in /var/www/html/webcp/includes/classes/class.Email.php:626
+Stack trace:
+#0 /var/www/html/webcp/includes/classes/class.Email.php(626): PDOStatement->fetch(2)
+#1 /var/www/html/webcp/includes/classes/class.Email.php(582): Email->AddSpamSubjectModifier('it@rftags.co.za', '7', '***spam**eee')
+#2 /var/www/html/webcp/emails/spamassassin/DoAddSpamAssassin.php(73): Email->AddSpamAssassin('7', 'it@rftags.co.za', '47', '57', '***spam**eee')
+#3 {main}
+2018-01-12 10:15:50 - ERROR - /class.Email.php -> DeleteSpamAssassin(); Error = exception 'PDOException' with message 'SQLSTATE[HY093]: Invalid parameter number' in /var/www/html/webcp/includes/classes/class.Email.php:718
+Stack trace:
+#0 /var/www/html/webcp/includes/classes/class.Email.php(718): PDOStatement->execute()
+#1 /var/www/html/webcp/emails/spamassassin/DoAddSpamAssassin.php(71): Email->DeleteSpamAssassin('59', 'email', 'it@rftags.co.za')
+#2 {main}
+2018-01-12 10:15:50 - ERROR - /class.Email.php -> AddSpamSubjectModifier(); Error = exception 'PDOException' with message 'SQLSTATE[HY000]: General error: 2053 ' in /var/www/html/webcp/includes/classes/class.Email.php:626
+Stack trace:
+#0 /var/www/html/webcp/includes/classes/class.Email.php(626): PDOStatement->fetch(2)
+#1 /var/www/html/webcp/includes/classes/class.Email.php(582): Email->AddSpamSubjectModifier('it@rftags.co.za', '7', '***spam***sdfsd...')
+#2 /var/www/html/webcp/emails/spamassassin/DoAddSpamAssassin.php(73): Email->AddSpamAssassin('7', 'it@rftags.co.za', '89', '85', '***spam***sdfsd...')
+#3 {main}
+2018-01-12 10:16:11 - ERROR - /class.Email.php -> DeleteSpamAssassin(); Error = exception 'PDOException' with message 'SQLSTATE[HY093]: Invalid parameter number' in /var/www/html/webcp/includes/classes/class.Email.php:718
+Stack trace:
+#0 /var/www/html/webcp/includes/classes/class.Email.php(718): PDOStatement->execute()
+#1 /var/www/html/webcp/emails/spamassassin/DoAddSpamAssassin.php(71): Email->DeleteSpamAssassin('59', 'email', 'it@rftags.co.za')
+#2 {main}
+2018-01-12 10:16:11 - ERROR - /class.Email.php -> AddSpamSubjectModifier(); Error = exception 'PDOException' with message 'SQLSTATE[HY000]: General error: 2053 ' in /var/www/html/webcp/includes/classes/class.Email.php:626
+Stack trace:
+#0 /var/www/html/webcp/includes/classes/class.Email.php(626): PDOStatement->fetch(2)
+#1 /var/www/html/webcp/includes/classes/class.Email.php(582): Email->AddSpamSubjectModifier('it@rftags.co.za', '7', '***spam***wfwef...')
+#2 /var/www/html/webcp/emails/spamassassin/DoAddSpamAssassin.php(73): Email->AddSpamAssassin('7', 'it@rftags.co.za', '75', '53', '***spam***wfwef...')
+#3 {main}
+2018-01-12 10:21:18 - ERROR - /class.Email.php -> DeleteSpamAssassin(); Error = exception 'PDOException' with message 'SQLSTATE[HY093]: Invalid parameter number' in /var/www/html/webcp/includes/classes/class.Email.php:718
+Stack trace:
+#0 /var/www/html/webcp/includes/classes/class.Email.php(718): PDOStatement->execute()
+#1 /var/www/html/webcp/emails/spamassassin/DoAddSpamAssassin.php(71): Email->DeleteSpamAssassin('59', 'email', 'it@rftags.co.za')
+#2 {main}
+2018-01-12 10:21:18 - ERROR - /class.Email.php -> AddSpamSubjectModifier(); Error = exception 'PDOException' with message 'SQLSTATE[HY000]: General error: 2053 ' in /var/www/html/webcp/includes/classes/class.Email.php:626
+Stack trace:
+#0 /var/www/html/webcp/includes/classes/class.Email.php(626): PDOStatement->fetch(2)
+#1 /var/www/html/webcp/includes/classes/class.Email.php(582): Email->AddSpamSubjectModifier('it@rftags.co.za', '7', '***spam***')
+#2 /var/www/html/webcp/emails/spamassassin/DoAddSpamAssassin.php(73): Email->AddSpamAssassin('7', 'it@rftags.co.za', '78', '36', '***spam***')
+#3 {main}
+2018-01-12 10:23:10 - ERROR - /class.Email.php -> AddSpamSubjectModifier(); Error = exception 'PDOException' with message 'SQLSTATE[HY000]: General error: 2053 ' in /var/www/html/webcp/includes/classes/class.Email.php:626
+Stack trace:
+#0 /var/www/html/webcp/includes/classes/class.Email.php(626): PDOStatement->fetch(2)
+#1 /var/www/html/webcp/includes/classes/class.Email.php(582): Email->AddSpamSubjectModifier('it@rftags.co.za', '7', '***spam**sdfsdf...')
+#2 /var/www/html/webcp/emails/spamassassin/DoAddSpamAssassin.php(73): Email->AddSpamAssassin('7', 'it@rftags.co.za', '96', '98', '***spam**sdfsdf...')
+#3 {main}
+2018-01-12 10:30:04 - DEBUG - /DoLogin.php -> CheckingLoginCredentials
+2018-01-12 10:30:04 - DEBUG - /DoLogin.php -> Log in suceeded, redirecting to /domains/index.php
+2018-01-12 10:30:05 - DEBUG - /domains/index.php...
+2018-01-12 10:30:05 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-01-12 11:05:06 - DEBUG - /domains/index.php...
+2018-01-12 11:05:06 - DEBUG - /domains/index.php -> client_id not set, redirecting to /index.php
+2018-01-12 11:05:16 - DEBUG - /DoLogin.php -> CheckingLoginCredentials
+2018-01-12 11:05:16 - DEBUG - /DoLogin.php -> Log in suceeded, redirecting to /domains/index.php
+2018-01-12 11:05:16 - DEBUG - /domains/index.php...
+2018-01-12 11:05:16 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-01-12 11:15:18 - DEBUG - In RecreateUserForwardFile, calling GenerateUserForwardFile(7)
+2018-01-12 11:17:37 - DEBUG - /DoLogin.php -> CheckingLoginCredentials
+2018-01-12 12:00:36 - DEBUG - /DoLogin.php -> CheckingLoginCredentials
+2018-01-12 12:00:36 - DEBUG - /DoLogin.php -> Log in suceeded, redirecting to /domains/index.php
+2018-01-12 12:00:37 - DEBUG - /domains/index.php...
+2018-01-12 12:00:37 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-01-12 12:04:51 - DEBUG - /DoLogin.php -> CheckingLoginCredentials
+2018-01-12 12:09:30 - ERROR - /class.Email.php -> GetUserBlackWhiteList(); Error = exception 'PDOException' with message 'SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '@rftags.co.za AND deleted = 0' at line 1' in /var/www/html/webcp/includes/classes/class.Email.php:547
+Stack trace:
+#0 /var/www/html/webcp/includes/classes/class.Email.php(547): PDO->prepare('SELECT * FROM e...')
+#1 /var/www/html/webcp/emails/whitelist/index.php(299): Email->GetUserBlackWhiteList(Array, 0, '59', 'email', 'white')
+#2 {main}
+2018-01-12 12:09:30 - ERROR - /class.Email.php -> GetUserBlackWhiteList(); Error = exception 'PDOException' with message 'SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '@rftags.co.za AND deleted = 0' at line 1' in /var/www/html/webcp/includes/classes/class.Email.php:547
+Stack trace:
+#0 /var/www/html/webcp/includes/classes/class.Email.php(547): PDO->prepare('SELECT * FROM e...')
+#1 /var/www/html/webcp/emails/blacklist/index.php(296): Email->GetUserBlackWhiteList(Array, 0, '59', 'email', 'black')
+#2 {main}
+2018-01-12 12:43:50 - DEBUG - In RecreateUserForwardFile, calling GenerateUserForwardFile(-1)
+2018-01-12 12:54:12 - DEBUG - In RecreateUserForwardFile, calling GenerateUserForwardFile(59)
+2018-01-12 13:07:21 - DEBUG - In RecreateUserForwardFile, calling GenerateUserForwardFile(-1)
+2018-01-12 13:10:19 - DEBUG - In RecreateUserForwardFile, calling GenerateUserForwardFile(7)
+2018-01-12 13:11:55 - DEBUG - In RecreateUserForwardFile, calling GenerateUserForwardFile(7)
+2018-01-12 13:12:00 - DEBUG - In RecreateUserForwardFile, calling GenerateUserForwardFile(7)
+2018-01-12 13:12:08 - DEBUG - In RecreateUserForwardFile, calling GenerateUserForwardFile(7)
+2018-01-12 13:24:02 - DEBUG - In RecreateUserForwardFile, calling GenerateUserForwardFile(7)
+2018-01-12 13:25:40 - DEBUG - In RecreateUserForwardFile, calling GenerateUserForwardFile(7)
+2018-01-12 13:26:27 - DEBUG - In RecreateUserForwardFile, calling GenerateUserForwardFile(7)
+2018-01-12 13:27:35 - DEBUG - In RecreateUserForwardFile, calling GenerateUserForwardFile(7)
+2018-01-12 13:29:18 - DEBUG - /DoLogin.php -> CheckingLoginCredentials
+2018-01-12 13:29:18 - DEBUG - /DoLogin.php -> Log in suceeded, redirecting to /domains/index.php
+2018-01-12 13:29:18 - DEBUG - /domains/index.php...
+2018-01-12 13:29:18 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-01-12 13:31:40 - DEBUG - In RecreateUserForwardFile, calling GenerateUserForwardFile(-1)
+2018-01-12 16:04:54 - DEBUG - /DoLogin.php -> CheckingLoginCredentials
+2018-01-12 16:04:54 - DEBUG - /DoLogin.php -> Log in suceeded, redirecting to /domains/index.php
+2018-01-12 16:04:55 - DEBUG - /domains/index.php...
+2018-01-12 16:04:55 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-01-12 19:17:14 - DEBUG - /domains/index.php -> client_id not set, redirecting to /index.php
+2018-01-12 19:17:25 - DEBUG - /DoLogin.php -> CheckingLoginCredentials
+2018-01-12 19:17:55 - ERROR - /class.Email.php -> AddSpamSubjectModifier(); Error = exception 'PDOException' with message 'SQLSTATE[HY000]: General error: 2053 ' in /var/www/html/webcp/includes/classes/class.Email.php:655
+Stack trace:
+#0 /var/www/html/webcp/includes/classes/class.Email.php(655): PDOStatement->fetch(2)
+#1 /var/www/html/webcp/includes/classes/class.Email.php(611): Email->AddSpamSubjectModifier('it@rftags.co.za', '7', '***spam***')
+#2 /var/www/html/webcp/emails/spamassassin/DoAddSpamAssassin.php(73): Email->AddSpamAssassin('7', 'it@rftags.co.za', '40', '38', '***spam***')
+#3 {main}
+2018-01-13 00:01:54 - DEBUG - /DoLogin.php -> CheckingLoginCredentials
+2018-01-15 16:41:10 - DEBUG - /DoLogin.php -> CheckingLoginCredentials
+2018-01-15 16:41:10 - DEBUG - /DoLogin.php -> Log in suceeded, redirecting to /domains/index.php

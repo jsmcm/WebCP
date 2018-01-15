@@ -1,0 +1,32 @@
+<html>
+<head>
+<style type="text/css">
+a
+{
+  color: #2581C4;
+  font-weight: bold;
+  font-size: 15px;
+  text-decoration: none;
+}
+</style>
+<title>Web Hosting Account</title>
+</head>
+<body style="margin: 0px;color: white;">
+
+<table width="100%" height="100%" cellpadding="0" cellspacing="0">
+<tr>
+<td align="center" valign="top" bgcolor="#2581C4">
+<p style="font-size:48px; font-weight: bold;">New home of <?php print $_SERVER["SERVER_NAME"]; ?>
+<p style="font-size:22px;">
+This domain was registered by a web hosting client.
+<br>
+Please check back here soon to see when they've uploaded their content.
+</p>
+</td>
+</tr>
+
+</table>
+
+</body>
+</html>
+

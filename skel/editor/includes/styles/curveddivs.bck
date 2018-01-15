@@ -1,0 +1,12 @@
+#xlekker {background: transparent; margin:10px 1em 10px 0em;}
+
+.xtop, .xbottom {display:block; background:transparent; font-size:1px;}
+.xb1, .xb2, .xb3, .xb4 {display:block; overflow:hidden;}
+.xb1, .xb2, .xb3 {height:1px;}
+.xb2, .xb3, .xb4 {background:#fff; border-left:1px solid #b5da7e; border-right:1px solid #b5da7e;}
+.xb1 {margin:0 5px; background:#b5da7e;}
+.xb2 {margin:0 3px; border-width:0 2px;background:#dbfaac;}
+.xb3 {margin:0 2px;background:#dbfaac;}
+.xb4 {height:2px; margin:0 1px;background:#dbfaac;}
+
+.xboxcontent {display:block; background:#dbfaac; border:0 solid #b5da7e; border-width:0 1px;}

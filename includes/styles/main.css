@@ -1,0 +1,104 @@
+input[type="text"], input[type="password"], textarea, select { 
+    outline: none;
+}
+
+* {
+	border:none; 
+	margin:0; 
+	padding:0;
+}
+
+body {
+	color: #000; 
+	font:12.35px Verdana, sans-serif;
+}
+
+a:link. a:visited {
+	color:#0054a6;
+	text-decoration:none; 
+}
+
+a:hover {
+	text-decoration:underline
+}
+
+h1 {
+	font-size:20px;
+	margin-bottom:20px; 
+}
+
+#wrap {
+	margin:20px 100px;
+	width:900px; 
+}
+
+p {
+	margin:15px 0;
+}
+
+#header {
+	margin-bottom:20px;
+}
+
+label {
+	display:block; 
+	padding-bottom:5px; 
+	margin-top:10px;
+	font-size:13px;
+}
+
+#contactform {
+	width:900px; 
+	overflow:hidden;
+}
+
+#contactform li {
+	list-style:none; 
+	padding-bottom:20px;
+}
+
+#contactform li .fieldbox {
+	background:transparent url(/img/subfield.jpg) no-repeat top left; 
+	float:left; 
+	height:27px; 
+	padding-left:5px;
+}
+
+#contactform li .fieldbox select {
+	background:transparent url(/img/subfield.jpg) no-repeat top right; 
+	height:27px; 
+	padding-top:1px;
+	width:400px;
+}
+#contactform li .fieldbox input {
+	background:transparent url(/img/subfield.jpg) no-repeat top right; 
+	height:27px; 
+	padding-top:1px;
+	width:400px;
+}
+
+#contactform li .fieldbox #contact {
+	width:200px;
+}
+
+#contactform li .msgbox {
+	background:transparent url(/img/msgfield.jpg) no-repeat top left; 
+	float:left; 
+	height:110px; 
+	padding-left:5px;
+}
+
+#contactform li .msgbox textarea {
+	background:transparent url(/img/msgfield.jpg) no-repeat top right; 
+	height:110px;
+	padding-top:5px;
+	width:500px;	 
+}
+
+#button {
+	background:#acb4cb; color:#fff; 
+	cursor:pointer;
+	padding:5px 20px; 
+	-moz-border-radius:4px;
+	-webkit-border-radius:4px
+}
