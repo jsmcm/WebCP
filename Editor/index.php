@@ -10,6 +10,7 @@ $oUser = new User();
 $oPackage = new Package();
 $oSettings = new Settings();
 $oLog = new Log();
+$oSimpleNonce = new SimpleNonce();
 
 require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 
@@ -218,16 +219,22 @@ if($ClientID < 1)
 										for($x = 0; $x < $ArrayCount; $x++)
 										{
 
-											if($Array[$x]["type"] == 'primary')
-											{
-											 	print "<tr>";
+											$Action = "logInEditor";
+											$Meta = array();
+											array_push($Meta, $_SERVER["SERVER_ADDR"]);
+											array_push($Meta, $Array[$x]["domain_name"]);
+		
+											$NonceValues = $oSimpleNonce->GenerateNonce($Action, $Meta);
 
-												print "<form action=\"http://".$Array[$x]["domain_name"].":20010/login.php\" method=\"post\" target=\"_new\">";
-												print "<input type=\"hidden\" name=\"ServerName\" value=\"".$Array[$x]["domain_name"]."\">";
-												print "<td><input style=\"background:transparent; color:#4D81CC; border: 0;\" type=\"submit\" value=\"".$Array[$x]["domain_name"]."\"></td>\r\n";
-														print "</form>";
-												print "</tr>";
-											}
+
+											
+                                                                                        if($Array[$x]["type"] == 'primary')
+                                                                                        {
+                                                                                                print "<tr>";
+
+                                                                                                print "<td><a target=\"_blank\" href=\"http://".$Array[$x]["domain_name"].":20010/login.php?Nonce=".$NonceValues["Nonce"]."&TimeStamp=".$NonceValues["TimeStamp"]."\" style=\"background:transparent; color:#4D81CC; border: 0;\">".$Array[$x]["domain_name"]."</a></td>\r\n";
+                                                                                                print "</tr>";
+                                                                                        }
 										}
 										?>
 	

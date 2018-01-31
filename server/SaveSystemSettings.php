@@ -19,13 +19,13 @@ $oUtils = new Utils();
 $ClientID = $oUser->getClientId();
 if($ClientID < 1)
 {
-	header("Location: /index.php");
+	header("Location: /index.php?1");
 	exit();
 }
 
 if($oUser->Role != "admin")
 {
-        header("Location: /index.php");
+        header("Location: /index.php?2");
         exit();
 }
 

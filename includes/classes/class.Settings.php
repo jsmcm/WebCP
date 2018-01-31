@@ -346,9 +346,11 @@ class Settings
 
 
 	function SetServerTrafficAllowance($Gb)
-	{
+	{		
+
 		if(! is_numeric($Gb))
 		{
+			print "Rturing<p>";
 			return 0;
 		}
 
@@ -800,14 +802,14 @@ class Settings
 
 			foreach($value as $IndexValue)
 			{
-					
 				try
 				{
 				
-					$query = $this->DatabaseConnection->prepare("INSERT INTO server_settings VALUES (0, :key, :index_value '', '', 0)");
+					$query = $this->DatabaseConnection->prepare("INSERT INTO server_settings VALUES (0, :key, :index_value, '', '', 0)");
 					$query->bindParam(":key",  $key);
 					$query->bindParam(":index_value",  $IndexValue);
-					
+			
+
 					$query->execute();
 					
 					if( $this->DatabaseConnection->lastInsertId() > 0 )

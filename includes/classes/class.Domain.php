@@ -1383,7 +1383,7 @@ class Domain
 					$DomainArray[$ArrayCount]["PackageID"] = $result["package_id"];
 					$DomainArray[$ArrayCount]["Suspended"] = $result["suspended"];
 					$DomainArray[$ArrayCount]["ParentDomainID"] = $result["parent_domain_id"];
-					$DomainArray[$ArrayCount]["ParentDomain"] = $result>GetDomainNameFromDomainID($result["parent_domain_id"]);
+					$DomainArray[$ArrayCount]["ParentDomain"] = $this->GetDomainNameFromDomainID($result["parent_domain_id"]);
 					$DomainArray[$ArrayCount]["AncestorDomainID"] = $result["ancestor_domain_id"];
 					$DomainArray[$ArrayCount]["AncestorDomain"] = $this->GetDomainNameFromDomainID($result["ancestor_domain_id"]);
 					$DomainArray[$ArrayCount++]["type"] = $result["domain_type"];
@@ -1849,7 +1849,9 @@ class Domain
 		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
 		$TempUser = new User();
 
-		$TempUser->GetUserDetails($ClientID, $FirstName, $Surname, $EmailAddress, $AccountUsername);
+		$UserRole = "";
+
+		$TempUser->GetUserDetails($ClientID, $FirstName, $Surname, $EmailAddress, $AccountUsername, $UserRole);
 		
 		$AncestorID = $this->GetParentDomainIDRecursive($PrimaryDomainID);
 
@@ -1987,7 +1989,8 @@ class Domain
 		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
 		$TempUser = new User();
 
-		$TempUser->GetUserDetails($ClientID, $FirstName, $Surname, $EmailAddress, $AccountUsername);
+		$Role = "";
+		$TempUser->GetUserDetails($ClientID, $FirstName, $Surname, $EmailAddress, $AccountUsername, $Role);
 		
 		$NextUID = $this->GetNextUID();
 		$UserName = $this->CreateUserName($DomainName);

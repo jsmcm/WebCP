@@ -41,11 +41,11 @@ function UserNameBelongsToLoggedInUser($UserName, $Role, $ClientID)
 
 		if($Role == "reseller")
 		{
-			$query = $this->DatabaseConnection->prepare("SELECT id FROM domains WHERE UserName = :user_name AND deleted = 0 AND client_id IN (SELECT client_id FROM reseller_relationships WHERE deleted = 0 AND reseller_id = :client_id UNION SELECT ".$ClientID." AS client_id");
+			$query = $DatabaseConnection->prepare("SELECT id FROM domains WHERE UserName = :user_name AND deleted = 0 AND client_id IN (SELECT client_id FROM reseller_relationships WHERE deleted = 0 AND reseller_id = :client_id UNION SELECT ".$ClientID." AS client_id");
 		}
 		else
 		{
-			$query = $this->DatabaseConnection->prepare("SELECT id FROM domains WHERE UserName = :user_name AND deleted = 0 AND client_id = :client_id");
+			$query = $DatabaseConnection->prepare("SELECT id FROM domains WHERE UserName = :user_name AND deleted = 0 AND client_id = :client_id");
 		}
 
 	

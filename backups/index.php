@@ -272,7 +272,8 @@ $Role = $oUser->Role;
       					
 
 					print "<td>".$oDomain->GetDomainName(substr($file, 0, strpos($file, "_")))."</td>";	
-					print "<td>".$oUtils->ConvertFromBytes(filesize($_SERVER["DOCUMENT_ROOT"]."/backups/adhoc/".$file))."</td>";	
+					$fileSize = filesize($_SERVER["DOCUMENT_ROOT"]."/backups/adhoc/".$file); 
+					print "<td>".$oUtils->ConvertFromBytes($fileSize)."</td>";	
 
 
 
@@ -362,11 +363,6 @@ $Role = $oUser->Role;
 												if($DomainArray[$x]["type"] == "primary")
 												{
 													print "<option value=\"".$DomainArray[$x]["id"]."\"";
-		
-													if($DomainID == $DomainArray[$x]["id"])
-													{
-														print " selected ";
-													}
 		
 													print ">".$DomainArray[$x]["domain_name"]."</option>";
 												}

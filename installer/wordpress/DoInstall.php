@@ -72,6 +72,7 @@ $WP_MySQLAllowance = $oPackage->GetPackageAllowance("MySQL", $WP_PackageID);
 
 $WP_DomainName = $DomainInfoArray["DomainName"];
 
+
 /*
 print "WP_DomainUserName: ".$WP_DomainUserName."<br>";
 print "WP_Path: ".$WP_Path."<br>";
@@ -92,7 +93,7 @@ if( ($WP_MySQLAllowance - $WP_MySQLUsage) > 0)
 
 	$TmpFile = $_SERVER["DOCUMENT_ROOT"]."/nm/".date("YmdHis")."_".generatePassword(5,0).".wp";
 
-	/*	
+	/*
 	print "ClientID: ".$WP_ClientID."<br>";	
 	print "DomainID: ".$DomainID."<br>";	
 	print "password = ".$WP_Password."<br>";
@@ -103,7 +104,7 @@ if( ($WP_MySQLAllowance - $WP_MySQLUsage) > 0)
 	print "Domain UserName: ".$WP_DomainUserName."<br>";
 	print "Path: ".$WP_Path."<br>";
 	print "PackageID: ".$WP_PackageID."<p>";
-	exit();
+	print "TmpFile: ".$TmpFile."<p>";
 	*/
 	
 	$oMySQL->AddMySQL($DomainID, $WP_DatabaseName, $WP_DomainUserName."_".$WP_DatabaseUserName, $WP_Password, $WP_ClientID, $WP_PackageID);
@@ -117,7 +118,7 @@ if( ($WP_MySQLAllowance - $WP_MySQLUsage) > 0)
 	fclose($f);
 
 	//print $TmpFile."<br>written<p>";
-	//exit();
+	
 
 	//print "Entering long sleep<br>";
 	sleep(7);
@@ -143,6 +144,8 @@ if( ($WP_MySQLAllowance - $WP_MySQLUsage) > 0)
 	}
 
 	unlink($TmpFile);	
+
+
 	header("Location: http://".$WP_DomainName);
 
 }

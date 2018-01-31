@@ -21,6 +21,8 @@ $oUser = new User();
 $oSettings = new Settings();
 
 $ClientID = $oUser->getClientId();
+$Role = $oUser->Role;
+
 if( $_SERVER["REMOTE_ADDR"] != $_SERVER["SERVER_ADDR"])
 {
 	if($ClientID < 1)
@@ -82,7 +84,8 @@ $oPackage = new Package();
 
 $PackageSettingValues = array();
 $ArrayCount = 0;
-$oPackage->GetPackageDetails($DomainArray["PackageID"], $PackageSettingValues, $ArrayCount);
+
+$oPackage->GetPackageDetails($DomainArray["PackageID"], $PackageSettingValues, $ArrayCount, $Role, $ClientID);
 
 $PackageXML = $XMLContent->addChild("Package");
 foreach($PackageSettingValues as $key=>$val)

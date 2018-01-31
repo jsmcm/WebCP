@@ -80,7 +80,8 @@ else
 	else
 	{
 		// If we're here, the login failed. Write it to a failed log so that it can be picked up by fail2ban
-		$Log = fopen($_SERVER["DOCUMENT_ROOT"]."/failedlog", 'a');
+
+		$Log = fopen("/var/log/webcp/failedlog", 'a');
 			fwrite($Log, date("Y-m-d H:i:s")." - Failed Login Attempt - IP Address = ".$_SERVER["REMOTE_ADDR"]."\r\n");
 		fclose($Log);
 

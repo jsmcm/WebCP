@@ -13,8 +13,8 @@ $oSettings = new Settings();
 $oPackage = new Package();
 $oUtils = new Utils();
 
-$ClientID = $oUser->getClientId();
-if($ClientID < 1)
+$UserID = $oUser->getClientId();
+if($UserID < 1)
 {
 	header("Location: /index.php");
 	exit();
@@ -25,7 +25,7 @@ if($oUser->Role != "admin")
 	exit();
 }
 
-
+$oReseller->deleteOldResellers();
 
 ?>
 
@@ -237,7 +237,7 @@ if($oUser->Role != "admin")
 	$Array = array();
 	$ArrayCount = 0;
 
-        $oReseller->GetResellerList($Array, $ArrayCount, $ClientID, $oUser->Role);
+        $oReseller->GetResellerList($Array, $ArrayCount, $UserID, $oUser->Role);
 
         for($x = 0; $x < $ArrayCount; $x++)
         {
@@ -271,7 +271,7 @@ if($oUser->Role != "admin")
                 print "<td class=\"center\">";
                 print "<div class=\"visible-md visible-lg hidden-sm hidden-xs\">";
 
-                print "<a href=\"EditReseller.php?ResellerID=".$Array[$x]["ClientID"]."\" class=\"btn btn-green tooltips\" data-placement=\"top\" data-original-title=\"Edit Reseller\"><i class=\"fa fa-edit fa fa-white\" style=\"color:white;\"></i></a>\n";
+                print "<a href=\"EditReseller.php?ResellerID=".$Array[$x]["UserID"]."\" class=\"btn btn-green tooltips\" data-placement=\"top\" data-original-title=\"Edit Reseller\"><i class=\"fa fa-edit fa fa-white\" style=\"color:white;\"></i></a>\n";
                                   
 
                         print "</div>";
@@ -284,7 +284,7 @@ if($oUser->Role != "admin")
 
                         print "<ul role=\"menu\" class=\"dropdown-menu pull-right\">";
                         print "<li role=\"presentation\">";
-                        print "<a role=\"menuitem\" tabindex=\"-1\" href=\"EditReseller.php?ResellerID=".$Array[$x]["ClientID"]."\">";
+                        print "<a role=\"menuitem\" tabindex=\"-1\" href=\"EditReseller.php?ResellerID=".$Array[$x]["UserID"]."\">";
                         print "<i class=\"fa fa-edit\"></i> Edit Reseller";
                         print "</a>";
                         print "</li>";

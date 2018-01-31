@@ -84,7 +84,7 @@ class Firewall
 		}
 
 
-                
+		$deleteArray = array();                
 		$ArrayCount = 0;
 		
 		try
@@ -115,6 +115,15 @@ class Firewall
 				$differenceInSeconds = $timeSecond - $timeFirst;
 
 				$TimeLeft = $result["timeout"] - $differenceInSeconds;
+
+
+				// sometimes we end up with records in the DB but they were (manually) removed from csf
+				// here we'll catch those IDs and delete them later...
+				if( $TimeLeft < 1 )
+				{
+					array_push($deleteArray, $result["id"]);
+					continue;
+				}
 
 				$BanArray[$ArrayCount]["TimeLeft"] = $TimeLeft;
 
@@ -176,9 +185,30 @@ class Firewall
 		}
 
 	
+		$this->deleteRecords($deleteArray);
 
         }
 
+	function deleteRecords($idArray)
+	{
+		if( is_array($idArray) && !empty($idArray) ) 
+		{
+			try
+			{
+			
+				$query = $this->DatabaseConnection->prepare("DELETE FROM csf WHERE id in (".implode(",", $idArray).")");
+				$query->execute();
+		
+	
+			}
+			catch(PDOException $e)
+			{
+				$oLog = new Log();
+				$oLog->WriteLog("error", "/class.Firewall.php -> deleteRecords(); Error = ".$e);
+			}
+		}
+	
+	}
 
 	function ManualBan($IP)
 	{

@@ -48,7 +48,7 @@ class MySQL
 	
 		try
 		{
-			$pdo_query = $this->DatabaseConnection->prepare("UPDATE user SET password=PASSWORD(\"".$Pwd."\") where User='".$Uname."';");
+			$pdo_query = $this->DatabaseConnection->prepare("UPDATE mysql.user SET password=PASSWORD(\"".$Pwd."\") where User='".$Uname."';");
 			
 			$pdo_query->execute();
 	
@@ -453,8 +453,9 @@ class MySQL
 	
 		try
 		{
-			$pdo_query = $this->DatabaseConnection->prepare("GRANT USAGE ON *.* TO  '".trim($Username)."'@'".trim($Host)."' IDENTIFIED BY  '".mysql_real_escape_string($Password)."' WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0 ;");
+			$pdo_query = $this->DatabaseConnection->prepare("GRANT USAGE ON *.* TO  '".trim($Username)."'@'".trim($Host)."' IDENTIFIED BY :password WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0 ;");
 			
+			$pdo_query->bindParam(":password", $Password);
 			$pdo_query->execute();
 	
 		}
@@ -543,8 +544,13 @@ class MySQL
 
 		try
 		{
-			$pdo_query = $this->DatabaseConnection->prepare("INSERT INTO mysql VALUES (0, ".$ClientID.", '".$DomainUserName."', '".$Username."', '".$cpDatabaseName."', '".mysql_real_escape_string($Password)."', '".date("Y-m-d H:i:s")."', 0);");
-			
+			$pdo_query = $this->DatabaseConnection->prepare("INSERT INTO mysql VALUES (0, :client_id, :domain_username, :username, :database_name, :password, '".date("Y-m-d H:i:s")."', 0);");
+			$pdo_query->bindParam(":client_id", $ClientID);
+			$pdo_query->bindParam(":domain_username", $DomainUserName);
+			$pdo_query->bindParam(":username", $Username);
+			$pdo_query->bindParam(":database_name", $cpDatabaseName);
+			$pdo_query->bindParam(":password", $Password);
+
 			$pdo_query->execute();
 	
 		}

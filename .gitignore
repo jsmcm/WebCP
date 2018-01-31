@@ -2,3 +2,6 @@ includes/license.txt
 includes/license.conf
 includes/country.txt
 includes/Variables.inc.php
+includes/cron/tmp/*
+tmp/*
+backups/adhoc/

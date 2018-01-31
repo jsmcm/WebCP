@@ -20,6 +20,19 @@ class Reseller
           	$this->DatabaseConnection = $this->oDatabase->GetConnection();
      	}
 
+        function deleteOldResellers()
+        {
+                try
+                {
+                        $query = $this->DatabaseConnection->prepare("UPDATE reseller_settings SET deleted = 1 WHERE reseller_id NOT IN (SELECT id FROM admin WHERE role = 'reseller' AND deleted = 0)");
+                        $query->execute();
+                }
+                catch(PDOException $e)
+                {
+                        $oLog = new Log();
+                        $oLog->WriteLog("error", "/class.Reseller.php -> deleteOldResellers(); Error = ".$e);
+                }
+        }
 
 	
 	function GetResellerSettings($ResellerID, &$Array, &$ArrayCount, $UserID, $Role)

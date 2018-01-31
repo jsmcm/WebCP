@@ -1547,7 +1547,6 @@ class Email
 				$query->bindParam(":email_option", $EmailOption);
 				$query->bindParam(":option_value", $OptionValue);
 			
-				$query = ";";
 			}
 			else
 			{
@@ -1557,7 +1556,6 @@ class Email
 				$query->bindParam(":option_value", $OptionValue);
 				$query->bindParam(":domain_name", $DomainName);
 			
-				$query = ";";
 			}
 		
 			
@@ -1589,7 +1587,6 @@ class Email
 				$query = $this->DatabaseConnection->prepare("SELECT option_value FROM email_options WHERE extra1 is NULL AND option_name = :email_option AND deleted = 0");
 				$query->bindParam(":email_option", $EmailOption);
 			
-				$query = ";";
 			}
 			else
 			{
@@ -1600,7 +1597,6 @@ class Email
 				$query->bindParam(":domain_name", $DomainName);
 				$query->bindParam(":email_option", $EmailOption);
 			
-				$query = ";";
 			}
 		
 		

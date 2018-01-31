@@ -586,9 +586,10 @@ class User
 			}
 			else if($Role == 'reseller')
 			{
-				$query = $this->DatabaseConnection->prepare("SELECT * FROM admin WHERE id in (SELECT client_id FROM reseller_relationships WHERE reseller_id = :client_id AND deleted = 0 UNION SELECT :client_id AS client_id);");
+				$query = $this->DatabaseConnection->prepare("SELECT * FROM admin WHERE id in (SELECT client_id FROM reseller_relationships WHERE reseller_id = :client_id AND deleted = 0 UNION SELECT :client_id2 AS client_id);");
 
 				$query->bindParam(":client_id", $ClientID);
+				$query->bindParam(":client_id2", $ClientID);
 			}
 			else
 			{	
