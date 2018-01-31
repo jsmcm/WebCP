@@ -5,3 +5,4 @@ includes/Variables.inc.php
 includes/cron/tmp/*
 tmp/*
 backups/adhoc/
+server/tmp/*.*

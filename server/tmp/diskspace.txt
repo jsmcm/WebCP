@@ -1,2 +1,0 @@
-Filesystem           1B-blocks       Used    Available Use% Mounted on
-/dev/ploop54825p1 126690590720 8772476928 112640307200   8% /
