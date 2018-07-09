@@ -6,3 +6,6 @@ includes/cron/tmp/*
 tmp/*
 backups/adhoc/
 server/tmp/*.*
+quota/quota_files/
+quota/quota_files/*
+.ftpquota
