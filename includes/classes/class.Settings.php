@@ -11,14 +11,36 @@ include_once(dirname(__FILE__)."/class.Database.php");
 
 class Settings 
 {
-     	var $oDatabase = null;
-     	var $DatabaseConnection = null;
+    var $oDatabase = null;
+    var $DatabaseConnection = null;
 
-     	function __construct()
-     	{
-          	$this->oDatabase = new Database();
-          	$this->DatabaseConnection = $this->oDatabase->GetConnection();
-     	}
+    function __construct()
+    {
+
+	if (! file_exists($_SERVER["DOCUMENT_ROOT"]."/nm")) {
+            mkdir($_SERVER["DOCUMENT_ROOT"]."/nm");
+        }
+
+        try {
+
+            $this->oDatabase = new Database();
+            $this->DatabaseConnection = $this->oDatabase->GetConnection();
+
+     	} catch (Exception $e) {
+
+	    if ($e->getMessage() == "class.Database->getConnection Matomo\Ini not found") {
+		print "<h1>Missing dependencies</h1><p>I'm going to try and install them. This might take several minutes. Please wait 30 minutes then try again</p><p>If you've already waited 30 minutes and still see this please contact support@webcp.pw for support</p>";
+
+                touch($_SERVER["DOCUMENT_ROOT"]."/nm/composer_install");
+            } else {
+                print "<h1>Unknown Error</h1><p>Something bad happened and I can't continue. Please contact support@webcp.pw for support</p>";
+            }
+
+            exit();   		    
+		    
+        }  
+    }
+
 
         function GetLicenseKey()
         {
@@ -581,7 +603,7 @@ class Settings
 	
 			if($result = $query->fetch(PDO::FETCH_ASSOC))
 			{
-				return $line["value"];
+				return $result["value"];
 			}
 	
 		}
@@ -631,7 +653,7 @@ class Settings
 	
 			if($result = $query->fetch(PDO::FETCH_ASSOC))
 			{
-				return $line["value"];
+				return $result["value"];
 			}
 	
 		}
@@ -668,7 +690,7 @@ class Settings
 	
 			if($result = $query->fetch(PDO::FETCH_ASSOC))
 			{
-				return $line["value"];
+				return $result["value"];
 			}
 	
 		}
@@ -742,7 +764,7 @@ class Settings
 	
 			if($result = $query->fetch(PDO::FETCH_ASSOC))
 			{
-				return $line["value"];
+				return $result["value"];
 			}
 	
 		}

@@ -1,13 +1,13 @@
 <?php
 session_start();
 
-function __autoload($classname)
-{
-        require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.".$classname.".php");
-}
-
+require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
 $oUser = new User();
+
+require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Firewall.php");
 $oFirewall = new Firewall();
+
+require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Reseller.php");
 $oReseller = new Reseller();
 
 if(!file_exists($_SERVER["DOCUMENT_ROOT"]."/fail2ban/tmp"))

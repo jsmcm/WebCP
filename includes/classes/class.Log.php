@@ -74,15 +74,15 @@ class Log
 		if(file_exists($RunLog))
 		{
 			chmod($RunLog, 0755);
-			chown($RunLog, "apache");
-			chgrp($RunLog, "apache");
+			chown($RunLog, "www-data");
+			chgrp($RunLog, "www-data");
 		}
 
 		if(file_exists($CriticalLog))
 		{
 			chmod($CriticalLog, 0755);
-			chown($CriticalLog, "apache");
-			chgrp($CriticalLog, "apache");
+			chown($CriticalLog, "www-data");
+			chgrp($CriticalLog, "www-data");
 		}
 	}
 

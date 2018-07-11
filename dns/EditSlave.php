@@ -2,13 +2,14 @@
 
 session_start();
 
-function __autoload($classname)
-{
-	require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.".$classname.".php");
-}
-
+	
+require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
 $oUser = new User();
+	
+require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Utils.php");
 $oUtils = new Utils();
+	
+require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.DNS.php");
 $oDNS = new DNS();
 
 $ClientID = $oUser->getClientId();

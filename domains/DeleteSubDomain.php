@@ -1,12 +1,10 @@
 <?php
 session_start();
 
-function __autoload($classname)
-{
-        require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.".$classname.".php");
-}
-
+require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
 $oUser = new User();
+
+require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Reseller.php");
 $oReseller = new Reseller();
 
 $Role = $oUser->Role;
@@ -17,6 +15,7 @@ if($ClientID < 1)
         exit();
 }
 
+require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
 $oDomain = new Domain();
 $SubDomainOwnerClientID = $oDomain->GetDomainOwner($_REQUEST["SubDomainID"]);
 $DomainID = $oDomain->GetDomainIDFromSubDomainID($_REQUEST["SubDomainID"]);

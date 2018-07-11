@@ -1,19 +1,16 @@
 <?php
 session_start();
 
-function __autoload($classname)
-{
-        require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.".$classname.".php");
-}
-
+require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
 $oUser = new User();
+       
+require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Settings.php");
 $oSettings = new Settings();
 
 $ClientID = $oUser->getClientId();
-if($ClientID < 1)
-{
-        header("Location: /index.php");
-        exit();
+if ($ClientID < 1) {
+    header("Location: /index.php");
+    exit();
 }
 
 $UserID = "";
@@ -30,12 +27,19 @@ if(isset($_REQUEST["UserID"]))
         $Action = "update";
 
         $oUser->GetUserDetails($UserID, $FirstName, $Surname, $EmailAddress, $Username, $UserRole);
+
 }
 
 if( ($UserID == "") && ($oUser->Role == "client") )
 {
 	header("Location: ./index.php?Notes=You don't have permission to be there&NoteType=error");
 	exit();
+}
+
+
+if ($oUser->EmailAddress == "admin@admin.admin") {
+    $Action = "update";
+    $UserID = $ClientID;
 }
 
 ?>
@@ -383,6 +387,7 @@ function DoSubmit()
 									
 
 										<?php
+
 										if($oUser->Role == "admin")
 										{
 										?>
@@ -399,6 +404,11 @@ function DoSubmit()
 												if($UserRole == "")
 												{
 													$UserRole = "client";
+													if( $oUser->EmailAddress == "admin@admin.admin" && $oUser->Role == "admin")
+													{
+														$UserRole = "admin";
+													}
+															
 												}
 												?>
 

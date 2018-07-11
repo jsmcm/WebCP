@@ -1,11 +1,7 @@
 <?php
 error_reporting(E_ALL);
 
-function __autoload($classname)
-{
-        require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.".$classname.".php");
-}
-
+require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Firewall.php");
 $oFirewall = new Firewall();
 
 

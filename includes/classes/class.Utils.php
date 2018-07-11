@@ -3,14 +3,6 @@ class Utils
 {
 
 
-	function CreateDefaultVariables()
-	{
-		$Out = "<";
-		$Out = $Out ."?php\nglobal \$DatabaseName;\n\$DatabaseName = \"cpadmin\";\n\nglobal \$DatabaseUserName;\n\$DatabaseUserName = \"root\";\n\nglobal \$DatabasePassword;\n\$DatabasePassword = \"eEF43%^fHT\";\n\nglobal \$DatabaseHost;\n\$DatabaseHost = \"localhost\";\n?";
-		$Out = $Out.">\n";
-
-		file_put_contents($_SERVER["DOCUMENT_ROOT"]."/includes/Variables.inc.php", $Out);
-	}
 
 	function ValidateHash($Hash, $LicenseKey)
 	{
@@ -90,8 +82,8 @@ class Utils
 
 		//print "AccountsCreated: ".$AccountsCreated."<p>";
                 $options = array(
-                'uri' => 'http://webcp.pw/api',
-                'location' => 'http://webcp.pw/api/updates/check.php',
+                'uri' => 'http://api.webcp.pw/',
+                'location' => 'http://api.webcp.pw/updates/check.php',
                 'trace' => 1);
 
                 $client = new SoapClient(NULL, $options);

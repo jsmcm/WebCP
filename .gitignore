@@ -9,3 +9,8 @@ server/tmp/*.*
 quota/quota_files/
 quota/quota_files/*
 .ftpquota
+vendor/
+includes/protected/key.*
+includes/activation.dat
+logs/*
+backups/daily

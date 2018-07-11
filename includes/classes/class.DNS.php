@@ -1283,23 +1283,13 @@ class DNS
                 $this->GetSOAList($DomainArray, $ArrayCount, -1, 101);
 
 
-		$myfile = $_SERVER["DOCUMENT_ROOT"]."/nm/named.conf";
+		$myfile = $_SERVER["DOCUMENT_ROOT"]."/nm/named.conf.options";
 		$fh = fopen($myfile, 'w') or die ("cant open file");
 
-		fwrite($fh, "//\r\n");
-		fwrite($fh, "// named.conf\r\n");
-		fwrite($fh, "//\r\n");
-		fwrite($fh, "// Provided by Red Hat bind package to configure the ISC BIND named(8) DNS\r\n");
-		fwrite($fh, "// server as a caching only nameserver (as a localhost DNS resolver only).\r\n");
-		fwrite($fh, "//	\r\n");
-		fwrite($fh, "// See /usr/share/doc/bind*/sample/ for example named configuration files.\r\n");
-		fwrite($fh, "//\r\n");
-		fwrite($fh, "\r\n");
-		fwrite($fh, "\r\n");
-		fwrite($fh, "include \"/etc/rndc.key\";\r\n");
+		fwrite($fh, "//include \"/etc/rndc.key\";\r\n");
 		fwrite($fh, "controls {\r\n");
-		        fwrite($fh, "inet 127.0.0.1 allow {localhost; }\r\n");
-		        fwrite($fh, "keys {\"rndc-key\"; };\r\n");
+		        fwrite($fh, "inet 127.0.0.1 allow {localhost; };\r\n");
+		        fwrite($fh, "//keys {\"rndc-key\"; };\r\n");
 		fwrite($fh, "};\r\n");
 		fwrite($fh, "\r\n");
 		fwrite($fh, "options {\r\n");
@@ -1312,10 +1302,10 @@ class DNS
 			}
 			*/
 		
-		        fwrite($fh, "directory       \"/var/named\";\r\n");
-		        fwrite($fh, "dump-file       \"/var/named/data/cache_dump.db\";\r\n");
-		        fwrite($fh, "statistics-file \"/var/named/data/named_stats.txt\";\r\n");
-		        fwrite($fh, "memstatistics-file \"/var/named/data/named_mem_stats.txt\";\r\n");
+		        fwrite($fh, "directory       \"/var/cache/bind\";\r\n");
+		        fwrite($fh, "dump-file       \"/var/cache/bind/data/cache_dump.db\";\r\n");
+		        fwrite($fh, "statistics-file \"/var/cache/bind/data/named_stats.txt\";\r\n");
+		        fwrite($fh, "memstatistics-file \"/var/cache/bind/data/named_mem_stats.txt\";\r\n");
 		        
 			fwrite($fh, "//allow-query     { localhost; };\r\n");
 		        fwrite($fh, "recursion no;\r\n");
@@ -1350,14 +1340,14 @@ class DNS
 		        //fwrite($fh, "/* Path to ISC DLV key */\r\n");
 		        //fwrite($fh, "bindkeys-file \"/etc/named.iscdlv.key\";\r\n");
 		fwrite($fh, "\r\n");
-		        //fwrite($fh, "managed-keys-directory \"/var/named/dynamic\";\r\n");
+		        //fwrite($fh, "managed-keys-directory \"/var/cache/bind/dynamic\";\r\n");
 		fwrite($fh, "};\r\n");
 		fwrite($fh, "\r\n");
 		fwrite($fh, "\r\n");
 
                 fwrite($fh, "logging {\r\n");
                         fwrite($fh, "channel default_debug {\r\n");
-                                fwrite($fh, "file \"data/named.run\";\r\n");
+                                fwrite($fh, "file \"named.run\";\r\n");
                                 //fwrite($fh, "severity dynamic;\r\n");
                         fwrite($fh, "};\r\n");
 
@@ -1366,22 +1356,21 @@ class DNS
                 fwrite($fh, "};\r\n");
                 fwrite($fh, "\r\n");
 
-		//fwrite($fh, "zone \".\" IN {\r\n");
-        		//fwrite($fh, "type hint;\r\n");
-		        //fwrite($fh, "file \"named.ca\";\r\n");
-		//fwrite($fh, "};\r\n");
-		fwrite($fh, "\r\n");
-		fwrite($fh, "include \"/etc/named.rfc1912.zones\";\r\n");
-		fwrite($fh, "include \"/etc/named.root.key\";\r\n");
-		fwrite($fh, "\r\n");
-	
+		fclose($fh);
+		
+		$myfile = $_SERVER["DOCUMENT_ROOT"]."/nm/named.conf.local";
+		$fh = fopen($myfile, 'w') or die ("cant open file");
+
+		fwrite($fh, "include \"/etc/bind/zones.rfc1918\";\r\n");
+
+
 		for($x = 0; $x  < $ArrayCount; $x++)
 		{
 			fwrite($fh, "\r\n");
 			fwrite($fh, "zone \"".$this->RemoveLastPeriod($DomainArray[$x]["Domain"])."\" IN {\r\n");
 			fwrite($fh, "type ".$ServerType.";\r\n");
 		
-			fwrite($fh, "file \"/var/named/slaves/".$this->RemoveLastPeriod($DomainArray[$x]["Domain"])."\";\r\n");
+			fwrite($fh, "file \"/var/cache/bind/slaves/".$this->RemoveLastPeriod($DomainArray[$x]["Domain"])."\";\r\n");
 
 			if($ServerType == "master")
 			{

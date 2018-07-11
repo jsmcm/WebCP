@@ -1,11 +1,7 @@
 <?php
 session_start();
 
-function __autoload($classname)
-{
-        require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.".$classname.".php");
-}
-
+require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
 $oUser = new User();
 
 $ClientID = $oUser->getClientId();
@@ -15,6 +11,7 @@ if($ClientID < 1)
         exit();
 }
 
+require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.MySQL.php");
 $oMySQL = new MySQL();
 if($oMySQL->DeleteMySQL($ClientID, $oUser->Role, $_REQUEST["id"]) == 1)
 {

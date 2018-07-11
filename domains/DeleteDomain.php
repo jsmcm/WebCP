@@ -1,11 +1,7 @@
 <?php
 session_start();
 
-function __autoload($classname)
-{
-        require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.".$classname.".php");
-}
-
+require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
 $oUser = new User();
 
 $ClientID = $oUser->getClientId();
@@ -15,6 +11,7 @@ if($ClientID < 1)
         exit();
 }
 
+require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
 $oDomain = new Domain();
 $DomainOwnerClientID = $oDomain->GetDomainOwner($_REQUEST["DomainID"]);
 

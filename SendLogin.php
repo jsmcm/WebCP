@@ -3,17 +3,14 @@ session_start();
 
 $somecontent = "";
 
-function __autoload($classname)
-{
-	require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.".$classname.".php");
-}
-
+require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
 $oUser = new User();
 $TempPassword = $oUser->ResetPassword($_POST["email"]);
 $UserName = $oUser->GetUserName($oUser->UserExistsByEmail($_POST["email"]));
 
 if($UserName != "")
 {
+	require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Settings.php");
 	$oSettings = new Settings();
 	$BCC = $oSettings->GetForwardSystemEmailsTo();
 

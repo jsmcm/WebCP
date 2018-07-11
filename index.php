@@ -222,7 +222,7 @@ $oSettings = new Settings();
 
 			<div class="copyright">
 
-				2014 &copy; <?php print $oSettings->GetWebCPLink(); ?>
+				2018 &copy; <?php print $oSettings->GetWebCPLink(); ?>
 
 			</div>
 

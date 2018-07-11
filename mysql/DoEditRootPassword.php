@@ -1,17 +1,16 @@
 <?php
 session_start();
 
-function __autoload($classname)
-{
-        require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.".$classname.".php");
-}
-
                 if( ! file_exists($_SERVER["DOCUMENT_ROOT"]."/nm/"))
                 {
                         mkdir($_SERVER["DOCUMENT_ROOT"]."/nm/", 0755);
                 }
 
+
+require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
 $oUser = new User();
+
+require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.MySQL.php");
 $oMySQL = new MySQL();
 
 $ClientID = $oUser->getClientId();

@@ -6,41 +6,57 @@ if(!isset($_SESSION))
      session_start();
 }
 
-// Get Field Type:
-// SELECT data_type FROM information_schema.columns WHERE table_name='reseller_settings' AND column_name = 'reseller_id';
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 
+use \Matomo\Ini\IniReader;
 
 include_once(dirname(__FILE__)."/class.Log.php");
 
 class Database
 {
      
-     function __construct() 
-     {
+    function __construct() 
+    {
+    }
 
-     }
+    public function GetConnection()
+    {
+        global $DatabaseName;
+        global $DatabaseHost;
+        global $DatabaseUserName;
+        global $DatabasePassword;
 
-        public function GetConnection()
-        {
-                global $DatabaseName;
-                global $DatabaseHost;
-                global $DatabaseUserName;
-                global $DatabasePassword;
-                include(dirname(__FILE__)."/../Variables.inc.php");
+	try {
+	    $reader = new IniReader();
+	} catch (Error $e) {
 
-                try
-                {
-                     $DBConnection = new PDO("mysql:dbname=".$DatabaseName.";host=".$DatabaseHost.";charset=utf8", $DatabaseUserName, $DatabasePassword);
-                     $DBConnection->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
-                     $DBConnection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                     return $DBConnection;
-                }
-                catch(PDOException $e)
-                {
-                        print "Cannot connect to database..";
-                }
+            if ($e->getMessage() == "Class 'Matomo\Ini\IniReader' not found") {
+	        throw new Exception("class.Database->getConnection Matomo\Ini not found");
+            } else {
+	        throw new Exception("class.Database->getConnection unknown error initting IniReader");
+            }
+ 
+            exit();
+	}
 
+	// Read a file
+	$array = $reader->readFile($_SERVER["DOCUMENT_ROOT"]."/../config.php");
+
+	$DatabaseName = $array["DATABASE_NAME"];
+	$DatabaseHost = $array["DATABASE_HOST"];
+	$DatabaseUserName = $array["DATABASE_USER"];
+	$DatabasePassword = $array["DATABASE_PASSWORD"];
+
+        try {
+            $DBConnection = new PDO("mysql:dbname=".$DatabaseName.";host=".$DatabaseHost.";charset=utf8", $DatabaseUserName, $DatabasePassword);
+            $DBConnection->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+            $DBConnection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            return $DBConnection;
+        } catch(PDOException $e) {
+            print "Cannot connect to database..";
         }
+
+    }
 
      
      function FieldExists($TableName, $FieldName, $AllowedTypesArray)

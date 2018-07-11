@@ -178,11 +178,6 @@
 				}
 				?>
 
-				<li>
-					<a href="/domains/awstats/index.php">
-						<span class="title"> > Awstats </span>
-					</a>
-				</li>
 				
 				
 			</ul>

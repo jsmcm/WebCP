@@ -1061,3 +1061,503 @@ Stack trace:
 2018-01-20 05:05:37 - DEBUG - /DoLogin.php -> Log in suceeded, redirecting to /domains/index.php
 2018-01-20 05:05:37 - DEBUG - /domains/index.php...
 2018-01-20 05:05:37 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-09 17:14:28 - DEBUG - /DoLogin.php -> CheckingLoginCredentials
+2018-07-10 17:41:39 - DEBUG - /DoLogin.php -> CheckingLoginCredentials
+2018-07-10 17:41:39 - DEBUG - /DoLogin.php -> Log in suceeded, redirecting to /domains/index.php
+2018-07-10 17:42:31 - DEBUG - /DoLogin.php -> CheckingLoginCredentials
+2018-07-10 17:42:31 - DEBUG - /DoLogin.php -> Log in suceeded, redirecting to /domains/index.php
+2018-07-10 17:44:12 - DEBUG - /DoLogin.php -> CheckingLoginCredentials
+2018-07-10 17:44:12 - DEBUG - /DoLogin.php -> Log in suceeded, redirecting to /domains/index.php
+2018-07-10 21:01:12 - DEBUG - /DoLogin.php -> CheckingLoginCredentials
+2018-07-10 21:01:12 - DEBUG - /DoLogin.php -> Log in suceeded, redirecting to /domains/index.php
+2018-07-10 21:10:55 - ERROR - /class.Reseller.php -> deleteOldResellers(); Error = PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'cpadmin.reseller_settings' doesn't exist in /var/www/html/webcp/includes/classes/class.Reseller.php:27
+Stack trace:
+#0 /var/www/html/webcp/includes/classes/class.Reseller.php(27): PDO->prepare('UPDATE reseller...')
+#1 /var/www/html/webcp/users/resellers.php(34): Reseller->deleteOldResellers()
+#2 {main}
+2018-07-10 21:10:55 - ERROR - /class.Package.php -> GetPackageUsageStats(); Error = PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'cpadmin.reseller_relationships' doesn't exist in /var/www/html/webcp/includes/classes/class.Package.php:115
+Stack trace:
+#0 /var/www/html/webcp/includes/classes/class.Package.php(115): PDO->prepare('SELECT COUNT( p...')
+#1 /var/www/html/webcp/includes/classes/class.Domain.php(179): Package->GetPackageUsageStats(Array, 0, 0)
+#2 /var/www/html/webcp/users/resellers.php(209): Domain->GetPackageDiskSpaceUsage(0)
+#3 {main}
+2018-07-10 21:10:55 - ERROR - /class.Package.php -> GetPackageUsageStats(); Error = PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'cpadmin.reseller_relationships' doesn't exist in /var/www/html/webcp/includes/classes/class.Package.php:119
+Stack trace:
+#0 /var/www/html/webcp/includes/classes/class.Package.php(119): PDO->prepare('SELECT COUNT( p...')
+#1 /var/www/html/webcp/includes/classes/class.Domain.php(179): Package->GetPackageUsageStats(Array, 0, -1)
+#2 /var/www/html/webcp/users/resellers.php(210): Domain->GetPackageDiskSpaceUsage(-1)
+#3 {main}
+2018-07-10 21:10:55 - ERROR - /class.Reseller.php -> GetDiskSpaceAllocation(); Error = PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'cpadmin.reseller_settings' doesn't exist in /var/www/html/webcp/includes/classes/class.Reseller.php:170
+Stack trace:
+#0 /var/www/html/webcp/includes/classes/class.Reseller.php(170): PDO->prepare('SELECT SUM(valu...')
+#1 /var/www/html/webcp/users/resellers.php(212): Reseller->GetDiskSpaceAllocation(-1)
+#2 {main}
+2018-07-10 22:23:43 - DEBUG - /domains/index.php...
+2018-07-10 22:23:43 - DEBUG - /domains/index.php -> client_id not set, redirecting to /index.php
+2018-07-10 22:23:49 - DEBUG - /DoLogin.php -> CheckingLoginCredentials
+2018-07-10 22:23:49 - DEBUG - /DoLogin.php -> Log in suceeded, redirecting to /domains/index.php
+2018-07-10 22:23:50 - DEBUG - /domains/index.php...
+2018-07-10 22:23:50 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-10 22:33:31 - DEBUG - /domains/index.php...
+2018-07-10 22:33:31 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-10 22:51:38 - DEBUG - /dns/index.php -> client_id set, continuing
+2018-07-10 22:53:10 - DEBUG - ServerIPAddressCount: 1
+2018-07-10 22:53:10 - DEBUG - count($IP): 1
+2018-07-10 22:53:10 - DEBUG - Checking if 95.216.142.8 exists...
+2018-07-10 22:53:10 - DEBUG - Not, so adding it...
+2018-07-10 22:53:11 - DEBUG - Shared IP is blanks..
+2018-07-10 22:53:11 - DEBUG - Unused IP = master
+2018-07-10 22:53:11 - DEBUG - AddIP(master, "shared")
+2018-07-10 22:54:09 - DEBUG - ServerIPAddressCount: 3
+2018-07-10 22:54:09 - DEBUG - count($IP): 1
+2018-07-10 22:54:09 - DEBUG - Checking if 95.216.142.8 exists...
+2018-07-10 22:54:09 - DEBUG - Does exists...
+2018-07-10 22:54:13 - DEBUG - /domains/index.php...
+2018-07-10 22:54:13 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-10 22:54:17 - DEBUG - ServerIPAddressCount: 3
+2018-07-10 22:54:17 - DEBUG - count($IP): 1
+2018-07-10 22:54:17 - DEBUG - Checking if 95.216.142.8 exists...
+2018-07-10 22:54:17 - DEBUG - Does exists...
+2018-07-10 22:54:17 - DEBUG - /domains/index.php...
+2018-07-10 22:54:17 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-10 23:00:08 - ERROR - class.Database.php -> AlterColumnType(); Error = PDOException: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '? MODIFY ? ?' at line 1 in /var/www/html/webcp/includes/classes/class.Database.php:212
+Stack trace:
+#0 /var/www/html/webcp/includes/classes/class.Database.php(212): PDO->prepare('ALTER TABLE :ta...')
+#1 /var/www/html/webcp/packages/index.php(24): Database->AlterColumnType('package_options', 'value', 'BIGINT')
+#2 {main}
+2018-07-10 23:00:15 - ERROR - class.Database.php -> AlterColumnType(); Error = PDOException: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '? MODIFY ? ?' at line 1 in /var/www/html/webcp/includes/classes/class.Database.php:212
+Stack trace:
+#0 /var/www/html/webcp/includes/classes/class.Database.php(212): PDO->prepare('ALTER TABLE :ta...')
+#1 /var/www/html/webcp/packages/index.php(24): Database->AlterColumnType('package_options', 'value', 'BIGINT')
+#2 {main}
+2018-07-10 23:00:24 - ERROR - class.Database.php -> AlterColumnType(); Error = PDOException: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '? MODIFY ? ?' at line 1 in /var/www/html/webcp/includes/classes/class.Database.php:212
+Stack trace:
+#0 /var/www/html/webcp/includes/classes/class.Database.php(212): PDO->prepare('ALTER TABLE :ta...')
+#1 /var/www/html/webcp/packages/index.php(24): Database->AlterColumnType('package_options', 'value', 'BIGINT')
+#2 {main}
+2018-07-10 23:00:51 - ERROR - class.Database.php -> AlterColumnType(); Error = PDOException: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '? MODIFY ? ?' at line 1 in /var/www/html/webcp/includes/classes/class.Database.php:212
+Stack trace:
+#0 /var/www/html/webcp/includes/classes/class.Database.php(212): PDO->prepare('ALTER TABLE :ta...')
+#1 /var/www/html/webcp/packages/index.php(24): Database->AlterColumnType('package_options', 'value', 'BIGINT')
+#2 {main}
+2018-07-10 23:01:54 - ERROR - /class.FTP.php -> UpdateFTPQuotas(); Error = PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'package_id' in 'where clause' in /var/www/html/webcp/includes/classes/class.FTP.php:59
+Stack trace:
+#0 /var/www/html/webcp/includes/classes/class.FTP.php(59): PDO->prepare('UPDATE ftpd SET...')
+#1 /var/www/html/webcp/includes/classes/class.Package.php(677): FTP->UpdateFTPQuotas('1', '1073741824')
+#2 /var/www/html/webcp/packages/DoAddPackage.php(58): Package->EditPackage('1', '1GB', Array)
+#3 {main}
+2018-07-10 23:01:54 - ERROR - /class.Package.php -> CreateDiskQuotaScripts(); Error = PDOException: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'domains WHERE domains.deleted = 0 AND  domains.package_id = ? AND domain_type = ' at line 1 in /var/www/html/webcp/includes/classes/class.Package.php:512
+Stack trace:
+#0 /var/www/html/webcp/includes/classes/class.Package.php(512): PDO->prepare('SELECT domains....')
+#1 /var/www/html/webcp/includes/classes/class.Package.php(678): Package->CreateDiskQuotaScripts('1', '1073741824')
+#2 /var/www/html/webcp/packages/DoAddPackage.php(58): Package->EditPackage('1', '1GB', Array)
+#3 {main}
+2018-07-10 23:01:54 - ERROR - class.Database.php -> AlterColumnType(); Error = PDOException: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '? MODIFY ? ?' at line 1 in /var/www/html/webcp/includes/classes/class.Database.php:212
+Stack trace:
+#0 /var/www/html/webcp/includes/classes/class.Database.php(212): PDO->prepare('ALTER TABLE :ta...')
+#1 /var/www/html/webcp/packages/index.php(24): Database->AlterColumnType('package_options', 'value', 'BIGINT')
+#2 {main}
+2018-07-10 23:02:00 - DEBUG - /domains/index.php...
+2018-07-10 23:02:00 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-10 23:06:56 - DEBUG - ServerIPAddressCount: 3
+2018-07-10 23:06:56 - DEBUG - count($IP): 1
+2018-07-10 23:06:56 - DEBUG - Checking if 95.216.142.8 exists...
+2018-07-10 23:06:56 - DEBUG - Does exists...
+2018-07-10 23:06:56 - DEBUG - /domains/index.php...
+2018-07-10 23:06:56 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-10 23:07:15 - DEBUG - In /domains/DoAddDomain.php - > AddDomain('five.demoserver.co.za', 'primary',1,1)
+2018-07-10 23:07:15 - DEBUG - DomainName: 'five.demoserver.co.za', DomainType: 'primary', PackageID: '1', ClientID: '1'
+2018-07-10 23:07:18 - DEBUG - mysql_insert_id: 1
+2018-07-10 23:07:18 - DEBUG - Top of DeleteDominFile
+2018-07-10 23:07:18 - DEBUG - myfile: '/var/www/html/webcp/nm/1.subdomain'
+2018-07-10 23:07:18 - DEBUG - Top of MakeDominFile
+2018-07-10 23:07:18 - DEBUG - myfile: '/var/www/html/webcp/nm/1.subdomain'
+2018-07-10 23:07:18 - DEBUG - AddDomain Succeeded
+2018-07-10 23:07:20 - DEBUG - /domains/index.php...
+2018-07-10 23:07:20 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-10 23:56:03 - DEBUG - ServerIPAddressCount: 3
+2018-07-10 23:56:03 - DEBUG - count($IP): 1
+2018-07-10 23:56:03 - DEBUG - Checking if 95.216.142.8 exists...
+2018-07-10 23:56:03 - DEBUG - Does exists...
+2018-07-10 23:56:03 - DEBUG - /domains/index.php...
+2018-07-10 23:56:03 - DEBUG - /domains/index.php -> client_id not set, redirecting to /index.php
+2018-07-10 23:56:07 - DEBUG - /DoLogin.php -> CheckingLoginCredentials
+2018-07-10 23:56:07 - DEBUG - /DoLogin.php -> Log in suceeded, redirecting to /domains/index.php
+2018-07-10 23:56:08 - DEBUG - /domains/index.php...
+2018-07-10 23:56:08 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-10 23:56:20 - DEBUG - ServerIPAddressCount: 3
+2018-07-10 23:56:20 - DEBUG - count($IP): 1
+2018-07-10 23:56:20 - DEBUG - Checking if 95.216.142.8 exists...
+2018-07-10 23:56:20 - DEBUG - Does exists...
+2018-07-10 23:56:20 - DEBUG - /domains/index.php...
+2018-07-10 23:56:20 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-10 23:56:31 - DEBUG - In /domains/DoAddDomain.php - > AddDomain('six.demoserver.co.za', 'primary',1,1)
+2018-07-10 23:56:31 - DEBUG - DomainName: 'six.demoserver.co.za', DomainType: 'primary', PackageID: '1', ClientID: '1'
+2018-07-10 23:56:34 - DEBUG - mysql_insert_id: 2
+2018-07-10 23:56:34 - DEBUG - Top of DeleteDominFile
+2018-07-10 23:56:34 - DEBUG - myfile: '/var/www/html/webcp/nm/2.subdomain'
+2018-07-10 23:56:34 - DEBUG - Top of MakeDominFile
+2018-07-10 23:56:34 - DEBUG - myfile: '/var/www/html/webcp/nm/2.subdomain'
+2018-07-10 23:56:34 - DEBUG - AddDomain Succeeded
+2018-07-10 23:56:36 - DEBUG - /domains/index.php...
+2018-07-10 23:56:36 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 00:01:03 - DEBUG - ServerIPAddressCount: 3
+2018-07-11 00:01:03 - DEBUG - count($IP): 1
+2018-07-11 00:01:03 - DEBUG - Checking if 95.216.142.8 exists...
+2018-07-11 00:01:03 - DEBUG - Does exists...
+2018-07-11 00:01:03 - DEBUG - /domains/index.php...
+2018-07-11 00:01:03 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 00:01:54 - DEBUG - In /domains/DoAddDomain.php - > AddDomain('testseven.demoserver.co.za', 'primary',1,1)
+2018-07-11 00:01:54 - DEBUG - DomainName: 'testseven.demoserver.co.za', DomainType: 'primary', PackageID: '1', ClientID: '1'
+2018-07-11 00:01:57 - DEBUG - mysql_insert_id: 3
+2018-07-11 00:01:57 - DEBUG - Top of DeleteDominFile
+2018-07-11 00:01:57 - DEBUG - myfile: '/var/www/html/webcp/nm/3.subdomain'
+2018-07-11 00:01:57 - DEBUG - Top of MakeDominFile
+2018-07-11 00:01:57 - DEBUG - myfile: '/var/www/html/webcp/nm/3.subdomain'
+2018-07-11 00:01:57 - DEBUG - AddDomain Succeeded
+2018-07-11 00:01:59 - DEBUG - /domains/index.php...
+2018-07-11 00:01:59 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 00:09:02 - DEBUG - ServerIPAddressCount: 3
+2018-07-11 00:09:02 - DEBUG - count($IP): 1
+2018-07-11 00:09:02 - DEBUG - Checking if 95.216.142.8 exists...
+2018-07-11 00:09:02 - DEBUG - Does exists...
+2018-07-11 00:09:02 - DEBUG - /domains/index.php...
+2018-07-11 00:09:02 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 00:09:08 - DEBUG - In /domains/DoAddDomain.php - > AddDomain('testeight.demoserver.co.za', 'primary',1,1)
+2018-07-11 00:09:08 - DEBUG - DomainName: 'testeight.demoserver.co.za', DomainType: 'primary', PackageID: '1', ClientID: '1'
+2018-07-11 00:09:11 - DEBUG - mysql_insert_id: 4
+2018-07-11 00:09:11 - DEBUG - Top of DeleteDominFile
+2018-07-11 00:09:11 - DEBUG - myfile: '/var/www/html/webcp/nm/4.subdomain'
+2018-07-11 00:09:11 - DEBUG - Top of MakeDominFile
+2018-07-11 00:09:11 - DEBUG - myfile: '/var/www/html/webcp/nm/4.subdomain'
+2018-07-11 00:09:11 - DEBUG - AddDomain Succeeded
+2018-07-11 00:09:12 - DEBUG - /domains/index.php...
+2018-07-11 00:09:12 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 00:14:45 - DEBUG - /dns/index.php -> client_id set, continuing
+2018-07-11 11:12:49 - DEBUG - /DoLogin.php -> CheckingLoginCredentials
+2018-07-11 11:12:49 - DEBUG - /DoLogin.php -> Log in suceeded, redirecting to /domains/index.php
+2018-07-11 11:12:49 - DEBUG - /domains/index.php...
+2018-07-11 11:12:49 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 11:17:17 - DEBUG - ServerIPAddressCount: 3
+2018-07-11 11:17:17 - DEBUG - count($IP): 1
+2018-07-11 11:17:17 - DEBUG - Checking if 95.216.142.8 exists...
+2018-07-11 11:17:17 - DEBUG - Does exists...
+2018-07-11 11:17:17 - DEBUG - /domains/index.php...
+2018-07-11 11:17:17 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 11:17:26 - DEBUG - In /domains/DoAddDomain.php - > AddDomain('testnine.demoserver.co.za', 'primary',1,1)
+2018-07-11 11:17:26 - DEBUG - DomainName: 'testnine.demoserver.co.za', DomainType: 'primary', PackageID: '1', ClientID: '1'
+2018-07-11 11:17:29 - DEBUG - mysql_insert_id: 5
+2018-07-11 11:17:29 - DEBUG - Top of DeleteDominFile
+2018-07-11 11:17:29 - DEBUG - myfile: '/var/www/html/webcp/nm/5.subdomain'
+2018-07-11 11:17:29 - DEBUG - Top of MakeDominFile
+2018-07-11 11:17:29 - DEBUG - myfile: '/var/www/html/webcp/nm/5.subdomain'
+2018-07-11 11:17:29 - DEBUG - AddDomain Succeeded
+2018-07-11 11:17:31 - DEBUG - /domains/index.php...
+2018-07-11 11:17:31 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 11:58:55 - DEBUG - ServerIPAddressCount: 3
+2018-07-11 11:58:55 - DEBUG - count($IP): 1
+2018-07-11 11:58:55 - DEBUG - Checking if 95.216.142.8 exists...
+2018-07-11 11:58:55 - DEBUG - Does exists...
+2018-07-11 11:58:55 - DEBUG - /domains/index.php...
+2018-07-11 11:58:55 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 11:59:05 - DEBUG - In /domains/DoAddDomain.php - > AddDomain('testten.demoserver.co.za', 'primary',1,1)
+2018-07-11 11:59:05 - DEBUG - DomainName: 'testten.demoserver.co.za', DomainType: 'primary', PackageID: '1', ClientID: '1'
+2018-07-11 11:59:08 - DEBUG - mysql_insert_id: 6
+2018-07-11 11:59:08 - DEBUG - Top of DeleteDominFile
+2018-07-11 11:59:08 - DEBUG - myfile: '/var/www/html/webcp/nm/6.subdomain'
+2018-07-11 11:59:08 - DEBUG - Top of MakeDominFile
+2018-07-11 11:59:08 - DEBUG - myfile: '/var/www/html/webcp/nm/6.subdomain'
+2018-07-11 11:59:08 - DEBUG - AddDomain Succeeded
+2018-07-11 11:59:08 - DEBUG - /domains/index.php...
+2018-07-11 11:59:08 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 12:14:25 - DEBUG - ServerIPAddressCount: 3
+2018-07-11 12:14:25 - DEBUG - count($IP): 1
+2018-07-11 12:14:25 - DEBUG - Checking if 95.216.142.8 exists...
+2018-07-11 12:14:25 - DEBUG - Does exists...
+2018-07-11 12:14:25 - DEBUG - /domains/index.php...
+2018-07-11 12:14:25 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 12:14:35 - DEBUG - In /domains/DoAddDomain.php - > AddDomain('testeleven.demoserver.co.za', 'primary',1,1)
+2018-07-11 12:14:36 - DEBUG - DomainName: 'testeleven.demoserver.co.za', DomainType: 'primary', PackageID: '1', ClientID: '1'
+2018-07-11 12:14:39 - DEBUG - mysql_insert_id: 7
+2018-07-11 12:14:39 - DEBUG - Top of DeleteDominFile
+2018-07-11 12:14:39 - DEBUG - myfile: '/var/www/html/webcp/nm/7.subdomain'
+2018-07-11 12:14:39 - DEBUG - Top of MakeDominFile
+2018-07-11 12:14:39 - DEBUG - myfile: '/var/www/html/webcp/nm/7.subdomain'
+2018-07-11 12:14:39 - DEBUG - AddDomain Succeeded
+2018-07-11 12:14:40 - DEBUG - /domains/index.php...
+2018-07-11 12:14:40 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 12:53:16 - DEBUG - ServerIPAddressCount: 2
+2018-07-11 12:53:16 - DEBUG - count($IP): 1
+2018-07-11 12:53:16 - DEBUG - Checking if 95.216.142.8 exists...
+2018-07-11 12:53:16 - DEBUG - Does exists...
+2018-07-11 12:53:16 - DEBUG - /domains/index.php...
+2018-07-11 12:53:16 - DEBUG - /domains/index.php -> client_id not set, redirecting to /index.php
+2018-07-11 12:54:10 - DEBUG - /DoLogin.php -> CheckingLoginCredentials
+2018-07-11 12:54:10 - DEBUG - /DoLogin.php -> Log in suceeded, redirecting to /domains/index.php
+2018-07-11 12:54:10 - DEBUG - /domains/index.php...
+2018-07-11 12:54:10 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 12:54:15 - DEBUG - ServerIPAddressCount: 2
+2018-07-11 12:54:15 - DEBUG - count($IP): 1
+2018-07-11 12:54:15 - DEBUG - Checking if 95.216.142.8 exists...
+2018-07-11 12:54:15 - DEBUG - Does exists...
+2018-07-11 12:54:15 - DEBUG - /domains/index.php...
+2018-07-11 12:54:15 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 12:54:25 - DEBUG - In /domains/DoAddDomain.php - > AddDomain('testtwelve.demoserver.co.za', 'primary',1,1)
+2018-07-11 12:54:25 - DEBUG - DomainName: 'testtwelve.demoserver.co.za', DomainType: 'primary', PackageID: '1', ClientID: '1'
+2018-07-11 12:54:28 - DEBUG - mysql_insert_id: 8
+2018-07-11 12:54:28 - DEBUG - Top of DeleteDominFile
+2018-07-11 12:54:28 - DEBUG - myfile: '/var/www/html/webcp/nm/8.subdomain'
+2018-07-11 12:54:28 - DEBUG - Top of MakeDominFile
+2018-07-11 12:54:28 - DEBUG - myfile: '/var/www/html/webcp/nm/8.subdomain'
+2018-07-11 12:54:28 - DEBUG - AddDomain Succeeded
+2018-07-11 12:54:29 - DEBUG - /domains/index.php...
+2018-07-11 12:54:29 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 12:59:26 - DEBUG - /domains/index.php...
+2018-07-11 12:59:26 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 12:59:50 - DEBUG - /dns/index.php -> client_id set, continuing
+2018-07-11 13:00:00 - DEBUG - /dns/index.php -> client_id set, continuing
+2018-07-11 13:00:06 - DEBUG - /dns/index.php -> client_id set, continuing
+2018-07-11 13:00:12 - DEBUG - /dns/index.php -> client_id set, continuing
+2018-07-11 13:00:15 - DEBUG - /dns/index.php -> client_id set, continuing
+2018-07-11 13:00:15 - DEBUG - /dns/index.php -> client_id set, continuing
+2018-07-11 13:00:15 - DEBUG - /dns/index.php -> client_id set, continuing
+2018-07-11 13:00:16 - DEBUG - /dns/index.php -> client_id set, continuing
+2018-07-11 13:00:23 - DEBUG - /domains/index.php...
+2018-07-11 13:00:23 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 13:16:55 - DEBUG - /domains/index.php...
+2018-07-11 13:16:55 - DEBUG - /domains/index.php -> client_id not set, redirecting to /index.php
+2018-07-11 13:16:58 - DEBUG - /DoLogin.php -> CheckingLoginCredentials
+2018-07-11 13:16:58 - DEBUG - /DoLogin.php -> Log in suceeded, redirecting to /domains/index.php
+2018-07-11 13:16:58 - DEBUG - /domains/index.php...
+2018-07-11 13:16:58 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 13:17:16 - DEBUG - /dns/index.php -> client_id set, continuing
+2018-07-11 13:18:07 - DEBUG - /domains/index.php...
+2018-07-11 13:18:07 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 13:18:10 - DEBUG - ServerIPAddressCount: 2
+2018-07-11 13:18:10 - DEBUG - count($IP): 1
+2018-07-11 13:18:10 - DEBUG - Checking if 95.216.142.8 exists...
+2018-07-11 13:18:10 - DEBUG - Does exists...
+2018-07-11 13:18:10 - DEBUG - /domains/index.php...
+2018-07-11 13:18:10 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 13:18:20 - DEBUG - In /domains/DoAddDomain.php - > AddDomain('testthirteen.demoserver.co.za', 'primary',1,1)
+2018-07-11 13:18:20 - DEBUG - DomainName: 'testthirteen.demoserver.co.za', DomainType: 'primary', PackageID: '1', ClientID: '1'
+2018-07-11 13:18:23 - DEBUG - mysql_insert_id: 9
+2018-07-11 13:18:23 - DEBUG - Top of DeleteDominFile
+2018-07-11 13:18:23 - DEBUG - myfile: '/var/www/html/webcp/nm/9.subdomain'
+2018-07-11 13:18:23 - DEBUG - Top of MakeDominFile
+2018-07-11 13:18:23 - DEBUG - myfile: '/var/www/html/webcp/nm/9.subdomain'
+2018-07-11 13:18:23 - DEBUG - AddDomain Succeeded
+2018-07-11 13:18:23 - DEBUG - /domains/index.php...
+2018-07-11 13:18:23 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 13:56:08 - DEBUG - /DoLogin.php -> CheckingLoginCredentials
+2018-07-11 13:56:08 - DEBUG - /DoLogin.php -> Log in suceeded, redirecting to /domains/index.php
+2018-07-11 13:56:09 - DEBUG - /domains/index.php...
+2018-07-11 13:56:09 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 13:56:56 - DEBUG - ServerIPAddressCount: 2
+2018-07-11 13:56:56 - DEBUG - count($IP): 1
+2018-07-11 13:56:56 - DEBUG - Checking if 95.216.142.8 exists...
+2018-07-11 13:56:56 - DEBUG - Does exists...
+2018-07-11 13:56:56 - DEBUG - /domains/index.php...
+2018-07-11 13:56:56 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 13:57:25 - DEBUG - In /domains/DoAddDomain.php - > AddDomain('testtwo.demoserver.co.za', 'primary',1,1)
+2018-07-11 13:57:25 - DEBUG - DomainName: 'testtwo.demoserver.co.za', DomainType: 'primary', PackageID: '1', ClientID: '1'
+2018-07-11 13:57:28 - DEBUG - mysql_insert_id: 10
+2018-07-11 13:57:28 - DEBUG - Top of DeleteDominFile
+2018-07-11 13:57:28 - DEBUG - myfile: '/var/www/html/webcp/nm/10.subdomain'
+2018-07-11 13:57:28 - DEBUG - Top of MakeDominFile
+2018-07-11 13:57:28 - DEBUG - myfile: '/var/www/html/webcp/nm/10.subdomain'
+2018-07-11 13:57:28 - DEBUG - AddDomain Succeeded
+2018-07-11 13:57:29 - DEBUG - /domains/index.php...
+2018-07-11 13:57:29 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 14:06:55 - DEBUG - /domains/index.php...
+2018-07-11 14:06:55 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 14:06:59 - DEBUG - At top of class.Domains.php -> DeleteDomain; ClientID: 1; DomainID: 10
+2018-07-11 14:07:02 - DEBUG - /domains/index.php...
+2018-07-11 14:07:02 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 14:07:22 - DEBUG - /dns/index.php -> client_id set, continuing
+2018-07-11 14:15:19 - DEBUG - /domains/index.php...
+2018-07-11 14:15:19 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 15:19:36 - DEBUG - /domains/index.php...
+2018-07-11 15:19:36 - DEBUG - /domains/index.php -> client_id not set, redirecting to /index.php
+2018-07-11 15:19:39 - DEBUG - /DoLogin.php -> CheckingLoginCredentials
+2018-07-11 15:19:39 - DEBUG - /DoLogin.php -> Log in suceeded, redirecting to /domains/index.php
+2018-07-11 16:09:39 - DEBUG - /DoLogin.php -> CheckingLoginCredentials
+2018-07-11 16:09:39 - DEBUG - /DoLogin.php -> Log in suceeded, redirecting to /domains/index.php
+2018-07-11 16:09:40 - DEBUG - /domains/index.php...
+2018-07-11 16:09:40 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 16:51:30 - DEBUG - /domains/index.php...
+2018-07-11 16:51:30 - DEBUG - /domains/index.php -> client_id not set, redirecting to /index.php
+2018-07-11 16:51:44 - DEBUG - /DoLogin.php -> CheckingLoginCredentials
+2018-07-11 16:51:44 - DEBUG - /DoLogin.php -> Log in suceeded, redirecting to /domains/index.php
+2018-07-11 16:51:44 - DEBUG - /DoLogin.php -> CheckingLoginCredentials
+2018-07-11 16:51:44 - DEBUG - /DoLogin.php -> Log in suceeded, redirecting to /domains/index.php
+2018-07-11 16:51:45 - DEBUG - /domains/index.php...
+2018-07-11 16:51:45 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 16:58:03 - DEBUG - /domains/index.php...
+2018-07-11 16:58:03 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 17:47:45 - DEBUG - /domains/index.php...
+2018-07-11 17:47:45 - DEBUG - /domains/index.php -> client_id not set, redirecting to /index.php
+2018-07-11 17:47:57 - DEBUG - /DoLogin.php -> CheckingLoginCredentials
+2018-07-11 17:47:57 - DEBUG - /DoLogin.php -> Log in suceeded, redirecting to /domains/index.php
+2018-07-11 17:47:57 - DEBUG - /domains/index.php...
+2018-07-11 17:47:57 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 20:47:47 - DEBUG - /DoLogin.php -> CheckingLoginCredentials
+2018-07-11 20:47:47 - DEBUG - /DoLogin.php -> Log in suceeded, redirecting to /domains/index.php
+2018-07-11 20:47:48 - DEBUG - /domains/index.php...
+2018-07-11 20:47:48 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 20:55:37 - DEBUG - /domains/index.php...
+2018-07-11 20:55:37 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 20:55:45 - DEBUG - ServerIPAddressCount: 2
+2018-07-11 20:55:45 - DEBUG - count($IP): 1
+2018-07-11 20:55:45 - DEBUG - Checking if 95.216.142.8 exists...
+2018-07-11 20:55:45 - DEBUG - Does exists...
+2018-07-11 20:55:45 - DEBUG - /domains/index.php...
+2018-07-11 20:55:45 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 20:56:06 - DEBUG - In /domains/DoAddDomain.php - > AddDomain('testthree.demoserver.co.za', 'primary',1,1)
+2018-07-11 20:56:06 - DEBUG - DomainName: 'testthree.demoserver.co.za', DomainType: 'primary', PackageID: '1', ClientID: '1'
+2018-07-11 20:56:09 - DEBUG - mysql_insert_id: 11
+2018-07-11 20:56:09 - DEBUG - Top of DeleteDominFile
+2018-07-11 20:56:09 - DEBUG - myfile: '/var/www/html/webcp/nm/11.subdomain'
+2018-07-11 20:56:09 - DEBUG - Top of MakeDominFile
+2018-07-11 20:56:09 - DEBUG - myfile: '/var/www/html/webcp/nm/11.subdomain'
+2018-07-11 20:56:09 - DEBUG - AddDomain Succeeded
+2018-07-11 20:56:10 - DEBUG - /domains/index.php...
+2018-07-11 20:56:10 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 21:08:00 - DEBUG - ServerIPAddressCount: 2
+2018-07-11 21:08:00 - DEBUG - count($IP): 1
+2018-07-11 21:08:00 - DEBUG - Checking if 95.216.142.8 exists...
+2018-07-11 21:08:00 - DEBUG - Does exists...
+2018-07-11 21:08:00 - DEBUG - /domains/index.php...
+2018-07-11 21:08:00 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 21:08:10 - DEBUG - In /domains/DoAddDomain.php - > AddDomain('testfour.demoserver.co.za', 'primary',1,1)
+2018-07-11 21:08:10 - DEBUG - DomainName: 'testfour.demoserver.co.za', DomainType: 'primary', PackageID: '1', ClientID: '1'
+2018-07-11 21:08:13 - DEBUG - mysql_insert_id: 12
+2018-07-11 21:08:13 - DEBUG - Top of DeleteDominFile
+2018-07-11 21:08:13 - DEBUG - myfile: '/var/www/html/webcp/nm/12.subdomain'
+2018-07-11 21:08:13 - DEBUG - Top of MakeDominFile
+2018-07-11 21:08:13 - DEBUG - myfile: '/var/www/html/webcp/nm/12.subdomain'
+2018-07-11 21:08:13 - DEBUG - AddDomain Succeeded
+2018-07-11 21:08:14 - DEBUG - /domains/index.php...
+2018-07-11 21:08:14 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 21:14:53 - DEBUG - ServerIPAddressCount: 2
+2018-07-11 21:14:53 - DEBUG - count($IP): 1
+2018-07-11 21:14:53 - DEBUG - Checking if 95.216.142.8 exists...
+2018-07-11 21:14:53 - DEBUG - Does exists...
+2018-07-11 21:14:53 - DEBUG - /domains/index.php...
+2018-07-11 21:14:53 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 21:15:45 - DEBUG - /domains/index.php...
+2018-07-11 21:15:45 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 21:15:49 - DEBUG - ServerIPAddressCount: 2
+2018-07-11 21:15:49 - DEBUG - count($IP): 1
+2018-07-11 21:15:49 - DEBUG - Checking if 95.216.142.8 exists...
+2018-07-11 21:15:49 - DEBUG - Does exists...
+2018-07-11 21:15:49 - DEBUG - /domains/index.php...
+2018-07-11 21:15:49 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 21:15:56 - DEBUG - In /domains/DoAddDomain.php - > AddDomain('testfive.demoserver.co.za', 'primary',1,1)
+2018-07-11 21:15:56 - DEBUG - DomainName: 'testfive.demoserver.co.za', DomainType: 'primary', PackageID: '1', ClientID: '1'
+2018-07-11 21:15:59 - DEBUG - mysql_insert_id: 13
+2018-07-11 21:15:59 - DEBUG - Top of DeleteDominFile
+2018-07-11 21:15:59 - DEBUG - myfile: '/var/www/html/webcp/nm/13.subdomain'
+2018-07-11 21:15:59 - DEBUG - Top of MakeDominFile
+2018-07-11 21:15:59 - DEBUG - myfile: '/var/www/html/webcp/nm/13.subdomain'
+2018-07-11 21:15:59 - DEBUG - AddDomain Succeeded
+2018-07-11 21:16:00 - DEBUG - /domains/index.php...
+2018-07-11 21:16:00 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 21:23:02 - DEBUG - /DoLogin.php -> CheckingLoginCredentials
+2018-07-11 21:23:02 - DEBUG - /DoLogin.php -> Log in suceeded, redirecting to /domains/index.php
+2018-07-11 21:23:02 - DEBUG - /domains/index.php...
+2018-07-11 21:23:02 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 21:24:20 - ERROR - /class.Domain.php -> SubDomainExists(); Error = PDOException: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '.?' AND deleted = 0 AND parent_domain_id = ?' at line 1 in /var/www/html/webcp/includes/classes/class.Domain.php:584
+Stack trace:
+#0 /var/www/html/webcp/includes/classes/class.Domain.php(584): PDO->prepare('SELECT id FROM ...')
+#1 /var/www/html/webcp/domains/DoAddSubDomain.php(82): Domain->SubDomainExists('sub', '13')
+#2 {main}
+2018-07-11 21:24:20 - DEBUG - Top of DeleteDominFile
+2018-07-11 21:24:20 - DEBUG - myfile: '/var/www/html/webcp/nm/13.subdomain'
+2018-07-11 21:24:20 - DEBUG - Top of MakeDominFile
+2018-07-11 21:24:20 - DEBUG - myfile: '/var/www/html/webcp/nm/13.subdomain'
+2018-07-11 21:46:00 - DEBUG - /domains/index.php...
+2018-07-11 21:46:00 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 21:50:05 - DEBUG - ServerIPAddressCount: 2
+2018-07-11 21:50:05 - DEBUG - count($IP): 1
+2018-07-11 21:50:05 - DEBUG - Checking if 95.216.142.8 exists...
+2018-07-11 21:50:05 - DEBUG - Does exists...
+2018-07-11 21:50:05 - DEBUG - /domains/index.php...
+2018-07-11 21:50:05 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 21:50:13 - DEBUG - In /domains/DoAddDomain.php - > AddDomain('testsix.demoserver.co.za', 'primary',1,1)
+2018-07-11 21:50:13 - DEBUG - DomainName: 'testsix.demoserver.co.za', DomainType: 'primary', PackageID: '1', ClientID: '1'
+2018-07-11 21:50:16 - DEBUG - mysql_insert_id: 15
+2018-07-11 21:50:16 - DEBUG - Top of DeleteDominFile
+2018-07-11 21:50:16 - DEBUG - myfile: '/var/www/html/webcp/nm/15.subdomain'
+2018-07-11 21:50:16 - DEBUG - Top of MakeDominFile
+2018-07-11 21:50:16 - DEBUG - myfile: '/var/www/html/webcp/nm/15.subdomain'
+2018-07-11 21:50:16 - DEBUG - AddDomain Succeeded
+2018-07-11 21:50:16 - DEBUG - /domains/index.php...
+2018-07-11 21:50:16 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 21:51:21 - ERROR - /class.Domain.php -> SubDomainExists(); Error = PDOException: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '.?' AND deleted = 0 AND parent_domain_id = ?' at line 1 in /var/www/html/webcp/includes/classes/class.Domain.php:584
+Stack trace:
+#0 /var/www/html/webcp/includes/classes/class.Domain.php(584): PDO->prepare('SELECT id FROM ...')
+#1 /var/www/html/webcp/domains/DoAddSubDomain.php(82): Domain->SubDomainExists('sub', '15')
+#2 {main}
+2018-07-11 21:51:21 - DEBUG - Top of DeleteDominFile
+2018-07-11 21:51:21 - DEBUG - myfile: '/var/www/html/webcp/nm/15.subdomain'
+2018-07-11 21:51:21 - DEBUG - Top of MakeDominFile
+2018-07-11 21:51:21 - DEBUG - myfile: '/var/www/html/webcp/nm/15.subdomain'
+2018-07-11 21:51:36 - DEBUG - /domains/index.php...
+2018-07-11 21:51:36 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 21:57:10 - DEBUG - ServerIPAddressCount: 2
+2018-07-11 21:57:10 - DEBUG - count($IP): 1
+2018-07-11 21:57:10 - DEBUG - Checking if 95.216.142.8 exists...
+2018-07-11 21:57:10 - DEBUG - Does exists...
+2018-07-11 21:57:10 - DEBUG - /domains/index.php...
+2018-07-11 21:57:10 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 21:57:21 - DEBUG - In /domains/DoAddDomain.php - > AddDomain('testseven.demoserver.co.za', 'primary',1,1)
+2018-07-11 21:57:21 - DEBUG - DomainName: 'testseven.demoserver.co.za', DomainType: 'primary', PackageID: '1', ClientID: '1'
+2018-07-11 21:57:24 - DEBUG - mysql_insert_id: 17
+2018-07-11 21:57:24 - DEBUG - Top of DeleteDominFile
+2018-07-11 21:57:24 - DEBUG - myfile: '/var/www/html/webcp/nm/17.subdomain'
+2018-07-11 21:57:24 - DEBUG - Top of MakeDominFile
+2018-07-11 21:57:24 - DEBUG - myfile: '/var/www/html/webcp/nm/17.subdomain'
+2018-07-11 21:57:24 - DEBUG - AddDomain Succeeded
+2018-07-11 21:57:25 - DEBUG - /domains/index.php...
+2018-07-11 21:57:25 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 21:58:43 - ERROR - /class.Domain.php -> SubDomainExists(); Error = PDOException: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '.?' AND deleted = 0 AND parent_domain_id = ?' at line 1 in /var/www/html/webcp/includes/classes/class.Domain.php:584
+Stack trace:
+#0 /var/www/html/webcp/includes/classes/class.Domain.php(584): PDO->prepare('SELECT id FROM ...')
+#1 /var/www/html/webcp/domains/DoAddSubDomain.php(82): Domain->SubDomainExists('sub', '17')
+#2 {main}
+2018-07-11 21:58:43 - DEBUG - Top of DeleteDominFile
+2018-07-11 21:58:43 - DEBUG - myfile: '/var/www/html/webcp/nm/17.subdomain'
+2018-07-11 21:58:43 - DEBUG - Top of MakeDominFile
+2018-07-11 21:58:43 - DEBUG - myfile: '/var/www/html/webcp/nm/17.subdomain'
+2018-07-11 22:02:59 - DEBUG - /domains/index.php...
+2018-07-11 22:02:59 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 22:03:55 - DEBUG - SubDomain: sub
+2018-07-11 22:03:55 - DEBUG - ParentDomainName: testseven.demoserver.co.za
+2018-07-11 22:03:55 - DEBUG - FQDN: sub.testseven.demoserver.co.za
+2018-07-11 22:03:55 - DEBUG - strlen(FQDN): 30
+2018-07-11 22:03:55 - DEBUG - strlen(ParentDomainName) + 1: 27
+2018-07-11 22:03:55 - DEBUG - Top of DeleteDominFile
+2018-07-11 22:03:55 - DEBUG - myfile: '/var/www/html/webcp/nm/17.subdomain'
+2018-07-11 22:03:55 - DEBUG - Top of MakeDominFile
+2018-07-11 22:03:55 - DEBUG - myfile: '/var/www/html/webcp/nm/17.subdomain'
+2018-07-11 22:04:00 - DEBUG - /domains/index.php...
+2018-07-11 22:04:00 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 22:05:49 - DEBUG - /domains/index.php...
+2018-07-11 22:05:49 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 22:06:47 - DEBUG - /domains/index.php...
+2018-07-11 22:06:47 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 22:06:59 - DEBUG - /domains/index.php...
+2018-07-11 22:06:59 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 22:10:09 - DEBUG - /domains/index.php...
+2018-07-11 22:10:09 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 22:14:59 - DEBUG - /domains/index.php...
+2018-07-11 22:14:59 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 22:22:24 - DEBUG - /domains/index.php...
+2018-07-11 22:22:24 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 22:55:40 - DEBUG - /domains/index.php...
+2018-07-11 22:55:40 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 22:57:20 - DEBUG - /domains/index.php...
+2018-07-11 22:57:20 - DEBUG - /domains/index.php -> client_id set, continuing
+2018-07-11 22:57:29 - DEBUG - /domains/index.php...
+2018-07-11 22:57:29 - DEBUG - /domains/index.php -> client_id set, continuing

@@ -1,11 +1,7 @@
 <?php
 session_start();
 
-function __autoload($classname)
-{
-        require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.".$classname.".php");
-}
-
+require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
 $oUser = new User();
 
 $ClientID = $oUser->getClientId();
@@ -21,7 +17,11 @@ if($ClientID < 1)
 $Role = $oUser->Role;
 
 
+
+require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
 $oDomain = new Domain();
+
+require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Email.php");
 $oEmail = new Email();
 
 $DomainID = $oEmail->GetDomainIDFromEmailID($_REQUEST["id"]);
