@@ -72,6 +72,8 @@ $CustomLanguage = array(
 'common' => 'too common and / or easily guessed',
 'environ'=> "Cannot use the email address or part thereof");
 
+
+require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.StupidPass.php");
 $sp = new StupidPass(40, $Environmental, null, $CustomLanguage, $Options);
 ///print "Checking ".$Password."<br>";
 

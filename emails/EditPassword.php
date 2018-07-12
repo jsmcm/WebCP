@@ -4,6 +4,9 @@ session_start();
 require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Email.php");
 $oEmail = new Email();
 
+require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Settings.php");
+$oSettings = new Settings();
+
 require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
 $oUser = new User();
 
@@ -27,8 +30,6 @@ if($ClientID < 1)
 
 
 $id = intVal($_REQUEST["id"]);
-$oEmail = new Email();
-$oSettings = new Settings();
 
 $NonceMeta = array("id"=>$id, "loggedInID"=>$loggedInId);
 

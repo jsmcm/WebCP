@@ -10,6 +10,7 @@ $oDomain = new Domain();
 require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Email.php");
 $oEmail = new Email();
 
+require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.SimpleNonce.php");
 $oSimpleNonce = new SimpleNonce();
 
 $ClientID = $oUser->GetClientID();

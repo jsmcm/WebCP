@@ -54,6 +54,8 @@ $Role = $oUser->Role;
 
 
 
+$DomainName = "";
+$DomainUerName = "";
 
 if($DomainID > -1)
 {
@@ -117,6 +119,8 @@ if($Reply < 1)
 	header("location: forward.php?Notes=".$Message);
 	exit();
 }
+
+file_put_contents(dirname(__DIR__)."/nm/".$DomainUserName.".forward_address", "LOCAL_PART=".$LocalPart."\r\nDOMAIN_NAME=".$DomainName."\r\n");
 
 header("location: forward.php?Notes=Forward added");
 

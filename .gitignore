@@ -14,3 +14,4 @@ includes/protected/key.*
 includes/activation.dat
 logs/*
 backups/daily
+logs/*

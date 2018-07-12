@@ -63,6 +63,7 @@ $CustomLanguage = array(
 'common' => 'too common and / or easily guessed',
 'environ'=> "Cannot use the email address or part thereof");
 
+require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.StupidPass.php");
 $sp = new StupidPass(40, $Environmental, null, $CustomLanguage, $Options);
 
 $bool = $sp->validate($Password);
@@ -88,6 +89,9 @@ if($oEmail->EditEmailPassword($ID, $Password) < 1)
 	header("location: index.php?NoteType=Error&Notes=Cannot change password");
 	exit();
 }
+
+touch(dirname(__DIR__)."/nm/".$UserName.".mailpassword");
+
 header("location: index.php?NoteType=Success&Notes=Password changed");
 
 ?>
