@@ -48,7 +48,7 @@ class MySQL
 	
 		try
 		{
-			$pdo_query = $this->DatabaseConnection->prepare("UPDATE mysql.user SET password=PASSWORD(\"".$Pwd."\") where User='".$Uname."';");
+			$pdo_query = $this->DatabaseConnection->prepare("UPDATE mysql.user SET authentication_string=PASSWORD(\"".$Pwd."\") where User='".$Uname."';");
 			
 			$pdo_query->execute();
 	

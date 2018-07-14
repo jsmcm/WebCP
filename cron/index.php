@@ -7,6 +7,7 @@ $oUser = new User();
 require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Settings.php");
 $oSettings = new Settings();
 
+require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
 require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 
 

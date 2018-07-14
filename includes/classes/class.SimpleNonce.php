@@ -1,4 +1,10 @@
 <?php
+
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
+
+use \Matomo\Ini\IniReader;
+
+
 /*********************************************************************
 class.SimpleNonce.php
 John McMurray <john@softsmart.co.za>
@@ -13,9 +19,23 @@ class SimpleNonce
     function __construct() 
     {
 	
-	global $DatabasePassword;
-	include(dirname(__FILE__)."/../Variables.inc.php");
+        try {
+            $reader = new IniReader();
+        } catch (Error $e) {
 
+            if ($e->getMessage() == "Class 'Matomo\Ini\IniReader' not found") {
+                throw new Exception("class.Database->getConnection Matomo\Ini not found");
+            } else {
+                throw new Exception("class.Database->getConnection unknown error initting IniReader");
+            }
+
+            exit();
+        }
+
+        // Read a file
+        $array = $reader->readFile($_SERVER["DOCUMENT_ROOT"]."/../config.php");
+
+        $DatabasePassword = $array["DATABASE_PASSWORD"];
 
 	$this->NonceSalt = $DatabasePassword;
 	$this->Path = $_SERVER["DOCUMENT_ROOT"]."/tmp/nonce"; // where will the nonce files be saved

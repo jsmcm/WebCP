@@ -221,7 +221,7 @@ if( ($ClientID < 1) || ($Role != 'admin') )
 $PackageArray = array();
 $ArrayCount = 0;
 
-$oPackage->GetPackageList($PackageArray, $ArrayCount);
+$oPackage->GetPackageList($PackageArray, $ArrayCount, $Role, $ClientID);
 
  
 print "<form id=\"MailFilter\" name=\"MailFilter\" action=\"SendMassMail.php\" method=\"post\">";

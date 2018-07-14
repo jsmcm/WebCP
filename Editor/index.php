@@ -16,6 +16,8 @@ $oLog = new Log();
 require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.SimpleNonce.php");
 $oSimpleNonce = new SimpleNonce();
 
+require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
+
 require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 
 $ClientID = $oUser->getClientId();

@@ -94,7 +94,6 @@ class Email
 			$DomainOwnerID = $this->GetClientIDFromEmailAddress($EmailAddress);
 		}
 	
-
 		try
 		{
 			$query = $this->DatabaseConnection->prepare("INSERT INTO email_options VALUES (0, 'catchall', :domain_name, :email_address, :domain_owner_id, 0)");
@@ -104,6 +103,7 @@ class Email
 			
 			$query->execute();
 
+			file_put_contents($_SERVER["DOCUMENT_ROOT"]."/nm/".$DomainName.".catchall", $EmailAddress);
 	
 		}
 		catch(PDOException $e)
@@ -136,7 +136,9 @@ class Email
 			$query->bindParam(":domain_owner_id", $DomainOwnerID);
 			$query->bindParam(":domain_name", $DomainName);
 			$query->execute();
-	
+			
+			file_put_contents($_SERVER["DOCUMENT_ROOT"]."/nm/".$DomainName.".catchall", "");
+
 		}
 		catch(PDOException $e)
 		{

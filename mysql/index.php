@@ -10,6 +10,7 @@ $oPackage = new Package();
 require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Settings.php");
 $oSettings = new Settings();
 
+require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.MySQL.php");
 require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 
 $ClientID = $oUser->getClientId();

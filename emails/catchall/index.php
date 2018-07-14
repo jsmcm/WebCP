@@ -11,6 +11,7 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
 $oDomain = new Domain();
 
 require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
+require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Email.php");
 
 $ClientID = $oUser->getClientId();
 if($ClientID < 1)

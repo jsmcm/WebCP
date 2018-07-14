@@ -117,12 +117,6 @@ if( ($WP_MySQLAllowance - $WP_MySQLUsage) > 0)
 	fwrite($f, "Path:".$WP_Path."\n");
 	fclose($f);
 
-	//print $TmpFile."<br>written<p>";
-	
-
-	//print "Entering long sleep<br>";
-	sleep(7);
-	//print "Yaawwwn, done...<br>";
 
 	$FileContents = trim(file_get_contents($TmpFile));
 	//print $FileContents."<br>";
