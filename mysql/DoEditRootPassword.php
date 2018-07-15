@@ -27,21 +27,36 @@ if($oUser->Role != 'admin')
 }
 
 
-$DBUser = $_POST["DBUser"];
-$DBName = $_POST["DBName"];
-$Password = $_POST["Password"];
+$DBUser = filter_var($_POST["DBUser"], FILTER_SANITIZE_STRING);
+$DBName = filter_var($_POST["DBName"], FILTER_SANITIZE_STRING);
+$Password = trim(filter_var($_POST["Password"], FILTER_SANITIZE_STRING));
 
 $Role = $oUser->Role;
 
 $oMySQL->ChangePassword($DBUser, $Password);
 
-$fp = fopen($_SERVER["DOCUMENT_ROOT"]."/nm/root.password", "w");
-fwrite($fp, $Password);
-fclose($fp);
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 
-while(file_exists($_SERVER["DOCUMENT_ROOT"]."/nm/root.password"))
-{
-	sleep(3);
+use \Matomo\Ini\IniReader;
+
+$reader = new IniReader();
+
+// Read a file
+$array = $reader->readFile($_SERVER["DOCUMENT_ROOT"]."/../config.php");
+
+$array["DATABASE_PASSWORD"] = $Password;
+
+// Write to a file
+unlink($_SERVER["DOCUMENT_ROOT"]."/../config.php");
+
+foreach ($array as $key=>$value) {
+    file_put_contents($_SERVER["DOCUMENT_ROOT"]."/../config.php", $key."=".$value."\r\n", FILE_APPEND);
+}
+
+touch($_SERVER["DOCUMENT_ROOT"]."/nm/root.password");
+
+while (file_exists($_SERVER["DOCUMENT_ROOT"]."/nm/root.password")) {
+    sleep(1);
 }
 
 

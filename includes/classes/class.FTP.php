@@ -468,13 +468,17 @@ class FTP
 		$this->GetDomainInfo($DomainUserName, $DomainID, $Uid);
 
 		
+		include_once(dirname(__FILE__)."/class.Utils.php");
+		$oUtils = new Utils();
+		$Quota = $oUtils->ConvertToScale($Quota, 'b', 'm');
 		
 		try
 		{
 			$query = $this->DatabaseConnection->prepare("INSERT INTO ftpd VALUES (0, :domain_user, :domain_id, :client_id, '1', :password, :uid, :uid1, :path, 0, 0, '', '*', :quota, 0);");
-			
+		
+	
 			$DomainUser = $DomainUserName."_".$UserName;
-			$Path = "'/home/".$DomainUserName."/public_html'";
+			$Path = "/home/".$DomainUserName."/public_html";
 			$Password = md5($Password);
 			
 			$query->bindParam(":domain_user", $DomainUser);
@@ -485,6 +489,8 @@ class FTP
 			$query->bindParam(":uid1", $Uid);
 			$query->bindParam(":path", $Path);
 			$query->bindParam(":quota", $Quota);
+
+
 			
 			$query->execute();
 	

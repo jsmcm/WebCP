@@ -20,10 +20,10 @@ if($ClientID < 1)
         exit();
 }
 
-$UserName = $_POST["UserName"];
-$DomainUserName = $_POST["DomainUserName"];
-$DomainID = $_POST["DomainID"];
-$Password = $_POST["Password"];
+$UserName = filter_var($_POST["UserName"], FILTER_SANITIZE_STRING);
+$DomainUserName = filter_var($_POST["DomainUserName"], FILTER_SANITIZE_STRING);
+$DomainID = filter_var($_POST["DomainID"], FILTER_SANITIZE_STRING);
+$Password = filter_var($_POST["Password"], FILTER_SANITIZE_STRING);
 
 $Role = $oUser->Role;
 
@@ -64,7 +64,7 @@ $Mb = $oPackage->GetPackageAllowance("DiskSpace", $PackageID);
 //print "User Name: ".$UserName."<p>";
 //print "PackageID: ".$PackageID."<p>";
 //print "Mb: ".$Mb."<p>";
-//print "Password: ".$Password."<p>";
+///print "Password: ".$Password."<p>";
 
 $x = $oFTP->AddFTP($UserName, $DomainID, $Password, $Mb, $DomainInfoArray["ClientID"]);
 
@@ -78,11 +78,11 @@ if($x < 1)
 	{
 		$Message = "You do not have any more FTP users on your current hosting plan";
 	}
-
+//print $Message;
 	header("location: index.php?NoteType=Error&Notes=".$Message);
 	exit();
 }
-
+//print "done";
 header("location: index.php?Notes=FTP user name added");
 
 ?>
