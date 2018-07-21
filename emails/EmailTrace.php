@@ -11,6 +11,8 @@ if($ClientID < 1)
 	exit();
 }
 $Role = $oUser->Role;
+
+require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Settings.php");
 $oSettings = new Settings();
 
 require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");

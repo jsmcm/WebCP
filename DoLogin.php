@@ -24,11 +24,28 @@ $LicenseKey = file_get_contents($_SERVER["DOCUMENT_ROOT"]."/includes/license.con
 $Hash = $oUtils->GetValidationHash($LicenseKey);
 
 if ($oUtils->ValidateHash($Hash, $LicenseKey) == true) {
-    print "Writing activation.dat: ".md5($LicenseKey.$_SERVER["SERVER_ADDR"].date("Y-m-t 23:59:59"))."<p>";
     file_put_contents($_SERVER["DOCUMENT_ROOT"]."/includes/activation.dat", md5($LicenseKey.$_SERVER["SERVER_ADDR"].date("Y-m-t 23:59:59")));
 } else {
-    header("location: index.php?Notes=Error with license file or license expired, please contact support:<p><b>".$Hash."</b><p><a href=\"/enter_license.php\">Enter New License</a>");
-    exit();
+ 
+
+
+    // The license server has an intermittent issue, so recheck!
+    if (strlen($Hash) == 34) {
+       
+        $Hash = $oUtils->GetValidationHash($LicenseKey);
+
+        if ($oUtils->ValidateHash($Hash, $LicenseKey) == true) {
+            file_put_contents($_SERVER["DOCUMENT_ROOT"]."/includes/activation.dat", md5($LicenseKey.$_SERVER["SERVER_ADDR"].date("Y-m-t 23:59:59")));
+        } else {
+            header("location: index.php?Notes=Error with license file or license expired, please contact support:<p><b>".$Hash."</b><p><a href=\"/enter_license.php\">Enter New License</a>");
+            exit();
+        }
+
+    } else {
+        header("location: index.php?Notes=Error with license file or license expired, please contact support:<p><b>".$Hash."</b><p><a href=\"/enter_license.php\">Enter New License</a>");
+        exit();
+    }
+
 }
 
 $emailAddress = "";

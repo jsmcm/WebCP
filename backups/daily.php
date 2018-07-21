@@ -271,7 +271,9 @@ if($Role != "admin")
                                         
 
 					print "<td>".date ("Y-m-d H:i:s", filemtime($_SERVER["DOCUMENT_ROOT"]."/backups/daily/".$file))."</td>";
-					print "<td>".$oUtils->ConvertFromBytes(filesize($_SERVER["DOCUMENT_ROOT"]."/backups/daily/".$file))."</td>";	
+
+				        $sizeOfFile = filesize($_SERVER["DOCUMENT_ROOT"]."/backups/daily/".$file);
+					print "<td>".$oUtils->ConvertFromBytes($sizeOfFile)."</td>";	
 
 
 

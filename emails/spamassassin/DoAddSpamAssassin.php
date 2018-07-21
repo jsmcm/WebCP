@@ -40,7 +40,7 @@ if($ClientID < 1)
 $EmailAddress = "";
 if(isset($_POST["EmailAddress"]))
 {
-	$EmailAddress = $_POST["EmailAddress"];
+	$EmailAddress = filter_var($_POST["EmailAddress"], FILTER_SANITIZE_EMAIL);
 }
 else
 {
@@ -51,21 +51,21 @@ else
 $SpamSubjectModifier = "";
 if(isset($_POST["SpamSubjectModifier"]))
 {
-	$SpamSubjectModifier = $_POST["SpamSubjectModifier"];
+	$SpamSubjectModifier = filter_var($_POST["SpamSubjectModifier"], FILTER_SANITIZE_STRING);
 }
 
 
 $SpamWarnLevel = "";
 if(isset($_POST["SpamWarnLevel"]))
 {
-	$SpamWarnLevel = $_POST["SpamWarnLevel"];
+	$SpamWarnLevel = intVal($_POST["SpamWarnLevel"]);
 }
 
 
 $SpamBlockLevel = "";
 if(isset($_POST["SpamBlockLevel"]))
 {
-	$SpamBlockLevel = $_POST["SpamBlockLevel"];
+	$SpamBlockLevel = intVal($_POST["SpamBlockLevel"]);
 }
 
 	$DomainOwnerID = $oEmail->GetClientIDFromEmailAddress($EmailAddress);

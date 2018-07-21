@@ -499,6 +499,8 @@ if(isset($MonthlyBackupSettingsArray["BackupFTPCount"]))
 								<div class="col-sm-10">
 									<span class="input-icon">
 									<input name="FTPRemotePath" value="<?php print $FTPRemotePath; ?>" type="text" id="form-field-11" class="form-control">
+									<br>
+ 									<i><b>Note: </b>This path must already exist on the FTP server, we will not create it!!!</i><br>&nbsp;<br>
 									</span>
 								</div>
 							</div>

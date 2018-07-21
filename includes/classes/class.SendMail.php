@@ -34,10 +34,6 @@ class SendMail
 
 
                 $MailFrom = $_SERVER["SERVER_NAME"];
-                if(strstr($MailFrom, "http://"))
-                {
-                        $MailFrom = substr($MailFrom, 7);
-                }
 
                 if(strstr($MailFrom, "www."))
                 {

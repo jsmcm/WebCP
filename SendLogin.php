@@ -26,12 +26,12 @@ if($UserName != "")
       
      	$mail = new PHPMailer();
             
-	$mail->IsSMTP();
+	//$mail->IsSMTP();
         $mail->ClearAddresses(); 
         $mail->ClearAttachments();
         $mail->IsHTML(true);
-        $mail->AddReplyTo("noreply@".substr($_SERVER["SERVER_NAME"], 4), $_SERVER["SERVER_NAME"]);
-        $mail->From = "noreply@".substr($_SERVER["SERVER_NAME"], 4);
+        $mail->AddReplyTo("noreply@".$_SERVER["SERVER_NAME"]);
+        $mail->From = "noreply@".$_SERVER["SERVER_NAME"];
         $mail->FromName = $_SERVER["SERVER_NAME"];
             
         $mail->AddAddress($_POST["email"]);

@@ -6,7 +6,7 @@ if(!isset($_SESSION))
      session_start();
 }
 
-include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
+include_once("/var/www/html/webcp/vendor/autoload.php");
 
 use \Matomo\Ini\IniReader;
 
@@ -40,7 +40,7 @@ class Database
 	}
 
 	// Read a file
-	$array = $reader->readFile($_SERVER["DOCUMENT_ROOT"]."/../config.php");
+	$array = $reader->readFile("/var/www/html/config.php");
 
 	$DatabaseName = $array["DATABASE_NAME"];
 	$DatabaseHost = $array["DATABASE_HOST"];
