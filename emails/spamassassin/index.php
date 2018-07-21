@@ -261,8 +261,6 @@ if($ClientID < 1)
 												$ClientID = $_REQUEST["ClientID"];
 											}
 										}
-									print "loggedInId: ".$loggedInId."<p>";
-									print "Role: ".$oUser->Role."<p>";
 
 										$oEmail->GetSpamAssassinSummaryList($Array, $ArrayCount, $loggedInId, $Role);
 

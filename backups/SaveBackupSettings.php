@@ -30,6 +30,11 @@ $FTPHost = filter_input(INPUT_POST, "FTPHost", FILTER_SANITIZE_STRING);
 $FTPRemotePath = filter_input(INPUT_POST, "FTPRemotePath", FILTER_SANITIZE_STRING);
 $FTPUserName = filter_input(INPUT_POST, "FTPUserName", FILTER_SANITIZE_STRING);
 $FTPPassword = filter_input(INPUT_POST, "FTPPassword", FILTER_SANITIZE_STRING);
+
+if ((strlen($FTPRemotePath) > 0) && (substr($FTPRemotePath, strlen($FTPRemotePath) - 1, 1) != "/")) {
+    $FTPRemotePath = $FTPRemotePath."/";
+}
+
 $oSettings->SaveBackupFTPSettings($FTPHost, $FTPRemotePath, $FTPUserName, $FTPPassword);
 
 $DailyBackupStatus = filter_input(INPUT_POST, "DailyBackupStatus", FILTER_SANITIZE_STRING);

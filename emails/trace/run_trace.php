@@ -29,7 +29,6 @@ if(file_exists($LockFile))
 
 touch($LockFile);
 
-$MySQLMailSent = 0;
 $UserNameArray = array();
 $UserNameArrayIndex = 0;
 
@@ -195,61 +194,9 @@ function InsertEmailTrace($MailQueueID, $ToUser, $FromUser, $Date, $Time, $Sende
 	{
 		$Status == "started";
 	}
-	else if(strlen($Status) > 7)
-	{
-		if(substr($Status, 0, 8) == "DNSBL - ")
-		{
-			$f = fopen("/var/www/html/webcp/emails/trace/spam_log.txt", "a");
-			fwrite($f, "Spam logger at 1\r\n");
-			fwrite($f, $Status."\r\n");
-			
-			
-			$Number = 0;
-			if(strpos($Status, "dnsbl.phpwebhost.co.za"))
-			{
-				$Number = -1;
-			}
-			else if(strpos($Status, "cbl.abuseat.org"))
-			{
-				$Number = 3;
-			}
+        
 
-			$IP = "";
-			if( ($Number > -1) && (strstr($Status, "?")) )
-			{
-				$IP = substr($Status, strpos($Status, "?") + 1 + $Number);
-			}
-
-			fwrite($f, "IP: ".$IP."\r\n");
-
-
-			if(strlen($IP) > 0)
-			{
-	         		$SendData = "IP=".$IP;
-	
-				fwrite($f, "curling\r\n");
-
-	               	 	$c = curl_init();
-	                	curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
-	                	curl_setopt($c, CURLOPT_POSTFIELDS,  $SendData);
-	                	curl_setopt($c, CURLOPT_POST, 1);
-	               	 	curl_setopt($c, CURLOPT_URL, "http://dnsbl.phpwebhost.co.za/insert_mail.php");
-        	        	$ResultString = curl_exec($c);
-	                	curl_close($c);
-
-				fwrite($f, "Result String: ".$ResultString."\r\n");
-			}			
-			else
-			{
-				fwrite($f, "strlen(IP): ".strlen($IP)."\r\n");
-			}
-
-			fclose($f);
-
-		}
-	}
-	
-        $oDatabase = new Database();
+	$oDatabase = new Database();
         $DatabaseConnection = $oDatabase->GetConnection();
 
 	try
@@ -355,52 +302,6 @@ function UpdateEmailTrace($MailQueueID, $Date, $Time, $ToAddress, $From, $Return
 	
 		
 		
-	if( (strlen($Progress) > 7) && (substr($Progress, 0, 8) == "DNSBL - ") )
-	{
-		$f = fopen("/var/www/html/webcp/emails/trace/spam_log.txt", "a");
-		fwrite($f, "Spam logger at 2\r\n");
-		fwrite($f, $Progress."\r\n");
-			
-			$Number = 0;
-			if(strpos($Progress, "dnsbl.phpwebhost.co.za"))
-			{
-				$Number = -1;
-			}
-			else if(strpos($Progress, "cbl.abuseat.org"))
-			{
-				$Number = 3;
-			}
-	
-			$IP = "";
-			if( ($Number > -1) && (strpos($Progress, "?")) )
-			{
-				$IP = substr($Progress, strpos($Progress, "?") + 1 + $Number);
-			}
-			fwrite($f, "IP = ".$IP."\r\n");
-
-			if(strlen($IP) > 0)
-			{
-	         		$SendData = "IP=".$IP;
-	
-				fwrite($f, "Curling\r\n");
-
-	                	$c = curl_init();
-	               	 	curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
-	               	 	curl_setopt($c, CURLOPT_POSTFIELDS,  $SendData);
-	                	curl_setopt($c, CURLOPT_POST, 1);
-	                	curl_setopt($c, CURLOPT_URL, "http://dnsbl.phpwebhost.co.za/insert_mail.php");
-        	        	$ResultString = curl_exec($c);
-	                	curl_close($c);
-				
-				fwrite($f, "Result String = ".$ResultString."\r\n");
-			}
-			else
-			{
-				fwrite($f, "strlen(IP): ".strlen($IP)."\r\n");
-			}
-
-			fclose($f);
-	}
 		
 	
 
@@ -408,58 +309,6 @@ function UpdateEmailTrace($MailQueueID, $Date, $Time, $ToAddress, $From, $Return
 
 function UpdateStatus($MailQueueID, $Status, $Debug=0)
 {
-
-	if( (strlen($Status) > 7) && (substr($Status, 0, 8) == "DNSBL - ") )
-	{
-		$f = fopen("/var/www/html/webcp/emails/trace/spam_log.txt", "a");
-			fwrite($f, "Spam logger at 3\r\n");
-		fwrite($f, $Status."\r\n");
-		
-			$Number = 0;
-			if(strpos($Status, "dnsbl.phpwebhost.co.za"))
-			{
-				$Number = -1;
-			}
-			else if(strpos($Status, "cbl.abuseat.org"))
-			{
-				$Number = 3;
-			}
-
-
-			$IP = "";
-			if( ($Number > -1) && (strpos($Status, "?")) )
-			{
-				$IP = substr($Status, strpos($Status, "?") + 1 + $Number);
-			}
-
-			fwrite($f, $IP."\r\n");
-
-			if(strlen($IP) > 0)
-			{
-	         		$SendData = "IP=".$IP;
-				
-				fwrite($f, "curling\r\n");
-
-	                	$c = curl_init();
-	                	curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
-	               	 	curl_setopt($c, CURLOPT_POSTFIELDS,  $SendData);
-	                	curl_setopt($c, CURLOPT_POST, 1);
-	                	curl_setopt($c, CURLOPT_URL, "http://dnsbl.phpwebhost.co.za/insert_mail.php");
-        	        	$ResultString = curl_exec($c);
-	                	curl_close($c);
-
-				fwrite($f, "Result String: ".$ResultString."\r\n");
-
-			}
-			else
-			{
-				fwrite($f, "strlen(IP): ".strlen($IP)."\r\n");
-			}
-
-			fclose($f);
-
-	}
-		
 
         $oDatabase = new Database();
         $DatabaseConnection = $oDatabase->GetConnection();
@@ -622,20 +471,9 @@ while (false !== ($line = fgets(STDIN)))
 
 	if($Ignore == 0)
 	{
-		//print "\r\n=============================\r\nLine: ".$line."\r\n";
+		print "\r\n=============================\r\nLine: ".$line."\r\n";
 
-		if(strstr($line, ": MYSQL connection failed: Too many connections"))
-		{
-			// problem!
-
-			if($MySQLMailSent == 0)
-			{
-				mail("admin@softsmart.co.za", "Too many mysql connections!", $line);
-			}
-
-			$MySQLMailSent = 1;
-		}
-		else if(strstr($line, "Completed"))
+		if(strstr($line, "Completed"))
                 {
                         $Date = trim(substr($line, 0, strpos($line, " ")));
                         $line = substr($line, strpos($line, " ") + 1);
@@ -1067,6 +905,12 @@ while (false !== ($line = fgets(STDIN)))
 
 		else if(strstr($line, ": DNSBL -"))
 		{
+
+			if (strstr($line, "Warning: DNSBL - dnsbl.sorbs.net")) {
+			    // just a warning...
+			    continue;
+                        }
+
                         $Date = trim(substr($line, 0, strpos($line, " ")));
                         $line = substr($line, strpos($line, " ") + 1);
 

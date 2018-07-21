@@ -613,6 +613,9 @@ class Email
 			$this->AddSpamSubjectModifier($EmailAddress, $ClientID, $SpamSubjectModifier);
 			$this->AddUseSpamSubjectModifier($EmailAddress, $ClientID, "1");
 		}
+
+		file_put_contents($_SERVER["DOCUMENT_ROOT"]."/nm/".$EmailAddress.".add_spamassassin", "block=".$SpamBlockLevel."\r\nwarn=".$SpamWarnLevel."\r\nsubject=".$SpamSubjectModifier."\r\nlocal_part=".substr($EmailAddress, 0, strpos($EmailAddress, "@"))."\r\ndomain=".substr($EmailAddress, strpos($EmailAddress, "@") + 1)."\r\n");
+
  		return true;
 	}
 
@@ -720,6 +723,8 @@ class Email
 	function DeleteSpamAssassin($ClientID, $Role, $EmailAddress)
 	{
 			
+		file_put_contents($_SERVER["DOCUMENT_ROOT"]."/nm/".$EmailAddress.".delete_spamassassin", "local_part=".substr($EmailAddress, 0, strpos($EmailAddress, "@"))."\r\ndomain=".substr($EmailAddress, strpos($EmailAddress, "@") + 1)."\r\n");
+
 		try
 		{
 			
@@ -745,7 +750,7 @@ class Email
 				$query->bindParam(":client_id", $ClientID);
 				$query->bindParam(":email_address", $EmailAddress);
 			}
-
+			
 			$query->execute();
 	
 		}
