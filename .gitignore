@@ -16,3 +16,5 @@ logs/*
 backups/daily
 logs/*
 nm/
+backups/weekly
+backups/weekly/*
