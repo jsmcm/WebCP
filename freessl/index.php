@@ -208,7 +208,7 @@ if($ClientID < 1)
 								<div class="panel-body">
 
 									<?php
-									if( (file_exists("/etc/letsencrypt")) && (file_exists("/etc/httpd/conf/ssl/letsencrypt")) )
+									if( (file_exists("/etc/letsencrypt")) && (file_exists("/etc/nginx/ssl/letsencrypt")) )
 									{
 									?>
 									<table class="table table-bordered table-full-width table-hover table-striped" id="sample_1">
