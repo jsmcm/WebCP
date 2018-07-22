@@ -156,7 +156,10 @@ foreach($BlockEmailArray as $SpamAddress)
 	$EmailAddress = "";
 	$Username = "";
 	$UserID = $oEmail->GetEmailOwnerFromEmailAddress($SpamAddress);
-	$oUser->GetUserDetails($UserID, $FirstName, $Surname, $EmailAddress, $Username);
+	
+	$role = "";
+
+	$oUser->GetUserDetails($UserID, $FirstName, $Surname, $EmailAddress, $Username, $role);
 
 	$EmailMessage = "Hello ".$FirstName.",<p>We have detected what appears to be spam originating from your email address, ".$SpamAddress.". We will investigate this, but please look into it yourself by going to the hosting control panel and clicking on Emails->Email Trace. If you see what appears to be spam originating from your address please immediately change the password.";
 	if($SpamAction == "block")
@@ -164,9 +167,12 @@ foreach($BlockEmailArray as $SpamAddress)
 		$EmailMessage = "Hello ".$FirstName.",<p>We have detected what appears to be spam originating from your email address, ".$SpamAddress.". As such we have suspended this email account until we've managed to investigate the cause of this.";
 	}
 	
-	if($EmailAddress != "")
-	{
-		$oSendMail->SendEmail($EmailAddress, "Outgoing Spam from your email address", $EmailMessage);
+	if ($EmailAddress != "") {
+        
+            if (!file_exists($_SERVER["DOCUMENT_ROOT"]."/tmp/spamguard_".$SpamAddress."_".date("YmdH"))) {
+	         $oSendMail->SendEmail($EmailAddress, "Outgoing Spam from your email address", $EmailMessage);
+                 touch($_SERVER["DOCUMENT_ROOT"]."/tmp/spamguard_".$SpamAddress."_".date("YmdH"));
+            }
 	}
 }
 

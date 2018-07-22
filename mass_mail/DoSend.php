@@ -38,8 +38,9 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.SendMail.php");
 
 $oSendMail = new SendMail();
 
+$sendTo = filter_var($_POST["SendTo"], FILTER_SANITIZE_STRING);
 
-$oUser->GetUserListFromPackageID($UserArray, $ArrayCount, $_POST["SendTo"]);
+$oUser->GetUserListFromPackageID($UserArray, $ArrayCount, $sendTo);
 
 $ResultArray = array();
 
@@ -49,13 +50,17 @@ for($x = 0; $x < $ArrayCount; $x++)
 	set_time_limit(30);
 	//print $UserArray[$x]["first_name"]." - ".$UserArray[$x]["surname"]." - ".$UserArray[$x]["email_address"]."<br>";
 
-	$Message = $_POST["TextToSend"];
+	$Message = filter_var($_POST["TextToSend"], FILTER_SANITIZE_STRING);
 	$Message = str_replace("{first_name}", $UserArray[$x]["first_name"], $Message);
 	$Message = str_replace("{surname}", $UserArray[$x]["surname"], $Message);
 	$Message = str_replace("{full_name}", $UserArray[$x]["first_name"]." ".$UserArray[$x]["surname"], $Message);
-	//$UserArray[$x]["email_address"] = "tdkubu@gmail.com";
 
-	if($oSendMail->SendEmail($UserArray[$x]["email_address"], $_POST["Subject"], $Message))
+	$subject = filter_var($_POST["Subject"], FILTER_SANITIZE_STRING);
+	$subject = str_replace("{first_name}", $UserArray[$x]["first_name"], $subject);
+	$subject = str_replace("{surname}", $UserArray[$x]["surname"], $subject);
+	$subject = str_replace("{full_name}", $UserArray[$x]["first_name"]." ".$UserArray[$x]["surname"], $subject);
+
+	if($oSendMail->SendEmail($UserArray[$x]["email_address"], $subject, $Message))
 	{
 		array_push($ResultArray, "Mail sent to ".$UserArray[$x]["first_name"]." ".$UserArray[$x]["surname"]." - ".$UserArray[$x]["email_address"]."<br>");
 	}

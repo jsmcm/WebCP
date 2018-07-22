@@ -200,7 +200,7 @@ class SendMail
 
                 $mail = new PHPMailer();
 
-		$mail->IsSMTP();
+		//$mail->IsSMTP();
                 $mail->ClearAddresses();
                 $mail->ClearAttachments();
                 $mail->IsHTML(true);
