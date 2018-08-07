@@ -53,6 +53,3 @@ class SSL
 		return 0;
 	}
 }
-
-?>
-

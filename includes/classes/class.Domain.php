@@ -1498,8 +1498,6 @@ class Domain
 		$ClientUserName = $oUser->GetUserName($ClientID);
 
 		$DomainUserName = $InfoArray["UserName"];
-		//print "ClientUserName: ".$ClientUserName."<br>";
-		//print "DomainUserName: ".$DomainUserName."<br>";
 
 		$this->UpdateQuery("UPDATE domains SET client_id = ".$ClientID.", admin_username = '".$ClientUserName."' WHERE id = ".$DomainID);
 		$this->UpdateQuery("UPDATE domains SET client_id = ".$ClientID.", admin_username = '".$ClientUserName."' WHERE ancestor_domain_id = ".$DomainID);
@@ -1803,7 +1801,6 @@ class Domain
 			$Error = "<p><b>The DNS could not be registered due to an error:<p>".$e->getMessage()."</b>";
 		}
 
-		//print $query."<p>";
 		//exit();
 
 		return $lastInsertId;
@@ -1948,7 +1945,6 @@ class Domain
 			$Error = "<p><b>".$Error."</b>";
 		}
 
-		//print $query."<p>";
 		//exit();
 
 		return $lastInsertId;
@@ -1975,11 +1971,6 @@ class Domain
 
 		$oLog->WriteLog("DEBUG", "DomainName: '".$DomainName."', DomainType: '".$DomainType."', PackageID: '".$PackageID."', ClientID: '".$ClientID."'");
 
-		//print "In AddDomain<br>";
-		//print "DomainName = '".$DomainName."'<br>";
-		//print "DomainType = ".$DomainType."<br>";
-		//print "PackageID = ".$PackageID."<br>";
-		//print "ClientID = ".$ClientID."<br>";
 
 		if(file_exists($_SERVER["DOCUMENT_ROOT"]."/includes/ipv6.txt"))
 		{
@@ -2080,7 +2071,6 @@ class Domain
 			$oLog->WriteLog("DEBUG", $Error);
 		}
 
-		//print $query."<p>";
 		//exit();
 
 		
@@ -2576,7 +2566,6 @@ class Domain
 
 		$DomainName = $DomainInfoArray["DomainName"];
 
-		//print "DomainName: ".$DomainName."<br>";
 		
 		$this->DeleteDomainFile($this->GetParentDomainIDRecursive($ParkedDomainID));
 		$this->MakeDomainFile($this->GetParentDomainIDRecursive($ParkedDomainID));
@@ -2681,5 +2670,3 @@ class Domain
     
 }
 
-
-?>

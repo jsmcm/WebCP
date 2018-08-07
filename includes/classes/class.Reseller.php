@@ -423,4 +423,3 @@ class Reseller
 		return 1;
 	}
 }
-?> 

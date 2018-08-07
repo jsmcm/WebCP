@@ -671,4 +671,3 @@ class Utils
 	}
 }		
 
-?>

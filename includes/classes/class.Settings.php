@@ -372,7 +372,6 @@ class Settings
 
 		if(! is_numeric($Gb))
 		{
-			print "Rturing<p>";
 			return 0;
 		}
 
@@ -880,5 +879,3 @@ class Settings
     
 }
 
-
-?>
