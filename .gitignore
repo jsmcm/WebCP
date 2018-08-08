@@ -18,3 +18,4 @@ logs/*
 nm/
 backups/weekly/
 backups/weekly/*
+emails/trace/run_trace_lock

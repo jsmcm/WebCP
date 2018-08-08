@@ -48,11 +48,11 @@ if($DomainOwnerID  != $DomainID)
 
 if( $Dkim == "enabled" )
 {
-	touch("/etc/exim/dkim/".$DomainName);
+	touch("/etc/exim4/dkim/".$DomainName);
 }
 else
 {
-	unlink("/etc/exim/dkim/".$DomainName);
+	unlink("/etc/exim4/dkim/".$DomainName);
 }
 
 print "Dkim updated for ".$DomainName." to ".$Dkim." dkim!";

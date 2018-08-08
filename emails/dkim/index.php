@@ -172,9 +172,9 @@ function DomainInArray($LookInArray, $Domain)
 
 <?php
 $PublicKey = "";
-if( file_exists("/etc/exim/dkim.public.key") )
+if( file_exists("/etc/exim4/dkim.public.key") )
 {
-	$PublicKey = file_get_contents("/etc/exim/dkim.public.key");
+	$PublicKey = file_get_contents("/etc/exim4/dkim.public.key");
 
 	$x = strpos($PublicKey, "-----BEGIN PUBLIC KEY-----");
 
@@ -295,7 +295,7 @@ See our post about <a href="https://webcp.pw/spf-dkim-dmarc" target="_blank">SPF
 										{
 											print "<tr>";
 											print "<td>".$DkimArray[$x]["domain_name"]."</td>\r\n";	
-											print "<td><a href=\"#\" id=\"dkim_".$x."\" data-type=\"select\" data-pk=\"".$DkimArray[$x]["id"]."\" data-value=\"".((file_exists("/etc/exim/dkim/".$DkimArray[$x]["domain_name"]))?"enabled":"not_enabled")."\" data-original-title=\"Select Dkim\"></a></td>\r\n";	
+											print "<td><a href=\"#\" id=\"dkim_".$x."\" data-type=\"select\" data-pk=\"".$DkimArray[$x]["id"]."\" data-value=\"".((file_exists("/etc/exim4/dkim/".$DkimArray[$x]["domain_name"]))?"enabled":"not_enabled")."\" data-original-title=\"Select Dkim\"></a></td>\r\n";	
 												
 
 												print "</tr>";
