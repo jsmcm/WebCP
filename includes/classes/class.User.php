@@ -927,6 +927,9 @@ class User
 	
 	function EditUser($FirstName, $Surname, $EmailAddress, $Password, $UserRole, $UserIDToChange, $Username, $ClientID)
 	{
+		if ($UserRole == "") {
+                    $UserRole = $this->GetUserRole($ClientID);
+                }
 
 		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Package.php");
 		$oPackage = new Package();

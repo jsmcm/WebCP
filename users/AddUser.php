@@ -353,8 +353,6 @@ function DoSubmit()
 							<div class="panel panel-default">
 									
 								<div class="panel-body">
-					
-
 								<form name="AddUser" method="post" action="DoAddUser.php" class="form-horizontal">
 									
 						                <input type="hidden" name="Action" value="<?php print $Action; ?>">
@@ -387,11 +385,8 @@ function DoSubmit()
 									
 
 										<?php
-
-										if($oUser->Role == "admin")
-										{
-										?>
-
+if (($oUser->Role == "admin") && ($UserID != $ClientID)) {
+?>
 										<div class="form-group">
 											<label class="col-sm-2 control-label">
 												Role:
@@ -423,8 +418,8 @@ function DoSubmit()
 									
 										<p>&nbsp;<p>
 										<?php
-										}
-										?>
+}
+?>
 	
 										<div class="form-group">
 											<label class="col-sm-2 control-label">

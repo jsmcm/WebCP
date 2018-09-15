@@ -1,6 +1,5 @@
 <?php
-
-//$Debug = true;
+//d$Debug = true;
 $Debug = false;
 
 if(!file_exists($_SERVER["DOCUMENT_ROOT"]."/includes/cron/tmp/"))
