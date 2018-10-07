@@ -342,6 +342,14 @@ class User
 	{
 		
 		$ClientArray = array();
+		$ClientArray["ClientID"] = 0;
+		$ClientArray["FirstName"] = "";
+		$ClientArray["Surname"] = "";
+		$ClientArray["EmailAddress"] = "";
+		$ClientArray["Role"] = "";
+		$ClientArray["UserName"] = "";
+		$ClientArray["Password"] = "";
+		
 		
 	
 		

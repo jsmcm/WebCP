@@ -2,24 +2,19 @@
 session_start();
 
 $Debug = false;
+$Debug = true;
 
-if(isset($_GET["Debug"]) && $_GET["Debug"] == "true")
-{
-	$Debug = true;
+if (!file_exists($_SERVER["DOCUMENT_ROOT"]."/backups/tmp/")) {
+    mkdir($_SERVER["DOCUMENT_ROOT"]."/backups/tmp/", 0755);
 }
 
-if(!file_exists($_SERVER["DOCUMENT_ROOT"]."/backups/tmp/"))
-{
-	mkdir($_SERVER["DOCUMENT_ROOT"]."/backups/tmp/", 0755);
+if (!file_exists($_SERVER["DOCUMENT_ROOT"]."/includes/cron/tmp/")) {
+    mkdir($_SERVER["DOCUMENT_ROOT"]."/includes/cron/tmp/", 0755);
 }
 
-if(!file_exists($_SERVER["DOCUMENT_ROOT"]."/includes/cron/tmp/"))
-{
-	mkdir($_SERVER["DOCUMENT_ROOT"]."/includes/cron/tmp/", 0755);
-}
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 
-
-
+/*
 require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Settings.php");
 require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
 require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
@@ -28,6 +23,7 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Email.php");
 require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.FTP.php");
 require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.MySQL.php");
 require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.DNS.php");
+*/
 
 $oUser = new User();
 $oDomain = new Domain();
@@ -361,7 +357,7 @@ for($DomainCount = 0; $DomainCount < $DomainBackupListCount; $DomainCount++)
 
 	$PackageSettingValues = array();
 	$ArrayCount = 0;
-	$oPackage->GetPackageDetails($DomainArray["PackageID"], $PackageSettingValues, $ArrayCount);
+	$oPackage->GetPackageDetails($DomainArray["PackageID"], $PackageSettingValues, $ArrayCount, "admin", 0);
 
 	$PackageXML = $XMLContent->addChild("Package");
 	foreach($PackageSettingValues as $key=>$val)
