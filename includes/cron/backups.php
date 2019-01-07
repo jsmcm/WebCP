@@ -2,7 +2,6 @@
 session_start();
 
 $Debug = false;
-$Debug = true;
 
 if (!file_exists($_SERVER["DOCUMENT_ROOT"]."/backups/tmp/")) {
     mkdir($_SERVER["DOCUMENT_ROOT"]."/backups/tmp/", 0755);

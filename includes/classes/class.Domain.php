@@ -5,9 +5,7 @@ if(!isset($_SESSION))
 {
      session_start();
 }
-
-include_once(dirname(__FILE__)."/class.Log.php");
-include_once(dirname(__FILE__)."/class.Database.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 
 class Domain
 {
@@ -1883,9 +1881,6 @@ class Domain
 		
 		$lastInsertId = $this->DatabaseConnection->lastInsertId();
 		
-		$this->DeleteDomainFile($this->GetParentDomainIDRecursive($PrimaryDomainID));
-		$this->MakeDomainFile($this->GetParentDomainIDRecursive($PrimaryDomainID));
-		
 		try
 		{
 			$ServerType = $oDNS->GetSetting("server_type");
@@ -1947,6 +1942,10 @@ class Domain
 
 		//exit();
 
+		
+		$this->DeleteDomainFile($this->GetParentDomainIDRecursive($PrimaryDomainID));
+		$this->MakeDomainFile($this->GetParentDomainIDRecursive($PrimaryDomainID));
+	
 		return $lastInsertId;
 		
 	}
@@ -2548,13 +2547,8 @@ class Domain
 
 	function DeleteParkedDomain($ClientID, $ParkedDomainID, &$Error)
 	{
-		
-		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Settings.php");
 		$oSettings = new Settings();
-	
-		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.DNS.php");
 		$oDNS = new DNS();
-	
 	
 		if($ClientID != $this->GetDomainOwner($ParkedDomainID))
 		{
@@ -2565,15 +2559,14 @@ class Domain
                 $this->GetDomainInfo($ParkedDomainID, $DomainInfoArray);
 
 		$DomainName = $DomainInfoArray["DomainName"];
+		$parentDomainId = $this->GetParentDomainIDRecursive($ParkedDomainID);
 
-		
-		$this->DeleteDomainFile($this->GetParentDomainIDRecursive($ParkedDomainID));
-		$this->MakeDomainFile($this->GetParentDomainIDRecursive($ParkedDomainID));
 
 		try
 		{
-			$query = $this->DatabaseConnection->prepare("UPDATE domains SET deleted = 1 WHERE id = ".$ParkedDomainID." AND client_id = :client_id");
+			$query = $this->DatabaseConnection->prepare("UPDATE domains SET deleted = 1 WHERE id = :parked_domain_id AND client_id = :client_id");
 			
+			$query->bindParam(":parked_domain_id", $ParkedDomainID);
 			$query->bindParam(":client_id", $ClientID);
 			
 			$query->execute();
@@ -2638,6 +2631,9 @@ class Domain
 		{
 			$Error = "<p>Could not delete DNS zone: <p>Error: ".$e->getMessage();
 		}
+		
+		$this->DeleteDomainFile($parentDomainId);
+		$this->MakeDomainFile($parentDomainId);
 	
 		return 1;
 	}

@@ -1,10 +1,13 @@
 <?php
 session_start();
 
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
+
+/*
 require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
 require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
 require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Package.php");
-
+*/
 
 $oUser = new User();
 $oDomain = new Domain();
@@ -16,7 +19,6 @@ if($ClientID < 1)
         header("Location: /ListParkedDomains.php");
         exit();
 }
-
 
 
 $DomainID = $_REQUEST["DomainID"];
@@ -122,7 +124,3 @@ if($oDomain->AddParkedDomain($ParkedDomain, $PrimaryDomain, $PackageID, $DomainO
 	exit();
 }
 header("location: ListParkedDomains.php?DomainID=".$AncestorDomainID."&NoteType=Success&Notes=Domain added<br><b>Please wait 1 minute before adding email or FTP accounts for this domains!</b>".$Error);
-
-?>
-
-i
