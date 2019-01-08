@@ -1516,7 +1516,7 @@ class DNS
 			sleep(3);
 
 			$SerialNumber = date("Ymd")."01";
-			$SOAID = $this->__AddSOA(1, $DomainName, $TTL, $PrimaryNameServer, $EmailAddress, $SerialNumber, $Refresh, $Retry, $Expire, $NegativeTTL);
+			$SOAID = $this->__AddSOA(1, $DomainName, $TTL, $PrimaryNameServer.".", $EmailAddress, $SerialNumber, $Refresh, $Retry, $Expire, $NegativeTTL);
 			if($SOAID > 0)
 			{
 				if($IPv4Address != "")
