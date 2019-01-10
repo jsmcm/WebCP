@@ -41,4 +41,22 @@ $(function(){
         }   
     });    
 
+    $('[id^="wwwredirect"]').editable({
+
+        source: [
+            {value: 'none', text: 'No Redirect'},
+            {value: 'www', text: 'Redirect to WWW'},
+            {value: 'naked', text: 'Redirect to Naked Domain'}
+        ],
+        display: function(value, sourceData) {
+             var colors = {"": "gray", "none": "red", "www": "green", "naked": "green"},
+                 elem = $.grep(sourceData, function(o){return o.value == value;});
+                 
+             if(elem.length) {    
+                 $(this).text(elem[0].text).css("color", colors[value]); 
+             } else {
+                 $(this).empty(); 
+             }
+        }   
+    });    
 });

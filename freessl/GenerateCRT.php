@@ -1,13 +1,10 @@
 <?php
 session_start();
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
+
 $oDomain = new Domain();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
 $oUser = new User();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Settings.php");
 $oSettings = new Settings();
 
 require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
@@ -39,6 +36,8 @@ if($oDomain->DomainExists($DomainName) != $DomainID)
 }
 
 file_put_contents($_SERVER["DOCUMENT_ROOT"]."/nm/".$DomainName.".freessl", "PrimaryDomainID=".$PrimaryDomainID."\nType=".$Type."\nPath=".$Path."\nDomainID=".$DomainID."\nDomainName=".$DomainName."\nDomainUserName=".$DomainUserName."\nEmailAddress=".$oUser->EmailAddress."\n");
+
+$oDomain->saveDomainSetting($DomainID, "letsencrypt", date("Y-m-d"), "", "");
 
 sleep(6);
 header("Location: index.php?NoteType=success&Notes=Certificate installed. It may take a few minutes to work correctly");

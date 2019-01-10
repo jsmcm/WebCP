@@ -210,6 +210,14 @@ $DisplayTraffic = $oUtils->ConvertFromBytes($Traffic, $Scale);
 		<!-- start: CSS REQUIRED FOR THIS PAGE ONLY -->
 		<link rel="stylesheet" type="text/css" href="/assets/plugins/select2/select2.css" />
 		<link rel="stylesheet" href="/assets/plugins/DataTables/media/css/DT_bootstrap.css" />
+
+
+                <link rel="stylesheet" href="/assets/plugins/x-editable/css/bootstrap-editable.css">
+
+
+
+
+
 		<!-- end: CSS REQUIRED FOR THIS PAGE ONLY -->
 		<link rel="shortcut icon" href="/favicon.ico" />
 		
@@ -510,7 +518,7 @@ if($Traffic == 0)
 												?>
 
 												<th>Package</th>
-												
+		<th>Redirect</th>											
 												<?php
 												if(($oUser->Role == "admin") || ($oUser->Role == "reseller"))
 												{
@@ -546,9 +554,15 @@ if($Traffic == 0)
 
 										for($x = 0; $x < $ArrayCount; $x++)
 										{
-
 											if($Array[$x]["type"] == 'primary')
 											{
+											
+												$domainSettings = $oDomain->getDomainSettings($Array[$x]["id"]);
+	                                                                                        $domainRedirect = "none";
+												if (isset($domainSettings["domain_redirect"]["value"])) {
+	     												$domainRedirect = $domainSettings["domain_redirect"]["value"];
+	                                                                                        }
+
 												$ClientInfoArray = array();
 												$oUser->GetUserInfoArray($Array[$x]["client_id"], $ClientInfoArray);
 												$DomainCount++;
@@ -579,7 +593,9 @@ if($Traffic == 0)
 												{
 													print "<td>".$oPackage->GetPackageName($Array[$x]["PackageID"])."</td>\r\n";
 												}	
-										
+
+                print "<td><a href=\"#\" id=\"wwwredirect_".$Array[$x]["id"]."\" data-type=\"select\" data-pk=\"".$Array[$x]["id"]."\" data-value=\"".$domainRedirect."\" data-original-title=\"Select Redirect\"></a></td>\r\n";
+
 												
 												if(($oUser->Role == "admin") || ($oUser->Role == "reseller"))
 												{
@@ -743,12 +759,31 @@ if($Traffic == 0)
 
 
 
+
+
+
+                <script src="/assets/plugins/bootstrap-modal/js/bootstrap-modal.js"></script>
+
+                <script src="/assets/plugins/bootstrap-modal/js/bootstrap-modalmanager.js"></script>
+
+                <script src="/assets/js/ui-modals.js"></script>
+
+                <script src="/assets/plugins/jquery-mockjax/jquery.mockjax.js"></script>
+
+                <script src="/assets/plugins/x-editable/js/bootstrap-editable.min.js"></script>
+
+                <script src="/assets/plugins/x-editable/domain-redirect.js"></script>
+
+                <script src="/assets/plugins/x-editable/demo.js"></script>
+
+
 		<!-- end: JAVASCRIPTS REQUIRED FOR THIS PAGE ONLY -->
 		<script>
 			jQuery(document).ready(function() {
 				Main.init();
 				TableData.init();
 				Index.init();
+				UIModals();
 			});
 		</script>
 	</body>

@@ -25,6 +25,53 @@ class Domain
 	}
 
 
+	function deleteDomainSetting($domainId, $setting)
+        {
+
+ 		try
+		{
+			$query = $this->DatabaseConnection->prepare("UPDATE domain_settings SET deleted = 1 WHERE setting_name = :setting AND domain_id = :domain_id");
+
+			$query->bindParam(":setting", $setting);
+			$query->bindParam(":domain_id", $domainId);
+
+			$query->execute();
+
+		}
+		catch(PDOException $e)
+		{
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Domain.php -> deleteDomainRedirect(); Error = ".$e);
+		}
+
+
+        }
+
+	function saveDomainSetting($domainId, $setting, $value, $extra1="", $extra2="")
+	{
+ 		$this->deleteDomainSetting($domainId, $setting);
+		
+		try {
+			$query = $this->DatabaseConnection->prepare("INSERT INTO domain_settings VALUES (0, :domain_id, :setting, :value, :extra1, :extra2, 0)");
+
+			$query->bindParam(":domain_id", $domainId);
+			$query->bindParam(":setting", $setting);
+			$query->bindParam(":value", $value);
+			$query->bindParam(":extra1", $extra1);
+			$query->bindParam(":extra2", $extra2);
+
+			$query->execute();
+			return true;
+		}
+		catch(PDOException $e)
+		{
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Domain.php -> saveDomainSetting(); Error = ".$e);
+		}
+
+		return false;
+	}
+
 	function GetAccountsCreatedCount()
 	{
 		try
@@ -2084,6 +2131,70 @@ class Domain
 	}
 
 
+	function getDomainSettings($domainId)
+ 	{
+
+		$settingsArray = array();
+
+		try {
+			$query = $this->DatabaseConnection->prepare("SELECT * FROM domain_settings WHERE deleted = 0 AND domain_id = :domain_id");
+			$query->bindParam(":domain_id", $domainId);
+			$query->execute();
+	
+			if($result = $query->fetch(PDO::FETCH_ASSOC)) {
+				$settingsArray[$result["setting_name"]]["value"] = $result["setting_value"];
+				$settingsArray[$result["setting_name"]]["extra1"] = $result["extra1"];
+				$settingsArray[$result["setting_name"]]["extra2"] = $result["extra2"];
+			} 
+		} catch(PDOException $e) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Domain.php -> getDomainSettings(); code: ".$e->GetCode()."; Error = ".$e);
+
+			if ($e->GetCode() == "42S02") {
+ 				if ($this->oDatabase->TableExists("domain_settings") === false) {
+                        
+					$TableInfoArray[0]["name"] = "id";
+					$TableInfoArray[0]["type"] = "int";
+					$TableInfoArray[0]["key"] = "primary key auto_increment";
+					$TableInfoArray[0]["default"] = "";
+
+					$TableInfoArray[1]["name"] = "domain_id";
+					$TableInfoArray[1]["type"] = "int";
+					$TableInfoArray[1]["key"] = "";
+					$TableInfoArray[1]["default"] = "";
+
+					$TableInfoArray[2]["name"] = "setting_name";
+					$TableInfoArray[2]["type"] = "tinytext";
+					$TableInfoArray[2]["key"] = "";
+					$TableInfoArray[2]["default"] = "";
+
+					$TableInfoArray[3]["name"] = "setting_value";
+					$TableInfoArray[3]["type"] = "text";
+					$TableInfoArray[3]["key"] = "";
+					$TableInfoArray[3]["default"] = "";
+
+					$TableInfoArray[4]["name"] = "extra1";
+					$TableInfoArray[4]["type"] = "text";
+					$TableInfoArray[4]["key"] = "";
+					$TableInfoArray[4]["default"] = "";
+
+					$TableInfoArray[5]["name"] = "extra2";
+					$TableInfoArray[5]["type"] = "text";
+					$TableInfoArray[5]["key"] = "";
+					$TableInfoArray[5]["default"] = "";
+
+					$TableInfoArray[6]["name"] = "deleted";
+					$TableInfoArray[6]["type"] = "int";
+					$TableInfoArray[6]["key"] = "";
+					$TableInfoArray[6]["default"] = "";
+ 
+					$this->oDatabase->CreateTableFromArray("domain_settings", $TableInfoArray);     
+          			}
+			}
+		}			
+
+		return $settingsArray;
+	}
 
         function GetDomainInfo($id, &$InfoArray)
         {

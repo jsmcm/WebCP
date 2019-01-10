@@ -57,4 +57,3 @@ else
 
 print "Dkim updated for ".$DomainName." to ".$Dkim." dkim!";
 
-?>
