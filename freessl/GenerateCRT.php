@@ -37,10 +37,6 @@ if($oDomain->DomainExists($DomainName) != $DomainID)
 
 file_put_contents($_SERVER["DOCUMENT_ROOT"]."/nm/".$DomainName.".freessl", "PrimaryDomainID=".$PrimaryDomainID."\nType=".$Type."\nPath=".$Path."\nDomainID=".$DomainID."\nDomainName=".$DomainName."\nDomainUserName=".$DomainUserName."\nEmailAddress=".$oUser->EmailAddress."\n");
 
-$oDomain->saveDomainSetting($DomainID, "letsencrypt", date("Y-m-d"), "", "");
-
 sleep(6);
 header("Location: index.php?NoteType=success&Notes=Certificate installed. It may take a few minutes to work correctly");
-
-?>
 

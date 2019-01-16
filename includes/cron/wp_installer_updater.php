@@ -63,5 +63,3 @@ if($RemoteVersion != $CurrentVersion)
 		file_put_contents($_SERVER["DOCUMENT_ROOT"]."/installer/wordpress/WP.zip", $ResultString); 
 	}
 }
-exit();
-?>

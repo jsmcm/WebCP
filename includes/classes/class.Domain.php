@@ -24,12 +24,28 @@ class Domain
 		}
 	}
 
+	function deleteDomainSettings($domainId)
+        {
+
+ 		try {
+			$query = $this->DatabaseConnection->prepare("UPDATE domain_settings SET deleted = 1 WHERE domain_id = :domain_id");
+
+			$query->bindParam(":domain_id", $domainId);
+
+			$query->execute();
+
+		} catch(PDOException $e) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Domain.php -> deleteDomainSettings(); Error = ".$e);
+		}
+
+        }
+
 
 	function deleteDomainSetting($domainId, $setting)
         {
 
- 		try
-		{
+ 		try {
 			$query = $this->DatabaseConnection->prepare("UPDATE domain_settings SET deleted = 1 WHERE setting_name = :setting AND domain_id = :domain_id");
 
 			$query->bindParam(":setting", $setting);
@@ -37,13 +53,10 @@ class Domain
 
 			$query->execute();
 
-		}
-		catch(PDOException $e)
-		{
+		} catch(PDOException $e) {
 			$oLog = new Log();
-			$oLog->WriteLog("error", "/class.Domain.php -> deleteDomainRedirect(); Error = ".$e);
+			$oLog->WriteLog("error", "/class.Domain.php -> deleteDomainSetting(); Error = ".$e);
 		}
-
 
         }
 
@@ -1302,7 +1315,7 @@ class Domain
 		// now we want to make sure its all really gone...
 
 		$this->DeleteDomainDescendants($DomainID, $ClientID);
-
+		$this->deleteDomainSettings($DomainID);
 	
 		$this->DeleteAccountFile($DomainID);
 		$this->MakeAccountFile($DomainID);

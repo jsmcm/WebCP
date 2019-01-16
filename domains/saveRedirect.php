@@ -35,6 +35,7 @@ if ($ClientID != $oDomain->GetDomainOwner($domainId) && ($Role == 'client')) {
 }
 
 if ($oDomain->saveDomainSetting($domainId, "domain_redirect", $redirect, "", "")) {
+    touch($_SERVER["DOCUMENT_ROOT"]."/nm/".$domainId.".subdomain", 0755);
     print "Domain Redirect Saved";
     exit();
 }
