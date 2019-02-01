@@ -10,8 +10,6 @@ include_once("/var/www/html/webcp/vendor/autoload.php");
 
 use \Matomo\Ini\IniReader;
 
-include_once(dirname(__FILE__)."/class.Log.php");
-
 class Database
 {
      

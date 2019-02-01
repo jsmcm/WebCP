@@ -1,4 +1,7 @@
 <?php
+
+include_once(dirname(__FILE__)."/class.Log.php");
+
 class Utils
 {
 
@@ -6,6 +9,10 @@ class Utils
 
 	function ValidateHash($Hash, $LicenseKey)
 	{
+		$oLog = new Log();
+		$oLog->WriteLog("debug", "Hash:  ".$Hash);
+		$oLog->WriteLog("debug", "LicenseKey:  ".$LicenseKey);
+		
 		$Formula = substr($Hash, strlen($Hash) - 2, 2);
 		$Hash = substr($Hash, 0, strlen($Hash) - 2);
 

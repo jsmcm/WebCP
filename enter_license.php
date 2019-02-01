@@ -1,5 +1,3 @@
-<!DOCTYPE html>
-
 <?php
 require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Settings.php");
 $oSettings = new Settings();
@@ -18,6 +16,7 @@ else
 		exit();
 }
 ?>
+<!DOCTYPE html>
 
 <!--[if IE 8]><html class="ie8 no-js" lang="en"><![endif]-->
 <!--[if IE 9]><html class="ie9 no-js" lang="en"><![endif]-->
