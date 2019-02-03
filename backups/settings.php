@@ -38,6 +38,9 @@ if(isset($FTPSettingsArray["FTPRemotePath"]))
 {
 	$FTPRemotePath = $FTPSettingsArray["FTPRemotePath"];
 }
+if ( $FTPRemotePath == "" ) {
+    $FTPRemotePath = "/";
+}
 
 $FTPUserName = "";
 if(isset($FTPSettingsArray["FTPUserName"]))
