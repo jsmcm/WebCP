@@ -1,51 +1,37 @@
 <?php
 session_start();
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Log.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
+
 $oLog = new Log();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
 $oUser = new User();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
 $oDomain = new Domain();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Utils.php");
 $oUtils = new Utils();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Settings.php");
 $oSettings = new Settings();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Reseller.php");
 $oReseller = new Reseller();
 
 
 require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 
-
-
-
-if( ! file_exists("./weekly"))
-{
+if( ! file_exists("./weekly")) {
         mkdir("./weekly", 0755);
 }
-if( ! file_exists("./daily"))
-{
+
+if( ! file_exists("./daily")) {
         mkdir("./daily", 0755);
 }
-if( ! file_exists("./adhoc"))
-{
+
+if( ! file_exists("./adhoc")) {
         mkdir("./adhoc", 0755);
 }
-if( ! file_exists("./tmp"))
-{
+
+if( ! file_exists("./tmp")) {
         mkdir("./tmp", 0755);
 }
 
 
 $ClientID = $oUser->getClientId();
-if($ClientID < 1)
-{
+if($ClientID < 1) {
 	$oLog->WriteLog("DEBUG", "/backups/index.php -> ClientID not set, redirecting to /index.php");
 	header("Location: /index.php");
 	exit();

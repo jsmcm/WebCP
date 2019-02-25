@@ -9,7 +9,7 @@ else
 	exit();	
 }
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Firewall.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 $oFirewall = new Firewall();
 
 $CountryCode = "";

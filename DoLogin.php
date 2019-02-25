@@ -6,17 +6,11 @@ if (! file_exists($_SERVER["DOCUMENT_ROOT"]."/includes/license.conf")) {
     exit();
 }
 
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Email.php");
 $oEmail = new Email();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
 $oUser = new User();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Log.php");
 $oLog = new Log();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Utils.php");
 $oUtils = new Utils();
 
 

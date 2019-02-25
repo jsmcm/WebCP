@@ -2,10 +2,9 @@
 <ul class="main-navigation-menu">
 
 	<?php
-	include_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Reseller.php");
+	include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 	$oReseller = new Reseller();
 	
-	include_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.DNS.php");
 	if( ! isset($oDNS))
 	{
 		$oDNS = new DNS();
@@ -254,14 +253,12 @@
 				{
 					if( !isset($oEmail) )
 					{
-						require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Email.php");
 						$oEmail = new Email();
 					}
 
 
 					if( !isset($oSimpleNonce) )
 					{
-						require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.SimpleNonce.php");
 						$oSimpleNonce = new SimpleNonce();
 					}
 

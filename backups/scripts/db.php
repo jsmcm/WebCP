@@ -1,6 +1,8 @@
 <?php
 session_start();
 
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
+
 if (!file_exists($_SERVER["DOCUMENT_ROOT"]."/backups/tmp/")) {
     mkdir($_SERVER["DOCUMENT_ROOT"]."/backups/tmp/", 0755);
 }
@@ -10,17 +12,9 @@ if (!file_exists($_SERVER["DOCUMENT_ROOT"]."/nm/")) {
     mkdir($_SERVER["DOCUMENT_ROOT"]."/nm/", 0755);
 }
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
 $oUser = new User();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Settings.php");
 $oSettings = new Settings();
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Package.php");
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.MySQL.php");
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Email.php");
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.FTP.php");
 
 $ClientID = $oUser->getClientId();
 $Role = $oUser->Role;

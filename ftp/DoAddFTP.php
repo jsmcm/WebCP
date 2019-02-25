@@ -1,16 +1,10 @@
 <?php
 session_start();
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 $oUser = new User();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.FTP.php");
 $oFTP = new FTP();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Package.php");
 $oPackage = new Package();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
 $oDomain = new Domain();
 
 $ClientID = $oUser->getClientId();

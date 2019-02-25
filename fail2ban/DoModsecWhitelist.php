@@ -1,24 +1,16 @@
 <?php
 session_start();
 
-                if( ! file_exists($_SERVER["DOCUMENT_ROOT"]."/nm/"))
-                {
-                        mkdir($_SERVER["DOCUMENT_ROOT"]."/nm/", 0755);
-                }
+if( ! file_exists($_SERVER["DOCUMENT_ROOT"]."/nm/")) {
+    mkdir($_SERVER["DOCUMENT_ROOT"]."/nm/", 0755);
+}
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
+
 $oUser = new User();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Settings.php");
 $oSettings = new Settings();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Firewall.php");
 $oFirewall = new Firewall();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
 $oDomain = new Domain();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Reseller.php");
 $oReseller = new Reseller();
 
 require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
