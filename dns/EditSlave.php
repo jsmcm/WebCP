@@ -3,13 +3,9 @@
 session_start();
 
 	
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 $oUser = new User();
-	
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Utils.php");
 $oUtils = new Utils();
-	
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.DNS.php");
 $oDNS = new DNS();
 
 $ClientID = $oUser->getClientId();
@@ -71,5 +67,3 @@ if(isset($_POST["HostName"]))
 }
 
 header("location: slaves.php?Notes=Slave Saved!");
-
-?>

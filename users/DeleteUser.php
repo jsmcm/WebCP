@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 $oUser = new User();
 
 $ClientID = $oUser->getClientId();
@@ -37,7 +37,3 @@ else
 {
 	header("location: index.php?Notes=".$Notes);	
 }
-exit();
-
-?>
-

@@ -8,12 +8,13 @@ if(! file_exists("./tmp"))
 	mkdir("./tmp", 0755);
 }
 
-                if( ! file_exists($_SERVER["DOCUMENT_ROOT"]."/nm/"))
-                {
-                        mkdir($_SERVER["DOCUMENT_ROOT"]."/nm/", 0755);
-                }
+if( ! file_exists($_SERVER["DOCUMENT_ROOT"]."/nm/"))
+{
+		mkdir($_SERVER["DOCUMENT_ROOT"]."/nm/", 0755);
+}
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Log.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
+
 $oLog = new Log();
 
 $URL = "index.php";
@@ -234,7 +235,6 @@ function DeleteDirectoryRecursive($dir)
 
 	// check if this package already exists, even if it has a different name
 	
-	require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Package.php");
 	$oPackage = new Package();
 		
 	$PackageArray = array();
@@ -441,7 +441,6 @@ function DeleteDirectoryRecursive($dir)
 	$oLog->WriteLog("DEBUG", "UserName: ".$UserName);
 	$oLog->WriteLog("DEBUG", "Password: ".$Password);
 
-	require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
 	$oUser = new User();
 
 	$UserID = $oUser->UserExistsByEmail($EmailAddress);
@@ -476,7 +475,6 @@ function DeleteDirectoryRecursive($dir)
 	sort($DomainArrayID, SORT_NUMERIC);
 	//print_r($DomainArrayID);
 
-	require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
 	$oDomain = new Domain();
 
 	$PrimaryDomainID = 0;
@@ -579,7 +577,6 @@ function DeleteDirectoryRecursive($dir)
 	}
 
 
-	require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.MySQL.php");
 	$oMySQL = new MySQL();
 
 	for($x = 0; $x < $XMLFile->MySQL->Instance->count(); $x++)
@@ -595,7 +592,6 @@ function DeleteDirectoryRecursive($dir)
 
 
 
-	require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Email.php");
 	$oEmail = new Email();
 
 	for($x = 0; $x < $XMLFile->Email->Instance->count(); $x++)
@@ -626,7 +622,6 @@ function DeleteDirectoryRecursive($dir)
 
 
 
-	require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.FTP.php");
 	$oFTP = new FTP();
 
 	for($x = 0; $x < $XMLFile->FTP->Instance->count(); $x++)

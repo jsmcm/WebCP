@@ -23,5 +23,3 @@ if(isset($_POST["FilesAndFolders"]))
 
 
 header("Location: index.php?Path=".$_POST["Path"]);
-
-?>

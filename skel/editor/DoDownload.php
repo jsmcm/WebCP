@@ -14,4 +14,3 @@ header("Content-Type: application/download");
 header("Content-Disposition: attachment;filename=".basename($file));
 header("Content-Transfer-Encoding: binary");
 readfile($file);
-?>

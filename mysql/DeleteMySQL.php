@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 $oUser = new User();
 
 $ClientID = $oUser->getClientId();
@@ -11,7 +11,6 @@ if($ClientID < 1)
         exit();
 }
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.MySQL.php");
 $oMySQL = new MySQL();
 if($oMySQL->DeleteMySQL($ClientID, $oUser->Role, $_REQUEST["id"]) == 1)
 {
@@ -34,6 +33,4 @@ else
 	header("location: index.php?Notes=".$Notes);	
 }
 exit();
-
-?>
 

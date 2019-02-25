@@ -37,10 +37,7 @@ function generatePassword($length=15, $Strength=1)
 }
 
 
-include("../../includes/classes/class.Package.php");
-include("../../includes/classes/class.User.php");
-include("../../includes/classes/class.Domain.php");
-include("../../includes/classes/class.MySQL.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 
 $oDomain = new Domain();
 $oClient = new User();
@@ -147,5 +144,3 @@ else
 {
 	print "<font color=\"red\">ERROR, you have no more MySQL databases left. Install cannot continue</font>";
 }
-
-?>

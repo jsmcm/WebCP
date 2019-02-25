@@ -4,7 +4,6 @@ class Provisioning
 
 	private function ValidateUser($UserName, $Password)
 	{
-		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
         	$oUser = new User();
 
 		$UserID = $oUser->CheckLoginCredentials($UserName, $Password);		
@@ -66,10 +65,8 @@ class Provisioning
 			return $ReturnArray;
 		}
 		
-     		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
         	$oDomain = new Domain();
      		
-		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
         	$oUser = new User();
 
 		/*****************************************************************************
@@ -124,11 +121,7 @@ class Provisioning
 			return $ReturnArray;
 		}
 
-
-		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Package.php");
 		$oPackage = new Package();
-		
-		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.FTP.php");
 		$oFTP = new FTP();
 
 
@@ -183,10 +176,7 @@ class Provisioning
 			return $ReturnArray;
 		}
 		
-     		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
         	$oDomain = new Domain();
-     		
-		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
         	$oUser = new User();
 
 		/*****************************************************************************
@@ -275,11 +265,7 @@ class Provisioning
 			return $ReturnArray;
 		}
 		
-		
-     		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
         	$oDomain = new Domain();
-     		
-		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
         	$oUser = new User();
 
 		/*****************************************************************************
@@ -374,10 +360,7 @@ class Provisioning
 		}
 		
 		
-     		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
         	$oDomain = new Domain();
-     		
-		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
         	$oUser = new User();
 
 		/*****************************************************************************
@@ -448,7 +431,6 @@ class Provisioning
         public function ProvisionAccount($LoginEmailAddress, $LoginPassword, $FirstName, $Surname, $EmailAddress, $Password, $PackageName, $DomainName, $DomainUserName)
         {  
 
-     		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Log.php");
         	$oLog = new Log();
 
 		$ReturnArray = array();
@@ -488,7 +470,6 @@ class Provisioning
 		* CHECK IF WE HAVE A VALID PACKAGE NAME
 		*
 		*****************************************************************************/
-     		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Package.php");
         	$oPackage = new Package();
 
         	$PackageID = $oPackage->GetPackageID($PackageName);
@@ -510,7 +491,6 @@ class Provisioning
 		* ADD NEW USER IF NOT EXISTS
 		*
 		*****************************************************************************/
-     		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
         	$oUser = new User();
 
         	$UserID = $oUser->UserExistsByEmail($EmailAddress);
@@ -544,7 +524,6 @@ class Provisioning
 		* FINALLY, ADD THE DOMAIN!
 		*
 		*****************************************************************************/
-     		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
         	$oDomain = new Domain();
 
 		if($oDomain->ValidateDomainName($DomainName) < 1)
@@ -612,4 +591,3 @@ class Provisioning
 		return $ReturnArray;
         }
 }
-?>

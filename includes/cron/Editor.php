@@ -18,5 +18,3 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/Editor/functions.inc.php");
 
 FetchEditableListFromRemoteServer();
 FetchIconListFromRemoteServer();
-exit();
-?>

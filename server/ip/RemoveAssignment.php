@@ -1,8 +1,6 @@
 <?php
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.DNS.php");
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.SSL.php");
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 
 $oSSL = new SSL();
 $oDNS = new DNS();
@@ -20,4 +18,3 @@ if($oDNS->RemoveAssignment($_REQUEST["IPAddress"], $_REQUEST["DomainName"]) == t
 }
 
 header("Location: index.php?NoteType=success&Notes=IP Assignment Removed");
-?>

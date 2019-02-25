@@ -68,5 +68,3 @@ while (false !== ($line = fgets(STDIN)))
 }
 
 unlink($LockFile);
-
-?>

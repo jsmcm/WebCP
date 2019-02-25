@@ -1,5 +1,7 @@
 <?php
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Settings.php");
+
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
+
 $oSettings = new Settings();
 
 if(isset($_SERVER["HTTP_REFERER"]))

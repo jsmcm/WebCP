@@ -7,10 +7,8 @@ if(!file_exists($_SERVER["DOCUMENT_ROOT"]."/includes/cron/tmp/"))
         mkdir($_SERVER["DOCUMENT_ROOT"]."/includes/cron/tmp/", 0755);
 }
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Settings.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 $oSettings = new Settings();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.DNS.php");
 $oDNS = new DNS();
 
 if($oDNS->IPExists($_SERVER["REMOTE_ADDR"]) == false)
@@ -101,5 +99,3 @@ function LoopDirectory($DirBase, $InSub = 0, $Debug=false)
 
 LoopDirectory("./", $InSub = 0, $Debug);
 print "cron_ok";
-exit();
-?>

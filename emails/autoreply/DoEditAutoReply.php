@@ -1,9 +1,8 @@
 <?php
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
-$oUser = new User();
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Email.php");
+$oUser = new User();
 $oEmail = new Email();
 
 $ClientID = $oUser->GetClientID();

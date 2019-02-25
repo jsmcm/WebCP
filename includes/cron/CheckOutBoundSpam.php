@@ -32,12 +32,7 @@ if(file_exists($_SERVER["DOCUMENT_ROOT"]."/includes/cron/tmp/OutboundSpam.lock")
 
 touch($_SERVER["DOCUMENT_ROOT"]."/includes/cron/tmp/OutboundSpam.lock");
 
-include($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Email.php");
-include($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Utils.php");
-include($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Firewall.php");
-include($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
-include($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.SendMail.php");
-include($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Settings.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 
 $oSendMail = new SendMail();
 $oSettings = new Settings();
@@ -177,5 +172,3 @@ foreach($BlockEmailArray as $SpamAddress)
 }
 
 unlink($_SERVER["DOCUMENT_ROOT"]."/includes/cron/tmp/OutboundSpam.lock");
-exit()
-?>

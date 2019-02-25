@@ -2,10 +2,8 @@
 session_start();
 
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 $oUser = new User();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
 $oDomain = new Domain();
 
 
@@ -86,5 +84,3 @@ if( ($oDomain->GetDomainOwnerFromDomainName($URL) != $oUser->ClientID) && ($oUse
 
 
 	header("location: manage.php?URL=".$URL."&Path=".$Path."&Notes=User Saved");
-
-?>
