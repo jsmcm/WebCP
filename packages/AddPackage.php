@@ -41,7 +41,6 @@ if(isset($_REQUEST["PackageID"]))
 	$PackageID = $_REQUEST["PackageID"];
 	$Action = "update";
 
-	require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Package.php");
 	$oPackage = new Package();
 
 	$oPackage->GetPackageDetails($PackageID, $Array, $ArrayCount, $oUser->Role, $oUser->ClientID);
