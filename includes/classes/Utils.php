@@ -82,7 +82,6 @@ class Utils
  	
 	function GetValidationHash($LicenseKey)
 	{
-		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
 		$oDomain = new Domain();
 
 		$AccountsCreated = $oDomain->GetAccountsCreatedCount();
@@ -100,16 +99,12 @@ class Utils
         
 	function GetTrafficStats(&$TotalTraffic, &$TotalUsed, &$TotalAvailable, &$PercentageUsed)
         {
-		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Package.php");
 		$oPackage = new Package();
 
-		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Settings.php");
 		$oSettings = new Settings();
 
-		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
 		$oDomain = new Domain();
 
-		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Utils.php");
 		$oUtils = new Utils();
 		
 		$TotalTraffic = $oSettings->GetServerTrafficAllowance();
@@ -124,13 +119,10 @@ class Utils
 
 	function GetDiskSpaceStats(&$TotalDiskSpace, &$TotalUsed, &$TotalAvailable, &$PercentageUsed)
 	{
-		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Package.php");
 		$oPackage = new Package();
 
-		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
 		$oDomain = new Domain();
 
-		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Utils.php");
 		$oUtils = new Utils();
 
 		$TotalDiskSpace = $oPackage->GetTotalDiskSpace();                                                   

@@ -6,8 +6,7 @@ if(!isset($_SESSION))
      session_start();
 }
 
-include_once(dirname(__FILE__)."/class.Log.php");
-include_once(dirname(__FILE__)."/class.Database.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 
 
 
@@ -422,9 +421,6 @@ class FTP
 	{
 		//print "AddFTP<p>";
 
-		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
-		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
-		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Package.php");
 
 
                 $oUser = new User();
@@ -548,7 +544,6 @@ class FTP
 		}
 		else if($Role == "reseller")
 		{
-			include_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Reseller.php");
 			$oReseller = new Reseller();
 
 			$FTPOwnerID = $this->GetFTPOwner($ftp_id);
