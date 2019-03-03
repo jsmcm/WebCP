@@ -12,6 +12,14 @@ if ($ClientID < 1) {
     exit();
 }
 
+$UserID = "";
+$FirstName = "";
+$Surname = "";
+$Password = "";
+$EmailAddress = "";
+$Action = "";
+$Username = "";
+
 
 $UserID = $_POST["UserID"];
 $FirstName = $_POST["FirstName"];
