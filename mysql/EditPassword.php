@@ -16,7 +16,6 @@ if($ClientID < 1)
 }
 
 $id = $_REQUEST["id"];
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.MySQL.php");
 $oMySQL = new MySQL();
 
 $MySQLUserName = "";

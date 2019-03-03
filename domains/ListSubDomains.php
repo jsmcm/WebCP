@@ -28,7 +28,6 @@ if( (! is_numeric($DomainID)) || ($DomainID < 1) )
 }
 
 
-	require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
 	$oDomain = new Domain();
         $ClientID = $oUser->ClientID;
         $DomainOwnerClientID = $oDomain->GetDomainOwner($DomainID);

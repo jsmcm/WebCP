@@ -33,7 +33,6 @@ if(isset($_POST["MailBoxID"]))
 
 
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Email.php");
 $oEmail = new Email();
 
 $DomainOwnerID = $oEmail->GetClientIDFromMailBoxID($MailBoxID);

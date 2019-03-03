@@ -33,7 +33,6 @@ $AdminArray = array();
 $ArrayCount = 0;
 //print "<p>".$_SERVER["DOCUMENT_ROOT"]."<p>";
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.SendMail.php");
 
 $oSendMail = new SendMail();
 
