@@ -29,11 +29,11 @@ class Settings
      	} catch (Exception $e) {
 
 	    if ($e->getMessage() == "class.Database->getConnection Matomo\Ini not found") {
-		print "<h1>Missing dependencies</h1><p>I'm going to try and install them. This might take several minutes. Please wait 30 minutes then try again</p><p>If you've already waited 30 minutes and still see this please contact support@webcp.pw for support</p>";
+		print "<h1>Missing dependencies</h1><p>I'm going to try and install them. This might take several minutes. Please wait 30 minutes then try again</p><p>If you've already waited 30 minutes and still see this please contact support@webcp.io for support</p>";
 
                 touch($_SERVER["DOCUMENT_ROOT"]."/nm/composer_install");
             } else {
-                print "<h1>Unknown Error</h1><p>Something bad happened and I can't continue. Please contact support@webcp.pw for support</p>";
+                print "<h1>Unknown Error</h1><p>Something bad happened and I can't continue. Please contact support@webcp.io for support</p>";
             }
 
             exit();   		    
@@ -112,7 +112,7 @@ class Settings
 
 		if($ReturnValue == "")
 		{
-			$ReturnValue = "<a href=\"http://webcp.pw\" target=\"_new\">Web <i class=\"clip-globe\"></i> CP</a>";
+			$ReturnValue = "<a href=\"https://webcp.io\" target=\"_new\">Web <i class=\"clip-globe\"></i> CP</a>";
 		}
 
 		return $ReturnValue;

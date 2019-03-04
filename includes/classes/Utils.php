@@ -64,7 +64,7 @@ class Utils
                        $NewHash = $Hash;
                    }
 	
-		$RemoteIP = gethostbyname("bug.webcp.pw");
+		$RemoteIP = gethostbyname("bug.webcp.io");
 
 		for($x = 1; $x < 11; $x++)
 		{
@@ -88,8 +88,8 @@ class Utils
 
 		//print "AccountsCreated: ".$AccountsCreated."<p>";
                 $options = array(
-                'uri' => 'http://api.webcp.pw/',
-                'location' => 'http://api.webcp.pw/updates/check.php',
+                'uri' => 'https://webcp.io/',
+                'location' => 'https://webcp.io/updates/check.php',
                 'trace' => 1);
 
                 $client = new SoapClient(NULL, $options);
@@ -399,8 +399,8 @@ class Utils
 	function GetCountryCode($IPAddress)
 	{
       		$options = array(
-                'uri' => 'http://webcp.pw/api',
-                'location' => 'http://webcp.pw/api/Country.php',
+                'uri' => 'https://api.webcp.io',
+                'location' => 'https://api.webcp.io/Country.php',
                 'trace' => 1);
 
                 $client = new SoapClient(NULL, $options);

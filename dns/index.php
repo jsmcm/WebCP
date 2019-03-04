@@ -477,9 +477,9 @@ if( $ServerType == "")
 							{
 							?>
 							<b>
-							<a href="http://api.webcp.pw/com.php" target="_new">Click here to order .com, .net. .org, etc domain names</a>
+							<a href="https://api.webcp.io/com.php" target="_new">Click here to order .com, .net. .org, etc domain names</a>
 							<br>
-							<a href="http://api.webcp.pw/coza.php" target="_new">Click here to order co.za domain names</a>
+							<a href="https://api.webcp.io/coza.php" target="_new">Click here to order co.za domain names</a>
 							</b>
 							<?php
 							}

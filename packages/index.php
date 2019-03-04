@@ -25,27 +25,6 @@ if($oUser->Role == "client")
 	exit();
 }
 
-	/*
-	try
-	{
-		$options = array(
-		'uri' => 'http://api.webcp.pw',
-		'location' => 'http://api.webcp.pw/Country.php',
-		'trace' => 1);
-
-		$client = new SoapClient(NULL, $options);
-		$CountryCode = strtolower($client->GetCountryCode($_SERVER["SERVER_ADDR"]));
-
-		file_put_contents($_SERVER["DOCUMENT_ROOT"]."/includes/country.inc", $CountryCode);		
-	}
-	catch(Exception $e)
-	{
-		print $e;
-	}	
-	*/
-
-
-
 
 ?>
 

@@ -1117,12 +1117,12 @@
 			</a>
 			<ul class="sub-menu">
 				<li>
-					<a href="http://bug.webcp.pw/bug_report_page.php" target="_new">
+					<a href="https://bug.webcp.io/bug_report_page.php" target="_new">
 						<span class="title"> Bug Report </span>
 					</a>
 				</li>
 				<li>
-					<a href="http://bug.webcp.pw/bug_report_page.php" target="_new">
+					<a href="https://bug.webcp.io/bug_report_page.php" target="_new">
 						<span class="title"> Feature Request </span>
 					</a>
 				</li>

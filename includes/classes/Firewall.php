@@ -150,8 +150,8 @@ class Firewall
 				if($BanArray[$ArrayCount]["CountryCode"] == "")
 				{
 					$options = array(
-					'uri' => 'http://api.webcp.pw',
-					'location' => 'http://api.webcp.pw/Country.php',
+					'uri' => 'https://webcp.io',
+					'location' => 'https://webcp.io/Country.php',
 					'trace' => 1);
 				
 					$client = new SoapClient(NULL, $options);

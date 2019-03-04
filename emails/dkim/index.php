@@ -209,7 +209,7 @@ v=DKIM1; k=rsa; p=<?php print $PublicKey; ?></p>
 <b>NOTE:</b> Switch <i>YOUR_DOMAIN</i> for your actual domain, eg, x._domainkey.example.com
 
 <p>&nbsp;<br>
-See our post about <a href="https://webcp.pw/spf-dkim-dmarc" target="_blank">SPF, DKIM and DMARC</a> for more info.
+See our post about <a href="https://webcp.io/spf-dkim-dmarc" target="_blank">SPF, DKIM and DMARC</a> for more info.
 </p>
 						</div>
 					</div>
