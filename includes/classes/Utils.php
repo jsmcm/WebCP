@@ -399,8 +399,8 @@ class Utils
 	function GetCountryCode($IPAddress)
 	{
       		$options = array(
-                'uri' => 'https://api.webcp.io',
-                'location' => 'https://api.webcp.io/Country.php',
+                'uri' => 'https://webcp.io/api',
+                'location' => 'https://webcp.io/api/Country.php',
                 'trace' => 1);
 
                 $client = new SoapClient(NULL, $options);
