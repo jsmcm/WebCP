@@ -88,8 +88,8 @@ class Utils
 
 		//print "AccountsCreated: ".$AccountsCreated."<p>";
                 $options = array(
-                'uri' => 'https://webcp.io/',
-                'location' => 'https://webcp.io/updates/check.php',
+                'uri' => 'https://api.webcp.io/',
+                'location' => 'https://api.webcp.io/updates/check.php',
                 'trace' => 1);
 
                 $client = new SoapClient(NULL, $options);
