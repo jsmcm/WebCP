@@ -43,11 +43,20 @@ if ($oUtils->ValidateHash($Hash, $LicenseKey) == true) {
 }
 
 $emailAddress = "";
-$emailAddress = filter_var($_POST["EmailAddress"], FILTER_SANITIZE_EMAIL);
+
+if ( isset($_POST["EmailAddress"]) ) {
+    $emailAddress = filter_var($_POST["EmailAddress"], FILTER_SANITIZE_EMAIL);
+} else {
+	header("Location: /");
+}
 
 $password = "";
-$password = filter_var($_POST["password"], FILTER_SANITIZE_STRING);
 
+if( isset($_POST["password"]) ) {
+	$password = filter_var($_POST["password"], FILTER_SANITIZE_STRING);
+} else {
+	header("Location: /");
+}
 
 $oLog->WriteLog("DEBUG", "/DoLogin.php -> CheckingLoginCredentials");
 
