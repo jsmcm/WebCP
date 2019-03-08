@@ -43,10 +43,11 @@ class Utils
 			$NewHash = "";
 
                        for($x = 0; $x < strlen($Hash); $x = $x + 2)
-                       {
-                            $NewHash = $NewHash.$Hash[$x + 1].$Hash[$x];
+		       {
+			   if ( isset( $Hash[$x + 1] ) ) {
+                               $NewHash = $NewHash.$Hash[$x + 1].$Hash[$x];
+                           }
                        }
-
 
                    }
                    else if($FormulaNumber == 3)
