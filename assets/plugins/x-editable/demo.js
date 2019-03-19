@@ -61,6 +61,45 @@ $(function(){
     });   
 
 
+    $('[id^="ssl_redirect_"]').editable({
+
+        source: [
+            {value: 'none', text: 'No Redirect'},
+            {value: 'enforce', text: 'Redirect to HTTPS'},
+        ],
+        display: function(value, sourceData) {
+             var colors = {"": "gray", "none": "red", "enforce": "green"},
+                 elem = $.grep(sourceData, function(o){return o.value == value;});
+                 
+             if(elem.length) {    
+                 $(this).text(elem[0].text).css("color", colors[value]); 
+             } else {
+                 $(this).empty(); 
+             }
+        }   
+    });   
+
+
+    $('[id^="parked_redirect_"]').editable({
+
+        source: [
+            {value: 'none', text: 'No Redirect'},
+            {value: 'redirect', text: 'Redirect to Parent'},
+        ],
+        display: function(value, sourceData) {
+             var colors = {"": "gray", "none": "red", "redirect": "green"},
+                 elem = $.grep(sourceData, function(o){return o.value == value;});
+                 
+             if(elem.length) {    
+                 $(this).text(elem[0].text).css("color", colors[value]); 
+             } else {
+                 $(this).empty(); 
+             }
+        }   
+    });   
+
+
+
     $('[id^="domain_transactional_email_"]').editable({
 
         source: [

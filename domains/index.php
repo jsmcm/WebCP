@@ -505,7 +505,7 @@ if($Traffic == 0)
 												?>
 
 												<th>Package</th>
-		<th>Redirect</th>											
+		<th>Redirect <a href="https://webcp.io/http-redirect/" target="_new"><img src="/img/help.png" width="20px"></a></th>											
 												<?php
 												if(($oUser->Role == "admin") || ($oUser->Role == "reseller"))
 												{
