@@ -148,6 +148,185 @@ class Email
 
 
 
+	function makeSendgridEximSettings()
+	{
+		if ( ! file_exists("/var/www/html/mail/sendgrid")) {
+			mkdir("/var/www/html/mail/sendgrid", 0755);
+		}
+
+		$settings = $this->getSendgridSettings();
+
+		$username = "";
+		$password = "";
+
+		if (isset($settings["username"]) ) {
+			$username = $settings["username"];
+		}
+
+		if (isset($settings["password"]) ) {
+			$password = $settings["password"];
+		}
+
+		if ( $username != "" && $password != "" ) {
+			file_put_contents("/var/www/html/mail/sendgrid/username", $username);
+			file_put_contents("/var/www/html/mail/sendgrid/password", $password);
+
+			$domains = $this->getSendgridDomains();
+
+			file_put_contents("/var/www/html/mail/sendgrid/domains", "");
+			if (!empty($domains) ) {
+				file_put_contents("/var/www/html/mail/sendgrid/domains", implode(":", $domains));
+			}
+		}
+
+	}
+
+        function getSendgridDomains()
+        {
+
+		$domains = array();
+
+		try {
+			$query = $this->DatabaseConnection->prepare("SELECT fqdn FROM email_options, domains WHERE option_name = 'domain_transactional_email' AND email_options.deleted = 0 AND option_value = 'sendgrid' AND extra1 = domains.id;");
+			$query->execute();
+	
+			while ($result = $query->fetch(PDO::FETCH_ASSOC)) {
+				array_push($domains, $result["fqdn"]);
+			}
+	
+		} catch(PDOException $e) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Email.php -> getSendgridDomains(); Error = ".$e);
+		}		
+
+		return $domains;
+
+        }
+
+
+	function deleteSendgridSettings()
+	{
+
+		try {
+			$query = $this->DatabaseConnection->prepare("UPDATE email_options SET deleted = 1 WHERE option_name LIKE 'sendgrid_setting_%'");
+				
+			$query->execute();
+	
+			
+		} catch(PDOException $e) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Email.php -> deleteSendgridSettings(); Error = ".$e);
+		}
+		
+	}
+
+        function getSendgridSettings()
+        {
+
+		$settings = array();
+
+		try {
+			$query = $this->DatabaseConnection->prepare("SELECT option_name, option_value FROM email_options WHERE option_name LIKE 'sendgrid_setting_%' AND deleted = 0");
+			$query->execute();
+	
+			while ($result = $query->fetch(PDO::FETCH_ASSOC)) {
+				
+				if ($result["option_name"] == "sendgrid_setting_username") {
+					$settings["username"] = $result["option_value"];
+				} else if ($result["option_name"] == "sendgrid_setting_password") {
+					$settings["password"] = $result["option_value"];
+				} else if ($result["option_name"] == "sendgrid_setting_default") {
+					$settings["default"] = $result["option_value"];
+				}
+
+			}
+	
+		} catch(PDOException $e) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Email.php -> getSendgridSettings(); Error = ".$e);
+		}		
+
+		return $settings;
+
+        }
+
+	function getDomainTransactionalSetting($domainId)
+	{
+
+		try {
+			$query = $this->DatabaseConnection->prepare("SELECT option_value FROM email_options WHERE option_name = 'domain_transactional_email' AND deleted = 0 and extra1 = :extra1");
+			$query->bindParam(":extra1", $domainId);
+			$query->execute();
+	
+			if ($result = $query->fetch(PDO::FETCH_ASSOC)) {
+				return $result["option_value"];
+			}
+	
+		} catch(PDOException $e) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Email.php -> getDomainTransactionalSetting(); Error = ".$e);
+		}		
+
+		return "none";
+
+        }
+
+
+
+	function deleteTransactionalDomain( $domainId )
+	{
+		
+		try {
+
+			$query = $this->DatabaseConnection->prepare("UPDATE email_options SET deleted = 1 WHERE extra1 = :domain_id AND option_name = 'domain_transactional_email'");
+			$query->bindParam(":domain_id", $domainId);		
+			$query->execute();
+	
+		} catch(PDOException $e) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Email.php -> deleteTransactionalDomain(); Error = ".$e);
+		}	
+	}
+
+
+	function saveTransactionalDomain($setting, $domainId)
+	{
+		$this->deleteTransactionalDomain($domainId);
+		$this->insertEmailOptions("domain_transactional_email", $setting, $domainId, "");
+	}
+
+
+	function saveSendgridSettings($userName, $password, $default)
+	{
+		$this->insertEmailOptions("sendgrid_setting_username", $userName, "", "");
+		$this->insertEmailOptions("sendgrid_setting_password", $password, "", "");
+		$this->insertEmailOptions("sendgrid_setting_default", $default, "", "");
+	}
+
+
+        function insertEmailOptions($optionName, $optionValue, $extra1 = "", $extra2 = "")
+        {
+
+		try {
+		
+
+			$query = $this->DatabaseConnection->prepare("INSERT INTO email_options VALUES (0, :email_option, :option_value, :extra1, :extra2, 0)");
+				
+			$query->bindParam(":email_option", $optionName);
+			$query->bindParam(":option_value", $optionValue);
+			$query->bindParam(":extra1", $extra1);
+			$query->bindParam(":extra2", $extra2);
+			
+			$query->execute();
+	
+		} catch(PDOException $e) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Email.php -> insertEmailOptions(); Error = ".$e);
+		}	
+
+	}
+
+
 
         function GetCatcher($DomainName)
         {

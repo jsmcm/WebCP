@@ -58,5 +58,26 @@ $(function(){
                  $(this).empty(); 
              }
         }   
-    });    
+    });   
+
+
+    $('[id^="domain_transactional_email_"]').editable({
+
+        source: [
+            {value: 'none', text: 'None'},
+            {value: 'sendgrid', text: 'Using Sendgrid'},
+        ],
+        display: function(value, sourceData) {
+             var colors = {"": "gray", "none": "red", "sendgrid": "green"},
+                 elem = $.grep(sourceData, function(o){return o.value == value;});
+                 
+             if(elem.length) {    
+                 $(this).text(elem[0].text).css("color", colors[value]); 
+             } else {
+                 $(this).empty(); 
+             }
+        }   
+    });   
+
+
 });

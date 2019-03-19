@@ -2000,7 +2000,6 @@ class Domain
 		$oLog = new Log();
 
 		$oSettings = new Settings();
-
 		$oDNS = new DNS();
 
 		$oLog->WriteLog("DEBUG", "DomainName: '".$DomainName."', DomainType: '".$DomainType."', PackageID: '".$PackageID."', ClientID: '".$ClientID."'");
@@ -2112,7 +2111,15 @@ class Domain
 
 		$this->DeleteDomainFile($AddDomainID);
 		$this->MakeDomainFile($AddDomainID);
-		
+
+		$oEmail = new Email();
+		$transactionalEmailSettings = $oEmail->getSendgridSettings();
+		if ( isset($transactionalEmailSettings["username"]) && $transactionalEmailSettings["username"] != "" && isset($transactionalEmailSettings["password"]) && $transactionalEmailSettings["password"]
+!= "" && isset($transactionalEmailSettings["default"]) && $transactionalEmailSettings["default"]
+== "checked") {
+			$oEmail->saveTransactionalDomain("sendgrid", $AddDomainID);
+		}
+
 		return $AddDomainID;
 		
 	}
