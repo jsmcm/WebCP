@@ -21,3 +21,5 @@ backups/weekly/*
 emails/trace/run_trace_lock
 installer/wordpress/WP.zip
 installer/wordpress/current_version.txt
+restore/tmp/
+restore/tmp/*
