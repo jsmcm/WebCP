@@ -3,14 +3,12 @@ ini_set('display_errors',1);
 ini_set('display_startup_errors',1);
 error_reporting(-1);
 
-if(! file_exists("./tmp"))
-{
+if(! file_exists("./tmp")) {
 	mkdir("./tmp", 0755);
 }
 
-if( ! file_exists($_SERVER["DOCUMENT_ROOT"]."/nm/"))
-{
-		mkdir($_SERVER["DOCUMENT_ROOT"]."/nm/", 0755);
+if( ! file_exists($_SERVER["DOCUMENT_ROOT"]."/nm/")) {
+	mkdir($_SERVER["DOCUMENT_ROOT"]."/nm/", 0755);
 }
 
 include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
@@ -18,8 +16,7 @@ include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 $oLog = new Log();
 
 $URL = "index.php";
-if(isset($_REQUEST["URL"]))
-{
+if(isset($_REQUEST["URL"])) {
 	$URL = $_REQUEST["URL"];
 }
 
@@ -233,12 +230,47 @@ function DeleteDirectoryRecursive($dir)
 	$oLog->WriteLog("DEBUG", "PostgreSQL = ".$PostgreSQL);
 
 
+	$FirstName = $XMLFile->User->FirstName;		
+	$Surname = $XMLFile->User->Surname;		
+	$EmailAddress = $XMLFile->User->EmailAddress;		
+	$Role = $XMLFile->User->Role;		
+	$UserName = $XMLFile->User->UserName;		
+	$Password = $XMLFile->User->Password;		
+
+	$oLog->WriteLog("DEBUG", "FirstName: ".$FirstName);
+	$oLog->WriteLog("DEBUG", "Surname: ".$Surname);
+	$oLog->WriteLog("DEBUG", "EmailAddress: ".$EmailAddress);
+	$oLog->WriteLog("DEBUG", "Role: ".$Role);
+	$oLog->WriteLog("DEBUG", "UserName: ".$UserName);
+	$oLog->WriteLog("DEBUG", "Password: ".$Password);
+
+	$oUser = new User();
+
+	$UserID = $oUser->UserExistsByEmail($EmailAddress);
+
+	$oLog->WriteLog("DEBUG", "UserID = ".$UserID);
+
+	if($UserID < 1)
+	{
+		$oLog->WriteLog("DEBUG", "AddUser('".$FirstName."', '".$Surname."', '".$EmailAddress."', '".$Password."', '".$Role."', '".$UserName."', 0)");
+		
+		$UserID = $oUser->AddUser($FirstName, $Surname, $EmailAddress, $Password, $Role, $UserName, 0);
+		$oUser->PlainTextChangePassword($Password, $UserID);
+		$oLog->WriteLog("DEBUG", "UserID = ".$UserID);
+	}
+
+	//print "UserID: ".$UserID."<br>";
+
+
+	//print "<p><hr><p>";
 	// check if this package already exists, even if it has a different name
 	
 	$oPackage = new Package();
 		
 	$PackageArray = array();
 	$ArrayCount = 0;
+
+	$Match = 0;
 
 	$oPackage->GetPackageList($PackageArray, $ArrayCount, "admin", 1);
 
@@ -414,7 +446,7 @@ function DeleteDirectoryRecursive($dir)
 		$Settings["MySQL"] = $MySQL;
 		$Settings["PostgreSQL"] = $PostgreSQL;
 	
-		$PackageID = $oPackage->AddPackage($PackageName, $Settings);
+		$PackageID = $oPackage->AddPackage($PackageName, $Settings, $UserID);
 
 	}
 	else
@@ -427,39 +459,6 @@ function DeleteDirectoryRecursive($dir)
 	$oLog->WriteLog("DEBUG", "Continuing with PackageID: ".$PackageID);
 
 
-	$FirstName = $XMLFile->User->FirstName;		
-	$Surname = $XMLFile->User->Surname;		
-	$EmailAddress = $XMLFile->User->EmailAddress;		
-	$Role = $XMLFile->User->Role;		
-	$UserName = $XMLFile->User->UserName;		
-	$Password = $XMLFile->User->Password;		
-
-	$oLog->WriteLog("DEBUG", "FirstName: ".$FirstName);
-	$oLog->WriteLog("DEBUG", "Surname: ".$Surname);
-	$oLog->WriteLog("DEBUG", "EmailAddress: ".$EmailAddress);
-	$oLog->WriteLog("DEBUG", "Role: ".$Role);
-	$oLog->WriteLog("DEBUG", "UserName: ".$UserName);
-	$oLog->WriteLog("DEBUG", "Password: ".$Password);
-
-	$oUser = new User();
-
-	$UserID = $oUser->UserExistsByEmail($EmailAddress);
-
-	$oLog->WriteLog("DEBUG", "UserID = ".$UserID);
-
-	if($UserID < 1)
-	{
-		$oLog->WriteLog("DEBUG", "AddUser('".$FirstName."', '".$Surname."', '".$EmailAddress."', '".$Password."', '".$Role."', '".$UserName."', 0)");
-		
-		$UserID = $oUser->AddUser($FirstName, $Surname, $EmailAddress, $Password, $Role, $UserName, 0);
-		$oUser->PlainTextChangePassword($Password, $UserID);
-		$oLog->WriteLog("DEBUG", "UserID = ".$UserID);
-	}
-
-	//print "UserID: ".$UserID."<br>";
-
-
-	//print "<p><hr><p>";
 
 	$DomainArrayID = array();
 	for($x = 0; $x < $XMLFile->Domain->Instance->count(); $x++)
@@ -547,7 +546,8 @@ function DeleteDirectoryRecursive($dir)
 						exit();
 					}
 
-					$oLog->WriteLog("DEBUG", "AddSubDomain(".substr($XMLFile->Domain->Instance[$y]->DomainName.", 0, ".strpos($XMLFile->Domain->Instance[$y]->DomainName, ".") ).", ".$ParentDomainID.", ".$UserID.", ".$Error.")");
+
+					$oLog->WriteLog("DEBUG", "AddSubDomain(".substr($XMLFile->Domain->Instance[$y]->DomainName, 0, strpos($XMLFile->Domain->Instance[$y]->DomainName, ".") ).", ".$ParentDomainID.", ".$UserID.", ".$Error.")");
 					$oDomain->AddSubDomain(substr($XMLFile->Domain->Instance[$y]->DomainName, 0, strpos($XMLFile->Domain->Instance[$y]->DomainName, ".") ), $ParentDomainID, $UserID, $Error);
 
 				}
@@ -641,4 +641,3 @@ function DeleteDirectoryRecursive($dir)
 	header("Location: ".$URL."?NoteType=Success&Notes=Restore succeeded.<br><b>It may be a few minutes before all files are available, please be patient</b>!");
 	exit();
 
-?>

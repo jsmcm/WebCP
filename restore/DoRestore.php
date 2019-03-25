@@ -2,18 +2,14 @@
 session_start();
 
 
-if(!file_exists($_SERVER["DOCUMENT_ROOT"]."/restore/tmp"))
-{
+if(!file_exists($_SERVER["DOCUMENT_ROOT"]."/restore/tmp")) {
 	mkdir($_SERVER["DOCUMENT_ROOT"]."/restore/tmp", 0755);
 }
 
 $FileName = "";
-if(isset($_REQUEST["FileName"]))
-{
+if(isset($_REQUEST["FileName"])) {
 	$UploadedFile = $_REQUEST["FileName"];
-}
-else
-{
+} else {
 	//print "Sorry, no valid file found please, hit the back button to continue..";
 	exit();
 }
@@ -27,8 +23,7 @@ else
         $RandomString = $RandomString.rand(0,9);
         $RandomString = $RandomString.rand(0,9);
 
-        while(is_dir($_SERVER["DOCUMENT_ROOT"]."/restore/tmp/".$RandomString))
-        {
+        while(is_dir($_SERVER["DOCUMENT_ROOT"]."/restore/tmp/".$RandomString)) {
                 $RandomString = date("Y-m-d_H-i-s")."_";
                 $RandomString = $RandomString.rand(0,9);
                 $RandomString = $RandomString.rand(0,9);
@@ -47,8 +42,7 @@ else
 	//print "UserName = ".$UserName."<br>";
 
 	$x = strrpos($UserName, "/");
-	if($x > -1)
-	{
+	if($x > -1) {
 		$UserName = substr($UserName, $x + 1);
 	}	
 	
@@ -58,29 +52,22 @@ else
 	copy($UploadedFile, $_SERVER["DOCUMENT_ROOT"]."/restore/tmp/".$RandomString."/".$FileName);
 	chmod($_SERVER["DOCUMENT_ROOT"]."/restore/tmp/".$RandomString."/".$FileName, 0755);
 	
-	if(strtolower(substr($UserName, strlen($UserName) - 7)) != ".tar.gz")
-	{
+	if(strtolower(substr($UserName, strlen($UserName) - 7)) != ".tar.gz") {
 		unlink($UploadedFile);
 		rmdir("./tmp/".$RandomString."/");
 	
-		if(isset($_REQUEST["URL"]))
-		{
+		if(isset($_REQUEST["URL"])) {
 			header("location: ".$_REQUEST["URL"]."?NoteType=Error&Notes=Incorrect file format!");
-		}
-		else
-		{
+		} else {
 			header("location: index.php?NoteType=Error&Notes=Incorrect file format!");
 		}
 		exit();
 	}
 	
 	$x = strpos($UserName, "_");
-	if($x > -1)
-	{
+	if($x > -1) {
 		$UserName = substr($UserName, 0, $x);
-	}
-	else
-	{
+	} else {
 		$UserName = substr($UserName, 0, strpos($UserName, "."));
 	}
 
@@ -104,4 +91,3 @@ else
 	
 	//print "location: DoUnzip.php?RandomString=".$RandomString."&UserName=".$UserName."&FileName=".$FileName.$URL;
 	header("location: DoUnzip.php?RandomString=".$RandomString."&UserName=".$UserName."&FileName=".$FileName.$URL);
-?>
