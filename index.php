@@ -300,4 +300,4 @@ $oSettings = new Settings();
 
 	<!-- end: BODY -->
 
-</html>dd
+</html>
