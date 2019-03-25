@@ -23,6 +23,7 @@ if( ($ClientID != $ParkedDomainOwnerClientID) && ($oUser->Role != 'admin') )
 
 //print "ParkedDomainOwnerClientID: ".$ParkedDomainOwnerClientID."<br>";
 //print "ParkedDomainID: ".$_REQUEST["ParkedDomainID"]."<br>";
+$parentDomainId = intVal($_REQUEST["parentDomainId"]);
 
 if($oDomain->DeleteParkedDomain($ParkedDomainOwnerClientID, $_REQUEST["ParkedDomainID"], $Error) == 1)
 {
@@ -34,5 +35,5 @@ else
 }
 
 
-header("location: index.php?Notes=".$Notes.$Error);	
+header("location: ./ListParkedDomains.php?DomainID=".$parentDomainId."&Notes=".$Notes.$Error);
 

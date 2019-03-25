@@ -35,7 +35,8 @@ if ($ClientID != $oDomain->GetDomainOwner($domainId) && ($Role == 'client')) {
 }
 
 if ($oDomain->saveDomainSetting($domainId, "parked_redirect", $redirect, "", "")) {
-    touch($_SERVER["DOCUMENT_ROOT"]."/nm/".$domainId.".subdomain", 0755);
+	$domainAncestorId = $oDomain->GetAncestorDomainID($domainId);
+	touch($_SERVER["DOCUMENT_ROOT"]."/nm/".$domainAncestorId.".subdomain", 0755);
     print "Parked Redirect Saved";
     exit();
 }

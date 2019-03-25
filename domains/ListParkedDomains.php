@@ -326,7 +326,7 @@ if( (! is_numeric($DomainID)) || ($DomainID < 1) )
 
 											print "<td class=\"center\">";
 											print "<div class=\"visible-md visible-lg hidden-sm hidden-xs\">";
-											print "<a href=\"DeleteParkedDomain.php?ParkedDomainID=".$Array[$x]["ID"]."\" onclick=\"return ConfirmDelete('".$Array[$x]["ParkedDomain"]."'); return false;\" class=\"btn btn-bricky tooltips\" data-placement=\"top\" data-original-title=\"Delete Parked Domain\"><i class=\"fa fa-times fa fa-white\" style=\"color:white;\"></i></a>\n";
+											print "<a href=\"DeleteParkedDomain.php?parentDomainId=".$DomainID."&ParkedDomainID=".$Array[$x]["ID"]."\" onclick=\"return ConfirmDelete('".$Array[$x]["ParkedDomain"]."'); return false;\" class=\"btn btn-bricky tooltips\" data-placement=\"top\" data-original-title=\"Delete Parked Domain\"><i class=\"fa fa-times fa fa-white\" style=\"color:white;\"></i></a>\n";
 											print "</div>";
 											print "<div class=\"visible-xs visible-sm hidden-md hidden-lg\">";
 											print "<div class=\"btn-group\">";
@@ -336,7 +336,7 @@ if( (! is_numeric($DomainID)) || ($DomainID < 1) )
 											print "<ul role=\"menu\" class=\"dropdown-menu pull-right\">";
 															
 											print "<li role=\"presentation\">";
-											print "<a role=\"menuitem\" tabindex=\"-1\" href=\"DeleteParkedDomain.php?ParkedDomainID=".$Array[$x]["ID"]."\" onclick=\"return ConfirmDelete('".$Array[$x]["ParkedDomain"]."'); return false;\">";
+											print "<a role=\"menuitem\" tabindex=\"-1\" href=\"DeleteParkedDomain.php?parentDomainId=".$DomainID."&ParkedDomainID=".$Array[$x]["ID"]."\" onclick=\"return ConfirmDelete('".$Array[$x]["ParkedDomain"]."'); return false;\">";
 											print "<i class=\"fa fa-times\"></i> Delete Parked Domain";
 											print "</a>";
 											print "</li>";																
