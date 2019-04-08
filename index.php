@@ -261,7 +261,6 @@ $oSettings = new Settings();
 		<script src="/assets/plugins/blockUI/jquery.blockUI.js"></script>
 
 		<script src="/assets/plugins/iCheck/jquery.icheck.min.js"></script>
-
 		<script src="/assets/plugins/perfect-scrollbar/src/jquery.mousewheel.js"></script>
 
 		<script src="/assets/plugins/perfect-scrollbar/src/perfect-scrollbar.js"></script>
