@@ -257,7 +257,6 @@ $oSettings = new Settings();
 		<script src="/assets/plugins/jquery-ui/jquery-ui-1.10.2.custom.min.js"></script>
 
 		<script src="/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
-
 		<script src="/assets/plugins/blockUI/jquery.blockUI.js"></script>
 
 		<script src="/assets/plugins/iCheck/jquery.icheck.min.js"></script>
