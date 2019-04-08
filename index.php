@@ -273,7 +273,6 @@ $oSettings = new Settings();
 		<script src="/assets/plugins/bootstrap-colorpalette/js/bootstrap-colorpalette.js"></script>
 
 		<script src="/assets/js/main.js"></script>
-
 		<!-- end: MAIN JAVASCRIPTS -->
 
 		<!-- start: JAVASCRIPTS REQUIRED FOR THIS PAGE ONLY -->
