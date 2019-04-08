@@ -283,7 +283,6 @@ $oSettings = new Settings();
 		<script src="/assets/js/login.js"></script>
 
 		<!-- end: JAVASCRIPTS REQUIRED FOR THIS PAGE ONLY -->
-
 		<script>
 
 			jQuery(document).ready(function() {
