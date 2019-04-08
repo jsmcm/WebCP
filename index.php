@@ -299,5 +299,4 @@ $oSettings = new Settings();
 	</body>
 
 	<!-- end: BODY -->
-
 </html>
