@@ -1,11 +1,7 @@
 <?php
 session_start();
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.DNS.php");
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Log.php");
-
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 
 $oUser = new User();
 $oDNS = new DNS();
@@ -44,7 +40,3 @@ if($oDNS->DeleteZone($ZoneName) < 1)
 
 
 header("location: index.php?NoteType=Message&Notes=Zone deleted<br>".$Error);
-
-?>
-
-

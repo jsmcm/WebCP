@@ -1,5 +1,4 @@
-<?
-
+<?php
 /*
 function RecallIssuedTags($TagUserNumbers, $SessionID)
 function GetNextTempIssuedTagsInsertOrder($SessionID)

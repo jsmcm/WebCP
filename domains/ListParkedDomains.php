@@ -106,6 +106,9 @@ if( (! is_numeric($DomainID)) || ($DomainID < 1) )
 		<link rel="stylesheet" href="/assets/plugins/DataTables/media/css/DT_bootstrap.css" />
 		<!-- end: CSS REQUIRED FOR THIS PAGE ONLY -->
 		<link rel="shortcut icon" href="/favicon.ico" />
+
+                <link rel="stylesheet" href="/assets/plugins/x-editable/css/bootstrap-editable.css">
+
 		
 		
 		<script language="javascript">
@@ -292,6 +295,7 @@ if( (! is_numeric($DomainID)) || ($DomainID < 1) )
 										<thead>
 											<tr>
 												<th>Parked Domain</th>
+												<th>Redirect <a href="https://webcp.io/parked-redirect/" target="_new"><img src="/img/help.png" width="20px"></a></th>
 												<th>Parked On</th>
 												<th>&nbsp;</th>
 											</tr>
@@ -308,11 +312,21 @@ if( (! is_numeric($DomainID)) || ($DomainID < 1) )
 										{
 											print "<tr>";
 											print "<td><a href=\"http://".$Array[$x]["ParkedDomain"]."\" target=\"_new\">".$Array[$x]["ParkedDomain"]."</a></td>\r\n";
+
+                                                                                        $parkedRedirect = "";
+                                                                                        $domainSettings = $oDomain->getDomainSettings($Array[$x]["ID"]);
+
+                                                                                        if (isset($domainSettings["parked_redirect"]["value"])) {
+                                                                                                $parkedRedirect = $domainSettings["parked_redirect"]["value"];
+                                                                                        }
+
+											print "<td><a href=\"#\" id=\"parked_redirect_".$Array[$x]["ID"]."\" data-type=\"select\" data-pk=\"".$Array[$x]["ID"]."\" data-value=\"".$parkedRedirect."\" data-original-title=\"Select Redirect\"></a></td>\r\n";
+
 											print "<td>".$Array[$x]["ParkedOn"]."</td>\r\n";
 
 											print "<td class=\"center\">";
 											print "<div class=\"visible-md visible-lg hidden-sm hidden-xs\">";
-											print "<a href=\"DeleteParkedDomain.php?ParkedDomainID=".$Array[$x]["ID"]."\" onclick=\"return ConfirmDelete('".$Array[$x]["ParkedDomain"]."'); return false;\" class=\"btn btn-bricky tooltips\" data-placement=\"top\" data-original-title=\"Delete Parked Domain\"><i class=\"fa fa-times fa fa-white\" style=\"color:white;\"></i></a>\n";
+											print "<a href=\"DeleteParkedDomain.php?parentDomainId=".$DomainID."&ParkedDomainID=".$Array[$x]["ID"]."\" onclick=\"return ConfirmDelete('".$Array[$x]["ParkedDomain"]."'); return false;\" class=\"btn btn-bricky tooltips\" data-placement=\"top\" data-original-title=\"Delete Parked Domain\"><i class=\"fa fa-times fa fa-white\" style=\"color:white;\"></i></a>\n";
 											print "</div>";
 											print "<div class=\"visible-xs visible-sm hidden-md hidden-lg\">";
 											print "<div class=\"btn-group\">";
@@ -322,7 +336,7 @@ if( (! is_numeric($DomainID)) || ($DomainID < 1) )
 											print "<ul role=\"menu\" class=\"dropdown-menu pull-right\">";
 															
 											print "<li role=\"presentation\">";
-											print "<a role=\"menuitem\" tabindex=\"-1\" href=\"DeleteParkedDomain.php?ParkedDomainID=".$Array[$x]["ID"]."\" onclick=\"return ConfirmDelete('".$Array[$x]["ParkedDomain"]."'); return false;\">";
+											print "<a role=\"menuitem\" tabindex=\"-1\" href=\"DeleteParkedDomain.php?parentDomainId=".$DomainID."&ParkedDomainID=".$Array[$x]["ID"]."\" onclick=\"return ConfirmDelete('".$Array[$x]["ParkedDomain"]."'); return false;\">";
 											print "<i class=\"fa fa-times\"></i> Delete Parked Domain";
 											print "</a>";
 											print "</li>";																
@@ -407,6 +421,28 @@ if( (! is_numeric($DomainID)) || ($DomainID < 1) )
 		<script type="text/javascript" src="/assets/plugins/DataTables/media/js/jquery.dataTables.min.js"></script>
 		<script type="text/javascript" src="/assets/plugins/DataTables/media/js/DT_bootstrap.js"></script>
 		<script src="/assets/js/table-data.js"></script>
+
+
+
+
+
+                <script src="/assets/plugins/bootstrap-modal/js/bootstrap-modal.js"></script>
+
+                <script src="/assets/plugins/bootstrap-modal/js/bootstrap-modalmanager.js"></script>
+
+                <script src="/assets/js/ui-modals.js"></script>
+
+                <script src="/assets/plugins/jquery-mockjax/jquery.mockjax.js"></script>
+
+                <script src="/assets/plugins/x-editable/js/bootstrap-editable.min.js"></script>
+
+                <script src="/assets/plugins/x-editable/parked-redirect.js"></script>
+
+                <script src="/assets/plugins/x-editable/demo.js"></script>
+
+
+
+
 		<!-- end: JAVASCRIPTS REQUIRED FOR THIS PAGE ONLY -->
 		<script>
 			jQuery(document).ready(function() {

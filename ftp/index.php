@@ -221,7 +221,6 @@ if($ClientID < 1)
 										<tbody>
 
 										<?php
-										require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.FTP.php");
 										$oFTP = new FTP();
 
 										$ClientID = $oUser->ClientID;

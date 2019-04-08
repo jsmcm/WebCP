@@ -464,6 +464,38 @@
 				</a>
 			</li>
 
+			<?php
+				if(strstr($_SERVER["SCRIPT_FILENAME"], "/emails/transactional/index.php"))
+				{
+					print "<li class=\"active open\">";
+				}
+				else
+				{
+					print "<li>";
+				}
+				?>
+				<a href="/emails/transactional/index.php">
+					<span class="title">Transactional Email </span>
+				</a>
+
+					<?php
+					if(strstr($_SERVER["SCRIPT_FILENAME"], "/emails/transactional/sendgrid.php"))
+					{
+						print "<li class=\"active open\">";
+					}
+					else
+					{
+						print "<li>";
+					}
+					?>
+					<a href="/emails/transactional/sendgrid.php">
+						<span class="title"> > Sendgrid Domains </span>
+					</a>
+
+				</li>
+
+			</li>
+
 		<?php
 		}
 		?>
@@ -1117,12 +1149,12 @@
 			</a>
 			<ul class="sub-menu">
 				<li>
-					<a href="http://bug.webcp.pw/bug_report_page.php" target="_new">
+					<a href="https://bug.webcp.io/bug_report_page.php" target="_new">
 						<span class="title"> Bug Report </span>
 					</a>
 				</li>
 				<li>
-					<a href="http://bug.webcp.pw/bug_report_page.php" target="_new">
+					<a href="https://bug.webcp.io/bug_report_page.php" target="_new">
 						<span class="title"> Feature Request </span>
 					</a>
 				</li>

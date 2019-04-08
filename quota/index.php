@@ -6,16 +6,9 @@ if(! file_exists($_SERVER["DOCUMENT_ROOT"]."/quota/quota_files"))
 	mkdir($_SERVER["DOCUMENT_ROOT"]."/quota/quota_files");
 }
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Database.php");
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Log.php");
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 $oUser = new User();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Settings.php");
 $oSettings = new Settings();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Utils.php");
 $oUtils = new Utils();
 
 require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");

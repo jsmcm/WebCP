@@ -1,13 +1,9 @@
 <?php
 session_start();
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Reseller.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 $oReseller = new Reseller();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
 $oUser = new User();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Settings.php");
 $oSettings = new Settings();
 
 require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
@@ -20,7 +16,6 @@ if($ClientID < 1)
 }
 
 $id = $_REQUEST["id"];
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.MySQL.php");
 $oMySQL = new MySQL();
 
 $MySQLUserName = "";

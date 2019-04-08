@@ -1,13 +1,10 @@
 <?php
 session_start();
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
+
 $oUser = new User();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Settings.php");
 $oSettings = new Settings();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
 $oDomain = new Domain();
 
 require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
@@ -212,7 +209,7 @@ v=DKIM1; k=rsa; p=<?php print $PublicKey; ?></p>
 <b>NOTE:</b> Switch <i>YOUR_DOMAIN</i> for your actual domain, eg, x._domainkey.example.com
 
 <p>&nbsp;<br>
-See our post about <a href="https://webcp.pw/spf-dkim-dmarc" target="_blank">SPF, DKIM and DMARC</a> for more info.
+See our post about <a href="https://webcp.io/spf-dkim-dmarc" target="_blank">SPF, DKIM and DMARC</a> for more info.
 </p>
 						</div>
 					</div>

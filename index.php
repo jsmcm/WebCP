@@ -1,6 +1,19 @@
 <?php
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Settings.php");
+
+if ( ! file_exists($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php") ) {
+    print "<h1>Missing dependencies</h1><p>I'm going to try and install them. This might take several minutes. Please wait 30 minutes then try again</p><p>If you've already waited 30 minutes and still see this please contact support@webcp.io for support</p>";
+
+    if ( ! file_exists($_SERVER["DOCUMENT_ROOT"]."/nm/") ) {
+        mkdir($_SERVER["DOCUMENT_ROOT"]."/nm/", 0755);
+    }
+
+    touch($_SERVER["DOCUMENT_ROOT"]."/nm/composer_install");
+    exit();
+}
+
+require_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 $oSettings = new Settings();
+
 ?>
 <!DOCTYPE html>
 
@@ -240,15 +253,11 @@ $oSettings = new Settings();
 		<![endif]-->
 
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-
 		<script src="/assets/plugins/jquery-ui/jquery-ui-1.10.2.custom.min.js"></script>
-
 		<script src="/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
-
 		<script src="/assets/plugins/blockUI/jquery.blockUI.js"></script>
 
 		<script src="/assets/plugins/iCheck/jquery.icheck.min.js"></script>
-
 		<script src="/assets/plugins/perfect-scrollbar/src/jquery.mousewheel.js"></script>
 
 		<script src="/assets/plugins/perfect-scrollbar/src/perfect-scrollbar.js"></script>
@@ -260,7 +269,6 @@ $oSettings = new Settings();
 		<script src="/assets/plugins/bootstrap-colorpalette/js/bootstrap-colorpalette.js"></script>
 
 		<script src="/assets/js/main.js"></script>
-
 		<!-- end: MAIN JAVASCRIPTS -->
 
 		<!-- start: JAVASCRIPTS REQUIRED FOR THIS PAGE ONLY -->
@@ -270,7 +278,6 @@ $oSettings = new Settings();
 		<script src="/assets/js/login.js"></script>
 
 		<!-- end: JAVASCRIPTS REQUIRED FOR THIS PAGE ONLY -->
-
 		<script>
 
 			jQuery(document).ready(function() {
@@ -286,5 +293,4 @@ $oSettings = new Settings();
 	</body>
 
 	<!-- end: BODY -->
-
 </html>

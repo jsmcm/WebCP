@@ -3,11 +3,6 @@ session_start();
 
 include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 
-/*
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Package.php");
-*/
 
 $oUser = new User();
 $oDomain = new Domain();
@@ -118,9 +113,15 @@ exit();
 */
 
 $Error = "";
-if($oDomain->AddParkedDomain($ParkedDomain, $PrimaryDomain, $PackageID, $DomainOwner, $DomainID, $Error) < 1)
-{
+$parkedDomainId = $oDomain->AddParkedDomain($ParkedDomain, $PrimaryDomain, $PackageID, $DomainOwner, $DomainID, $Error);
+
+if ($parkedDomainId < 1 ) {
 	header("location: ListParkedDomains.php?DomainID=".$AncestorDomainID."&NoteType=Error&Notes=Cannot add domain");
 	exit();
 }
+
+$oDomain->saveDomainSetting($parkedDomainId, "parked_redirect", "redirect", "", "");
+
 header("location: ListParkedDomains.php?DomainID=".$AncestorDomainID."&NoteType=Success&Notes=Domain added<br><b>Please wait 1 minute before adding email or FTP accounts for this domains!</b>".$Error);
+
+

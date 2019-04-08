@@ -18,5 +18,3 @@ else
 {
 	print "Cannot delete file (please check permissions)";
 }
-
-?>

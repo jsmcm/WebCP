@@ -1,15 +1,12 @@
 <?php
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.DNS.php");
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.SSL.php");
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 
 
-
-                if( ! file_exists($_SERVER["DOCUMENT_ROOT"]."/nm/"))
-                {
-                        mkdir($_SERVER["DOCUMENT_ROOT"]."/nm/", 0755);
-                }
+if( ! file_exists($_SERVER["DOCUMENT_ROOT"]."/nm/"))
+{
+        mkdir($_SERVER["DOCUMENT_ROOT"]."/nm/", 0755);
+}
 
 $oSSL = new SSL();
 $oDNS = new DNS();
@@ -24,4 +21,3 @@ if($oDNS->AssignIP($_POST["IPAddress"], $DomainName) == true)
 }
 
 header("Location: index.php?NoteType=success&Notes=IP Address Assigned");
-?>

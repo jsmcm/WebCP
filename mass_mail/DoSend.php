@@ -2,10 +2,9 @@
 
 session_start();
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
-$oUser = new User();
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Settings.php");
+$oUser = new User();
 $oSettings = new Settings();
 
 require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
@@ -34,7 +33,6 @@ $AdminArray = array();
 $ArrayCount = 0;
 //print "<p>".$_SERVER["DOCUMENT_ROOT"]."<p>";
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.SendMail.php");
 
 $oSendMail = new SendMail();
 

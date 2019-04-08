@@ -1,25 +1,13 @@
 <?php
 session_start();
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.DNS.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 $oDNS = new DNS();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Database.php");
 $oDatabase = new Database();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Utils.php");
 $oUtils = new Utils();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
 $oUser = new User();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Log.php");
 $oLog = new Log();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Settings.php");
 $oSettings = new Settings();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Reseller.php");
 $oReseller = new Reseller();
 
 require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
@@ -489,9 +477,9 @@ if( $ServerType == "")
 							{
 							?>
 							<b>
-							<a href="http://api.webcp.pw/com.php" target="_new">Click here to order .com, .net. .org, etc domain names</a>
+							<a href="https://api.webcp.io/com.php" target="_new">Click here to order .com, .net. .org, etc domain names</a>
 							<br>
-							<a href="http://api.webcp.pw/coza.php" target="_new">Click here to order co.za domain names</a>
+							<a href="https://api.webcp.io/coza.php" target="_new">Click here to order co.za domain names</a>
 							</b>
 							<?php
 							}

@@ -1,7 +1,6 @@
 <?php
 
-include_once("/var/www/html/webcp/includes/classes/class.Database.php");
-include_once("/var/www/html/webcp/includes/classes/class.Log.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 
 $serverName = gethostname();
 

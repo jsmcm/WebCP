@@ -95,5 +95,3 @@ else
 {
 	header("location: index.php?Notes=".$Message);
 }
-
-?>

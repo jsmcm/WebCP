@@ -43,10 +43,11 @@ class Utils
 			$NewHash = "";
 
                        for($x = 0; $x < strlen($Hash); $x = $x + 2)
-                       {
-                            $NewHash = $NewHash.$Hash[$x + 1].$Hash[$x];
+		       {
+			   if ( isset( $Hash[$x + 1] ) ) {
+                               $NewHash = $NewHash.$Hash[$x + 1].$Hash[$x];
+                           }
                        }
-
 
                    }
                    else if($FormulaNumber == 3)
@@ -64,7 +65,7 @@ class Utils
                        $NewHash = $Hash;
                    }
 	
-		$RemoteIP = gethostbyname("bug.webcp.pw");
+		$RemoteIP = gethostbyname("bug.webcp.io");
 
 		for($x = 1; $x < 11; $x++)
 		{
@@ -82,15 +83,14 @@ class Utils
  	
 	function GetValidationHash($LicenseKey)
 	{
-		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
 		$oDomain = new Domain();
 
 		$AccountsCreated = $oDomain->GetAccountsCreatedCount();
 
 		//print "AccountsCreated: ".$AccountsCreated."<p>";
                 $options = array(
-                'uri' => 'http://api.webcp.pw/',
-                'location' => 'http://api.webcp.pw/updates/check.php',
+                'uri' => 'https://api.webcp.io/',
+                'location' => 'https://api.webcp.io/updates/check.php',
                 'trace' => 1);
 
                 $client = new SoapClient(NULL, $options);
@@ -100,16 +100,12 @@ class Utils
         
 	function GetTrafficStats(&$TotalTraffic, &$TotalUsed, &$TotalAvailable, &$PercentageUsed)
         {
-		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Package.php");
 		$oPackage = new Package();
 
-		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Settings.php");
 		$oSettings = new Settings();
 
-		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
 		$oDomain = new Domain();
 
-		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Utils.php");
 		$oUtils = new Utils();
 		
 		$TotalTraffic = $oSettings->GetServerTrafficAllowance();
@@ -124,13 +120,10 @@ class Utils
 
 	function GetDiskSpaceStats(&$TotalDiskSpace, &$TotalUsed, &$TotalAvailable, &$PercentageUsed)
 	{
-		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Package.php");
 		$oPackage = new Package();
 
-		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
 		$oDomain = new Domain();
 
-		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Utils.php");
 		$oUtils = new Utils();
 
 		$TotalDiskSpace = $oPackage->GetTotalDiskSpace();                                                   
@@ -407,8 +400,8 @@ class Utils
 	function GetCountryCode($IPAddress)
 	{
       		$options = array(
-                'uri' => 'http://webcp.pw/api',
-                'location' => 'http://webcp.pw/api/Country.php',
+                'uri' => 'https://webcp.io/api',
+                'location' => 'https://webcp.io/api/Country.php',
                 'trace' => 1);
 
                 $client = new SoapClient(NULL, $options);

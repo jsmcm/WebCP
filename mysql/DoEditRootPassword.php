@@ -1,16 +1,14 @@
 <?php
 session_start();
 
-                if( ! file_exists($_SERVER["DOCUMENT_ROOT"]."/nm/"))
-                {
-                        mkdir($_SERVER["DOCUMENT_ROOT"]."/nm/", 0755);
-                }
+if( ! file_exists($_SERVER["DOCUMENT_ROOT"]."/nm/"))
+{
+        mkdir($_SERVER["DOCUMENT_ROOT"]."/nm/", 0755);
+}
 
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 $oUser = new User();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.MySQL.php");
 $oMySQL = new MySQL();
 
 $ClientID = $oUser->getClientId();

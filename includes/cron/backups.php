@@ -13,17 +13,6 @@ if (!file_exists($_SERVER["DOCUMENT_ROOT"]."/includes/cron/tmp/")) {
 
 include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 
-/*
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Settings.php");
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Package.php");
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Email.php");
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.FTP.php");
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.MySQL.php");
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.DNS.php");
-*/
-
 $oUser = new User();
 $oDomain = new Domain();
 $oSettings = new Settings();

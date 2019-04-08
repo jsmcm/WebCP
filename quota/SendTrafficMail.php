@@ -4,11 +4,7 @@ $DomainUserName = $_REQUEST["DomainUserName"];
 $Percentage = $_REQUEST["Percentage"];
 $HostName = $_REQUEST["HostName"];
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Settings.php");
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Database.php");
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Log.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 
 $oDomain = new Domain();
 $oSettings = new Settings();

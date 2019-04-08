@@ -1,13 +1,9 @@
 <?php
 session_start();
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 $oUser = new User();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Package.php");
 $oPackage = new Package();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Settings.php");
 $oSettings = new Settings();
 
 
@@ -28,27 +24,6 @@ if($oUser->Role == "client")
 	header("Location: /index.php");
 	exit();
 }
-
-	/*
-	try
-	{
-		$options = array(
-		'uri' => 'http://api.webcp.pw',
-		'location' => 'http://api.webcp.pw/Country.php',
-		'trace' => 1);
-
-		$client = new SoapClient(NULL, $options);
-		$CountryCode = strtolower($client->GetCountryCode($_SERVER["SERVER_ADDR"]));
-
-		file_put_contents($_SERVER["DOCUMENT_ROOT"]."/includes/country.inc", $CountryCode);		
-	}
-	catch(Exception $e)
-	{
-		print $e;
-	}	
-	*/
-
-
 
 
 ?>

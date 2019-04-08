@@ -879,8 +879,8 @@ class Domain
 		
 		$oLog->WriteLog("DEBUG", "myfile: '".$myfile."'");
 	
-		$DomainName = $this->GetDomainNameFromDomainID($DomainID);	
-		$oSSL->GetCertificatesChainName($DomainName);
+		//$DomainName = $this->GetDomainNameFromDomainID($DomainID);	
+		//$oSSL->GetCertificatesChainName($DomainName);
 
 		$fh = fopen($myfile, "a");
 		fwrite($fh, "");
@@ -2000,7 +2000,6 @@ class Domain
 		$oLog = new Log();
 
 		$oSettings = new Settings();
-
 		$oDNS = new DNS();
 
 		$oLog->WriteLog("DEBUG", "DomainName: '".$DomainName."', DomainType: '".$DomainType."', PackageID: '".$PackageID."', ClientID: '".$ClientID."'");
@@ -2112,7 +2111,16 @@ class Domain
 
 		$this->DeleteDomainFile($AddDomainID);
 		$this->MakeDomainFile($AddDomainID);
-		
+		$this->saveDomainSetting($AddDomainID, "ssl_redirect", "enforce", "", "");
+
+		$oEmail = new Email();
+		$transactionalEmailSettings = $oEmail->getSendgridSettings();
+		if ( isset($transactionalEmailSettings["username"]) && $transactionalEmailSettings["username"] != "" && isset($transactionalEmailSettings["password"]) && $transactionalEmailSettings["password"]
+!= "" && isset($transactionalEmailSettings["default"]) && $transactionalEmailSettings["default"]
+== "checked") {
+			$oEmail->saveTransactionalDomain("sendgrid", $AddDomainID);
+		}
+
 		return $AddDomainID;
 		
 	}
@@ -2128,7 +2136,7 @@ class Domain
 			$query->bindParam(":domain_id", $domainId);
 			$query->execute();
 	
-			if($result = $query->fetch(PDO::FETCH_ASSOC)) {
+			while($result = $query->fetch(PDO::FETCH_ASSOC)) {
 				$settingsArray[$result["setting_name"]]["value"] = $result["setting_value"];
 				$settingsArray[$result["setting_name"]]["extra1"] = $result["extra1"];
 				$settingsArray[$result["setting_name"]]["extra2"] = $result["extra2"];

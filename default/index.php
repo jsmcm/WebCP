@@ -19,7 +19,7 @@ a
 <p style="font-size:22px;">
 There is no website configured at this address. This is a control panel default page
 <br>
-For more info please see <a href="https://webcp.pw/default-landing-page" target="_new">WebCP.pw</a>
+For more info please see <a href="https://webcp.io/default-landing-page" target="_new">WebCP.io</a>
 </p>
 </td>
 </tr>

@@ -20,25 +20,17 @@ class DNS
                 $this->DatabaseConnection = $this->oDatabase->GetConnection();
 	}
 
-	function FillIPArray(&$IPArray, $IPType="ipv4")
+	function FillIPArray()
 	{
 			
-		$IPJson = `/usr/webcp/server_vars.sh`;
+		$ipJson = `/usr/webcp/server_vars.sh`;
 	
-		$IPArray = array();
-		if($IPJson != "")
-			{
-			$IPArray = json_decode($IPJson, true);
+		$ipArray = array();
+		if($ipJson != "") {
+			$ipArray = json_decode($ipJson, true);
 		}
-	
-		if($IPType == "ipv4")
-		{
-			$IPArray = $IPArray["ipv4"];
-			return;
-		}
-		
-		$IPArray = $IPArray["ipv6"];
-	
+
+		return $ipArray;
 	}
 		
 	function ManageIPAddresses()
@@ -48,7 +40,7 @@ class DNS
 		$oDomain = new Domain();
 
 		$IP = array();
-		$this->FillIPArray($IP, "ipv4");
+		$IP = $this->FillIPArray();
 	
 		$ServerIPAddressCount = $this->GetServerIPAddressCount();
 		$oLog->WriteLog("debug", "ServerIPAddressCount: ".$ServerIPAddressCount);
@@ -58,20 +50,28 @@ class DNS
 			// There are no IPs in the server (might be new)...
 			$oLog->WriteLog("debug", "count(\$IP): ".count($IP));
 	
-			if(count($IP) > 0)
+			if(count($IP["ipv4"]) > 0)
 			{
-				$oLog->WriteLog("debug", "AddIP(".$IP[0].", \"shared\"");
-				$this->AddIP($IP[0], "shared");
+				$oLog->WriteLog("debug", "AddIP(".$IP["ipv4"][0].", \"shared\"");
+				$this->AddIP($IP["ipv4"][0], "ipv4", "shared");
+	
+				$oDomain->RecreateVHostFiles();
+			}
+			
+			if(count($IP["ipv6"]) > 0)
+			{
+				$oLog->WriteLog("debug", "AddIP(".$IP["ipv6"][0].", \"shared\"");
+				$this->AddIP($IP["ipv6"][0], "ipv6", "shared");
 	
 				$oDomain->RecreateVHostFiles();
 			}
 		}
 		else
 		{
-			$oLog->WriteLog("debug", "count(\$IP): ".count($IP));
-			for($x = 0; $x < count($IP); $x++)
+			$oLog->WriteLog("debug", "count(\$IP['ipv4']): ".count($IP["ipv4"]));
+			for($x = 0; $x < count($IP["ipv4"]); $x++)
 			{
-				$IPAddress = trim($IP[$x]);
+				$IPAddress = trim($IP["ipv4"][$x]);
 	
 				if($IPAddress != "")
 				{
@@ -79,7 +79,7 @@ class DNS
 					if( ! $this->IPExists($IPAddress))
 					{
 						$oLog->WriteLog("debug", "Not, so adding it...");
-						$this->AddIP($IPAddress, "");
+						$this->AddIP($IPAddress, "ipv4",  "");
 					}
 					else
 					{
@@ -88,24 +88,59 @@ class DNS
 				}
 			}
 	
-			if($this->GetSharedIP() == "")
+			$oLog->WriteLog("debug", "count(\$IP['ipv6']): ".count($IP["ipv6"]));
+			for($x = 0; $x < count($IP["ipv6"]); $x++)
 			{
-				$oLog->WriteLog("debug", "Shared IP is blanks..");
+				$IPAddress = trim($IP["ipv6"][$x]);
+	
+				if($IPAddress != "")
+				{
+					$oLog->WriteLog("debug", "Checking if ".$IPAddress." exists...");
+					if( ! $this->IPExists($IPAddress))
+					{
+						$oLog->WriteLog("debug", "Not, so adding it...");
+						$this->AddIP($IPAddress, "ipv4", "");
+					}
+					else
+					{
+						$oLog->WriteLog("debug", "Does exists...");
+					}
+				}
+			}
+
+			if($this->GetSharedIP("ipv4") == "")
+			{
+				$oLog->WriteLog("debug", "Shared IPv4 is blanks..");
 
 				// for some reason the shared ip does not exists, add it now
-				$SharedIP = trim($this->GetUnusedIP());
+				$SharedIP = trim($this->GetUnusedIP("ipv4"));
 	
 				$oLog->WriteLog("debug", "Unused IP = ".$SharedIP);
 	
-				if($SharedIP == "")
-				{
+				if($SharedIP == "") {
 					// Problem!!! no IP available for sharing!
 					// alert should come here...
+				} else {
+					$oLog->WriteLog("debug", "makeIpShared(".$SharedIP.")");
+					$this->makeIpShared($SharedIP);
 				}
-				else
-				{
-					$oLog->WriteLog("debug", "AddIP(".$SharedIP.", \"shared\")");
-					$this->AddIP($SharedIP, "shared");
+			}
+			
+			if($this->GetSharedIP("ipv6") == "")
+			{
+				$oLog->WriteLog("debug", "Shared IPv6 is blanks..");
+
+				// for some reason the shared ip does not exists, add it now
+				$SharedIP = trim($this->GetUnusedIP("ipv6"));
+	
+				$oLog->WriteLog("debug", "Unused IP = ".$SharedIP);
+	
+				if($SharedIP == "") {
+					$oLog->WriteLog("debug", "Problem!!! no IPv6 available for sharing!");
+					// alert should come here...
+				} else {
+					$oLog->WriteLog("debug", "makeIpShared(".$SharedIP.")");
+					$this->makeIpShared($SharedIP);
 				}
 			}
 		}
@@ -509,15 +544,17 @@ class DNS
 			$oLog->WriteLog("error", "/class.DNS.php -> GetDomainIP(); Error = ".$e);
 		}
 
-		return $this->GetSharedIP();
+		return $this->GetSharedIP("ipv4");
 	}
 
-	function GetSharedIP()
+	function GetSharedIP($type="ipv4")
 	{
 		try
 		{
-			$query = $this->DatabaseConnection->prepare("SELECT option_value FROM dns_options WHERE option_name = 'ip' AND extra1 = 'shared' AND deleted = 0");
-			
+			$query = $this->DatabaseConnection->prepare("SELECT option_value FROM dns_options WHERE option_name = 'ip' AND extra1 = 'shared' AND extra2 = :type AND deleted = 0");
+
+			$query->bindParam(":type", $type);
+
 			$query->execute();
 	
 			if($result = $query->fetch(PDO::FETCH_ASSOC))
@@ -536,13 +573,15 @@ class DNS
 		return "";
 	}
 
-	function GetUnusedIP()
+	function GetUnusedIP($type)
 	{
 	
 		try
 		{
-			$query = $this->DatabaseConnection->prepare("SELECT option_value FROM dns_options WHERE extra1 = '' AND deleted = 0 LIMIT 1");
-			
+			$query = $this->DatabaseConnection->prepare("SELECT option_value FROM dns_options WHERE extra1 = '' AND extra2 = :type AND deleted = 0 LIMIT 1");
+
+			$query->bindParam(":type", $type);
+
 			$query->execute();
 	
 			if($result = $query->fetch(PDO::FETCH_ASSOC))
@@ -585,14 +624,15 @@ class DNS
 		return "";
 	}
 
-	function AddIP($IP, $Domain)
+	function AddIP($IP, $type, $Domain)
 	{
 		try
 		{
-			$query = $this->DatabaseConnection->prepare("INSERT INTO dns_options VALUES (0, 'ip', :ip, :domain, '', 0)");
+			$query = $this->DatabaseConnection->prepare("INSERT INTO dns_options VALUES (0, 'ip', :ip, :domain, :type, 0)");
 			
 			$query->bindParam(":ip", $IP);
 			$query->bindParam(":domain", $Domain);
+			$query->bindParam(":type", $type);
 			
 			$query->execute();
 	
@@ -676,17 +716,44 @@ class DNS
 			'trace' => 1
 		);
 
+		$type = "ipv4";
+		if ( strstr($IP, ":") ) {
+			$type = "ipv6";
+		}
+
                	$client = new SoapClient(NULL, $options);
 
-               	$Result = $client->WebCP_UpdateARecords($Domain, $IP, $this->GetSharedIP(), $Hash);
+               	$Result = $client->WebCP_UpdateARecords($Domain, $IP, $this->GetSharedIP($type), $Hash);
 			
 		for($x = 0; $x < $ParkedDomainCount; $x++)
 		{
-               		$Result = $client->WebCP_UpdateARecords($ParkedDomainArray[$x]["ParkedDomain"], $IP, $this->GetSharedIP(), $Hash);
+               		$Result = $client->WebCP_UpdateARecords($ParkedDomainArray[$x]["ParkedDomain"], $IP, $this->GetSharedIP($type), $Hash);
 		}
 
 		return true;
 	}
+
+	function makeIpShared($ip)
+	{
+		try
+		{
+			$query = $this->DatabaseConnection->prepare("UPDATE dns_options SET extra1 = 'shared' WHERE option_name = 'ip' AND option_value = :ip AND deleted = 0");
+			
+			$query->bindParam(":ip", $ip);
+			
+			$query->execute();
+	
+		}
+		catch(PDOException $e)
+		{
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.DNS.php -> makeIpShared(); Error = ".$e);
+		}
+		
+		return true;
+	}
+
+
 
 	function AssignIP($IP, $Domain)
 	{

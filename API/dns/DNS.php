@@ -7,4 +7,3 @@ $server = new SoapServer(NULL, $options);
 $server->setClass('API_DNS');
 $server->handle();
 
-?>

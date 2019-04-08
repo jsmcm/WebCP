@@ -12,8 +12,8 @@
      $URL = $_SERVER["REQUEST_URI"];
 
      $options = array(
-     'uri' => 'http://api.webcp.pw',
-     'location' => 'http://api.webcp.pw/Country.php',
+     'uri' => 'https://api.webcp.io',
+     'location' => 'https://api.webcp.io/Country.php',
      'trace' => 1);
 
      $client = new SoapClient(NULL, $options);

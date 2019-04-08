@@ -1,6 +1,6 @@
 <?php
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 $oUser = new User();
 
 $ClientID = $oUser->getClientId();
@@ -12,7 +12,6 @@ if($ClientID < 1)
 $Role = $oUser->Role;
 
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Email.php");
 $oEmail = new Email();
 
 $oEmail->EditAutoReply($_POST["AutoReplyID"], $_POST["Subject"], $_POST["MessageBody"], $ClientID);

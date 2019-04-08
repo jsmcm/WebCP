@@ -2,10 +2,8 @@
 
 session_start();
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 $oUser = new User();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Reseller.php");
 $oReseller = new Reseller();
 
 $ClientID = $oUser->getClientId();
@@ -65,4 +63,3 @@ else if($ResellerID == -2)
 	$oReseller->RemoveClientFromResellers($ClientID);
 	header("Location: index.php?NoteType=Success&Notes=Reseller Changed");
 }
-?>

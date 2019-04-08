@@ -15,10 +15,9 @@ if(strlen($SendTo) == 0)
 
 $SendTo = substr($SendTo, 0, strlen($SendTo) - 1);
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
-$oUser = new User();
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Settings.php");
+$oUser = new User();
 $oSettings = new Settings();
 
 require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");

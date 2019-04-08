@@ -7,7 +7,8 @@ function ValidateIP($ip)
 }
 
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
+
 $oUser = new User();
 
 $ClientID = $oUser->getClientId();

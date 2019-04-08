@@ -32,28 +32,27 @@ else
 //print "Unzipping ".$ZipFile." -> to ".$Path;
 //exit();
 
-	require_once($_SERVER["DOCUMENT_ROOT"]."/skel/editor/includes/functions.inc.php");
+require_once($_SERVER["DOCUMENT_ROOT"]."/skel/editor/includes/functions.inc.php");
 
-	
-	$zip = new ZipArchive;
 
-	if($zip->open($ZipFile))
+$zip = new ZipArchive;
+
+if($zip->open($ZipFile))
+{
+	for($i=0; $i<$zip->numFiles; $i++)
 	{
-		for($i=0; $i<$zip->numFiles; $i++)
-		{
-			$zip->getNameIndex($i);
-		}
-
-		$zip->extractTo($Path);
-		$zip->close();
-
-	} 
-	else 
-	{
-		header("location: index.php?Notes=Error reading zip-archive!");
+		$zip->getNameIndex($i);
 	}
 
-	chmod_R($Path, 0755, 0755);
+	$zip->extractTo($Path);
+	$zip->close();
 
-	header("Location: index.php?Path=".$Path);
-?>
+} 
+else 
+{
+	header("location: index.php?Notes=Error reading zip-archive!");
+}
+
+chmod_R($Path, 0755, 0755);
+
+header("Location: index.php?Path=".$Path);

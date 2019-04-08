@@ -3,7 +3,7 @@
 	function FetchIconListFromRemoteServer()
 	{
 		$LocalMD5 = "";
-		$RemoteMD5 = md5_file("http://api.webcp.pw/FileEditor/icon_list.txt");
+		$RemoteMD5 = md5_file("https://api.webcp.io/FileEditor/icon_list.txt");
 
 		if( file_exists($_SERVER["DOCUMENT_ROOT"]."/Editor/icon_list.txt"))
 		{
@@ -26,7 +26,7 @@
 			unlink($_SERVER["DOCUMENT_ROOT"]."/Editor/icon_list.txt");
 		}
 
-		file_put_contents($_SERVER["DOCUMENT_ROOT"]."/Editor/icon_list.txt", file_get_contents("http://api.webcp.pw/FileEditor/icon_list.txt"));
+		file_put_contents($_SERVER["DOCUMENT_ROOT"]."/Editor/icon_list.txt", file_get_contents("https://api.webcp.io/FileEditor/icon_list.txt"));
 
 		$IconArray = file($_SERVER["DOCUMENT_ROOT"]."/Editor/icon_list.txt");
 
@@ -39,7 +39,7 @@
 				unlink($_SERVER["DOCUMENT_ROOT"]."/Editor/icons/".$val);
 			}
 
-			file_put_contents($_SERVER["DOCUMENT_ROOT"]."/Editor/icons/".$val, file_get_contents("http://api.webcp.pw/FileEditor/icons/".$val));
+			file_put_contents($_SERVER["DOCUMENT_ROOT"]."/Editor/icons/".$val, file_get_contents("https://api.webcp.io/FileEditor/icons/".$val));
 		}
 	}
 
@@ -47,7 +47,7 @@
 	function FetchEditableListFromRemoteServer()
 	{
 		$LocalMD5 = "";
-		$RemoteMD5 = md5_file("http://api.webcp.pw/FileEditor/editable_list.txt");
+		$RemoteMD5 = md5_file("https://api.webcp.io/FileEditor/editable_list.txt");
 
 		if( file_exists($_SERVER["DOCUMENT_ROOT"]."/Editor/editable_list.txt"))
 		{
@@ -70,7 +70,7 @@
 			unlink($_SERVER["DOCUMENT_ROOT"]."/Editor/editable_list.txt");
 		}
 
-		file_put_contents($_SERVER["DOCUMENT_ROOT"]."/Editor/editable_list.txt", file_get_contents("http://api.webcp.pw/FileEditor/editable_list.txt"));
+		file_put_contents($_SERVER["DOCUMENT_ROOT"]."/Editor/editable_list.txt", file_get_contents("https://api.webcp.io/FileEditor/editable_list.txt"));
 		
 	}
 
