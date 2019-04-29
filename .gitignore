@@ -23,3 +23,4 @@ installer/wordpress/WP.zip
 installer/wordpress/current_version.txt
 restore/tmp/
 restore/tmp/*
+emails/trace/bw_log.txt
