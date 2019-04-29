@@ -146,6 +146,10 @@ if($ClientID < 1)
 	
 $oLog->WriteLog("DEBUG", "/domains/index.php -> client_id set, continuing");
 
+$serverAccountsCreated = $oDomain->GetAccountsCreatedCount();
+$serverAccountsAllowed = $validationArray["allowed"];
+$serverLicenseType = $validationArray["type"];
+
 $Accounts = 0;
 if($oUser->Role == "admin")
 {
@@ -707,12 +711,16 @@ if($Traffic == 0)
 										{
 											$BlockReason = $BlockReason."Max number of accounts created<br>";
 										}
-									
+
+										if ( $serverLicenseType == "free" && ($serverAccountsCreated >= $serverAccountsAllowed) ) {
+											$BlockReason = "You can only create ".$serverAccountsAllowed." accounts on the free plan. Please <a href=\"https://webcp.io\" target=\"_new\">upgrade</a> if you need to add more accounts";
+										}
+
 										if($BlockReason == "")
 										{		
 										?>
-										<a class="btn btn-primary" href="AddDomain.php"><i class="fa fa-plus"></i>
-										Add new Domain</a>
+											<a class="btn btn-primary" href="AddDomain.php"><i class="fa fa-plus"></i>
+											Add new Domain</a>
 										<?php
 										}
 										else
@@ -729,11 +737,11 @@ if($Traffic == 0)
 							if($oUser->Role == "admin")
 							{
 							?>
-							<b>
-							<a href="https://api.webcp.io/com.php" target="_new">Click here to order .com, .net. .org, etc domain names</a>
-							<br>
-							<a href="https://api.webcp.io/coza.php" target="_new">Click here to order co.za domain names</a>
-							</b>
+								<b>
+								<a href="https://api.webcp.io/com.php" target="_new">Click here to order .com, .net. .org, etc domain names</a>
+								<br>
+								<a href="https://api.webcp.io/coza.php" target="_new">Click here to order co.za domain names</a>
+								</b>
 							<?php
 							}
 							?>

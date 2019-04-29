@@ -11,6 +11,19 @@ $oDomain = new Domain();
 $oReseller = new Reseller();
 $oSettings = new Settings();
 
+require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
+
+$serverAccountsCreated = $oDomain->GetAccountsCreatedCount();
+$serverAccountsAllowed = $validationArray["allowed"];
+$serverLicenseType = $validationArray["type"];
+
+
+if ( $serverLicenseType == "free" && ($serverAccountsCreated >= $serverAccountsAllowed) ) {
+	header("Location: index.php?Notes=".htmlentities("You are on a free license. Please upgrade to add more accounts")."&NoteType=error");
+	exit();
+}
+
+
 $oDNS->ManageIPAddresses();
 $oLog->WriteLog("DEBUG", "/domains/index.php...");
 

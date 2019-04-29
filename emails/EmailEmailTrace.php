@@ -1,5 +1,7 @@
 <?php
 
+require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
+
 $HostName = $_SERVER["SERVER_NAME"];
 $EmailAddress = $_POST["EmailAddress"];
 $Body = $_POST["Body"];

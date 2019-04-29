@@ -6,6 +6,8 @@ $oSimpleNonce = new SimpleNonce();
 $oUser = new User();
 $oEmail = new Email();
 
+require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
+
 $ClientID = $oUser->GetClientID();
 $loggedInId = $ClientID;
 

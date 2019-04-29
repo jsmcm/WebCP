@@ -6,6 +6,8 @@ $oUser = new User();
 $oPackage = new Package();
 $oLog = new Log();
 
+require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
+
 $oLog->WriteLog("DEBUG", "/domains/Suspensions.php...");
 
 $ClientID = $oUser->getClientId();

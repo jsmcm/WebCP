@@ -9,6 +9,8 @@ $oPackage = new Package();
 $oLog = new Log();
 $oFTP = new FTP();
 
+require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
+
 $ClientID = $oUser->getClientId();
 if($ClientID < 1)
 {

@@ -1,10 +1,27 @@
 <?php
-//$LicenseKey = $oSettings->GetLicenseKey();
-//$Activation = file_get_contents($_SERVER["DOCUMENT_ROOT"]."/includes/activation.dat");
 
-//if( md5($LicenseKey.$_SERVER["SERVER_ADDR"].date("Y-m-t 23:59:59")) != $Activation)
-//{
-        //header("location: /index.php?Notes=License expired or invalid, please contact support");
-        //exit();
-//}
-?>
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
+
+$oUtils = new Utils();
+
+$LicenseKey = file_get_contents($_SERVER["DOCUMENT_ROOT"]."/includes/license.conf");
+$key = $oUtils->getValidationKey($LicenseKey);
+
+if( $key == "expired" ) {
+        header("location: index.php?Notes=License is expired. Please renew or contact support: <a href=\"https://webcp.io\">webcp.io</a>");
+        exit();
+} else if ($key == "not-found" ) {
+        header("location: index.php?Notes=License not found. Please register for one at: <a href=\"https://webcp.io\">webcp.io</a><p><a href=\"/enter_license.php\">Enter License Key</a>");
+        exit();
+}
+
+
+$validationData = $oUtils->getValidationData($key);
+
+$validationArray = json_decode($validationData, true);
+
+if ( ($oUtils->ValidateHash($validationArray["hash"], $LicenseKey) !== true) || $validationArray["status"] != "valid" ) {
+        header("location: index.php?Notes=License failed, please try logging in again or contact support");
+        exit();
+}
+

@@ -9,6 +9,8 @@ $oPackage = new Package();
 $oUtils = new Utils();
 $oSettings = new Settings();
 
+require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
+
 $ClientID = $oUser->getClientId();
 if($ClientID < 1)
 {

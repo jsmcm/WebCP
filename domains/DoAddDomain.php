@@ -7,6 +7,19 @@ $oUser = new User();
 $oDomain = new Domain();
 $oLog = new Log();
 
+require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
+
+$serverAccountsCreated = $oDomain->GetAccountsCreatedCount();
+$serverAccountsAllowed = $validationArray["allowed"];
+$serverLicenseType = $validationArray["type"];
+
+
+if ( $serverLicenseType == "free" && ($serverAccountsCreated >= $serverAccountsAllowed) ) {
+        header("Location: index.php?Notes=".htmlentities("You are on a free license. Please upgrade to add more accounts")."&NoteType=error");
+        exit();
+}
+
+
 $ClientID = $oUser->getClientId();
 if($ClientID < 1)
 {

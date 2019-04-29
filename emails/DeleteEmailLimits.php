@@ -5,17 +5,17 @@ include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 $oUser = new User();
 $oEmail = new Email();
 
+require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
+
 $ClientID = $oUser->getClientId();
-if($ClientID < 1)
-{
+if($ClientID < 1) {
         header("Location: /index.php");
         exit();
 }
 
 $Role = $oUser->Role;
 
-if($Role != "admin")
-{
+if($Role != "admin") {
 	header("location: /index.php");
 	exit();
 }

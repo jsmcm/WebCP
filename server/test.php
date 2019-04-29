@@ -1,6 +1,6 @@
 <?php
 
-
+require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 $oUtils = new Utils();
 
 $oUtils->GetTrafficStats($TotalTraffic, $TotalUsed, $TotalAvailable, $PercentageUsed);

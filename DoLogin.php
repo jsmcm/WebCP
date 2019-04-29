@@ -13,33 +13,32 @@ $oUser = new User();
 $oLog = new Log();
 $oUtils = new Utils();
 
-
 $LicenseKey = file_get_contents($_SERVER["DOCUMENT_ROOT"]."/includes/license.conf");
-$Hash = $oUtils->GetValidationHash($LicenseKey);
-
-if ($oUtils->ValidateHash($Hash, $LicenseKey) == true) {
-    file_put_contents($_SERVER["DOCUMENT_ROOT"]."/includes/activation.dat", md5($LicenseKey.$_SERVER["SERVER_ADDR"].date("Y-m-t 23:59:59")));
-} else {
- 
+$key = $oUtils->getValidationKey($LicenseKey);
 
 
-    // The license server has an intermittent issue, so recheck!
-    if (strlen($Hash) == 34) {
-       
-        $Hash = $oUtils->GetValidationHash($LicenseKey);
+if( $key == "expired" ) {
+	header("location: index.php?Notes=License is expired. Please renew or contact support: <a href=\"https://webcp.io\">webcp.io</a>");
+	exit();
+} else if ($key == "not-found" ) {
+	header("location: index.php?Notes=License not found. Please register for one at: <a href=\"https://webcp.io\">webcp.io</a><p><a href=\"/enter_license.php\">Enter License Key</a>");
+	exit();
+}
 
-        if ($oUtils->ValidateHash($Hash, $LicenseKey) == true) {
-            file_put_contents($_SERVER["DOCUMENT_ROOT"]."/includes/activation.dat", md5($LicenseKey.$_SERVER["SERVER_ADDR"].date("Y-m-t 23:59:59")));
-        } else {
-            header("location: index.php?Notes=Error with license file or license expired, please contact support:<p><b>".$Hash."</b><p><a href=\"/enter_license.php\">Enter New License</a>");
-            exit();
-        }
 
-    } else {
-        header("location: index.php?Notes=Error with license file or license expired, please contact support:<p><b>".$Hash."</b><p><a href=\"/enter_license.php\">Enter New License</a>");
-        exit();
-    }
+$validationData = $oUtils->getValidationData($key);
 
+if ( $validationData === false ) {
+	header("location: index.php?Notes=Session expired, please retry logging in");
+	exit();
+}
+
+$validationArray = json_decode($validationData, true);
+
+
+if ( ($oUtils->ValidateHash($validationArray["hash"], $LicenseKey) !== true) || $validationArray["status"] != "valid" ) {
+	header("location: index.php?Notes=License failed, please try logging in again or contact support");
+	exit();
 }
 
 $emailAddress = "";
@@ -98,7 +97,4 @@ else
 		header("Location: index.php?Notes=Login failed!");
 	}
 }
-
-
-?>
 

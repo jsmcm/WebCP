@@ -4,9 +4,10 @@ session_start();
 include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 $oUser = new User();
 
+require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
+
 $ClientID = $oUser->getClientId();
-if($ClientID < 1)
-{
+if($ClientID < 1) {
         header("Location: /index.php");
         exit();
 }
@@ -24,8 +25,7 @@ $oEmail = new Email();
 
 $DomainID = $oEmail->GetDomainIDFromEmailID($_REQUEST["id"]);
 
-if($DomainID > -1)
-{
+if($DomainID > -1) {
         $DomainInfoArray = array();
         $oDomain->GetDomainInfo($DomainID, $DomainInfoArray);
 
