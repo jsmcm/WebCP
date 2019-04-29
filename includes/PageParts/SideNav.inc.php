@@ -817,6 +817,40 @@
 					<span class="title"> View Quota Usage </span>
 				</a>
 			</li>
+				
+			<?php
+			if(strstr($_SERVER["SCRIPT_FILENAME"], "/server/stats/ram.php"))
+			{
+				print "<li class=\"active open\">";
+			}
+			else
+			{
+				print "<li>";
+			}
+			?>
+			<a href="/server/stats/ram.php">
+				<span class="title"> RAM Stats </span>
+			</a>
+			</li>
+
+				
+			<?php
+			if(strstr($_SERVER["SCRIPT_FILENAME"], "/server/stats/cpu.php"))
+			{
+				print "<li class=\"active open\">";
+			}
+			else
+			{
+				print "<li>";
+			}
+			?>
+			<a href="/server/stats/cpu.php">
+				<span class="title"> CPU Stats </span>
+			</a>
+			</li>
+
+
+
 
 			<?php
 			if($oUser->Role == "admin")

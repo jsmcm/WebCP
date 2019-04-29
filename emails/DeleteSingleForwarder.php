@@ -10,12 +10,13 @@ $oSimpleNonce = new SimpleNonce();
 $ClientID = $oUser->GetClientID();
 $Role = $oUser->Role;
 
+require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
+
 $loggedInId = $ClientID;
 
 $email_ClientID = $oEmail->getLoggedInEmailId();
 
-if($ClientID < 1)
-{
+if($ClientID < 1) {
         if( $email_ClientID < 1 )
         {
                 header("Location: /index.php");

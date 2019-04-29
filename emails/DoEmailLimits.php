@@ -5,6 +5,9 @@ include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 $oUser = new User();
 $oEmail = new Email();
 
+
+require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
+
 $ClientID = $oUser->getClientId();
 if($ClientID < 1)
 {

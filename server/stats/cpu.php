@@ -2,36 +2,21 @@
 session_start();
 
 include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
-$oDomain = new Domain();
-$oUser = new User();
 $oSettings = new Settings();
+$oUser = new User();
 
 require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 
 $ClientID = $oUser->getClientId();
-if($ClientID < 1)
-{
-	$oLog->WriteLog("DEBUG", "/domains/index.php -> client_id not set, redirecting to /index.php");
+if($ClientID < 1) {
 	header("Location: /index.php");
 	exit();
 }
-	
-if($oUser->Role == "client")
-{
-	header("Location: ./index.php?NoteType=Error&Notes=No Permissions");
+
+if($oUser->Role != "admin") {
+	header("Location: /index.php");
 	exit();
 }
-
-
-
-if(!isset($_REQUEST["DomainID"]))
-{
-	header("Location: index.php?NoteType=Error&Notes=Error changing package");
-	exit();
-}
-
-$DomainID = $_REQUEST["DomainID"];
-$DomainOwnerID = $oDomain->GetDomainOwner($DomainID);
 
 ?>
 
@@ -43,7 +28,7 @@ $DomainOwnerID = $oDomain->GetDomainOwner($DomainID);
 	<!--<![endif]-->
 	<!-- start: HEAD -->
 	<head>
-		<title>Change User | <?php print $oSettings->GetWebCPTitle(); ?></title>
+		<title>CPU over time | <?php print $oSettings->GetWebCPTitle(); ?></title>
 		<!-- start: META -->
 		<meta charset="utf-8" />
 		<!--[if IE]><meta http-equiv='X-UA-Compatible' content="IE=edge,IE=9,IE=8,chrome=1" /><![endif]-->
@@ -67,33 +52,7 @@ $DomainOwnerID = $oDomain->GetDomainOwner($DomainID);
 		<link rel="stylesheet" href="/assets/plugins/font-awesome/css/font-awesome-ie7.min.css">
 		<![endif]-->
 		<!-- end: MAIN CSS -->
-		<!-- start: CSS REQUIRED FOR THIS PAGE ONLY -->
-		<link rel="stylesheet" type="text/css" href="/assets/plugins/select2/select2.css" />
-		<link rel="stylesheet" href="/assets/plugins/DataTables/media/css/DT_bootstrap.css" />
-		<!-- end: CSS REQUIRED FOR THIS PAGE ONLY -->
 		<link rel="shortcut icon" href="/favicon.ico" />
-		
-		
-		<script language="javascript">
-
-function ValidateForm()
-{
-
-	if(document.EditUser.UserID.value == "")
-	{
-		alert("ERROR!!!\r\nPlease select the user....");
-		document.EditUser.UserID.focus();
-		return false;
-	}
-
-	return true;
-}
-
-
-		</script>
-		
-	
-
 	</head>
 	<!-- end: HEAD -->
 	<!-- start: BODY -->
@@ -158,136 +117,58 @@ function ValidateForm()
 							<!-- start: PAGE TITLE & BREADCRUMB -->
 							<ol class="breadcrumb">
 								<li>
-							
-									<a href="/domains/index.php">
-										Domains
-									</a>
-								</li>
-					
-								<li>
 									<i class="active"></i>
-									<a href="/domains/EditUser.php">
-										Change User
+									<a href="/server/stats/cpu.php">
+										CPU Stats
 									</a>
 								</li>
 					
 							</ol>
 							<div class="page-header">
-								<h1>Change User <small> select new user for this domain</small></h1>
+								<h1>CPU Usage <small>Cpu usage over 24 hours</small></h1>
 							</div>
 							<!-- end: PAGE TITLE & BREADCRUMB -->
 						</div>
 					</div>
 					<!-- end: PAGE HEADER -->
 					<!-- start: PAGE CONTENT -->
+					
 					<div class="row">
-					
-			
-					<?php
-					if(isset($_REQUEST["Notes"]))
-					{
-						$NoteType = "Message";
-						
-						if(isset($_REQUEST["NoteType"]))
-						{
-							$NoteType = $_REQUEST["NoteType"];
-						}
-						
-						if($NoteType == "Error")
-						{
-							print "<div class=\"alert alert-danger\">";
-								print "<button data-dismiss=\"alert\" class=\"close\">";
-									print "&times;";
-								print "</button>";
-								print "<i class=\"fa fa-times-circle\"></i>";
-						
-						}
-						else
-						{
-							print "<div class=\"alert alert-success\">";
-								print "<button data-dismiss=\"alert\" class=\"close\">";
-									print "&times;";
-								print "</button>";
-								print "<i class=\"fa fa-check-circle\"></i>";
-						}
-					
-							print $_REQUEST["Notes"];
-						print "</div>";
-					
-					}
-					?>
-					
-
 
 						<div class="col-md-12">
-						
-						
-							<!-- start: DYNAMIC TABLE PANEL -->
+
+							<!-- start: INTERACTIVITY PANEL -->
+
 							<div class="panel panel-default">
-									
-								<div class="panel-body">
-					
 
-								<form name="EditUser" method="post" action="DoEditUser.php" class="form-horizontal">
-									
-										<input type="hidden" name="DomainID" value="<?php print $DomainID; ?>">
+								<div class="panel-heading">
 
-										<div class="form-group">
-											<label class="col-sm-2 control-label">
-												New User:
-											</label>										
-											<div class="col-sm-4">
-												<span class="input-icon">
-												<select id="form-field-select-1" class="form-control" name="UserID" style="padding-left:20px;">
-													<option value="">select...</option>
-													<?php
-													$oUser->GetUserList($Array, $ArrayCount, $oUser->ClientID, $oUser->Role);
+									<i class="fa fa-external-link-square"></i>
 
-													for($x = 0; $x < $ArrayCount; $x++)
-													{
-														print "<option value=\"".$Array[$x]["id"]."\"";
-
-														if($Array[$x]["id"] == $DomainOwnerID)
-														{
-															print " selected ";
-														}
-
-														print ">".$Array[$x]["first_name"]." ".$Array[$x]["surname"]." - ".$Array[$x]["username"]."</option>";
-													}
-
-													?>
-												</select>
-												<i class="fa clip-list-4"></i>
-												</span>										
-											</div>
-										</div>
-									
+									CPU
 
 
-
-
-							
-										<div class="form-group">										
-											<div class="col-sm-4">
-												<input type="submit" value="Switch User" data-style="zoom-in" class="btn btn-info ladda-button" onclick="return ValidateForm(); return false;">
-													<span class="ladda-spinner"></span>
-													<span class="ladda-progress" style="width: 0px;"></span>
-												</input>
-											</div>
-										</div>
-
-
-
-								</form>
-
-
-										
 								</div>
+
+								<div class="panel-body">
+
+									<div class="flot-container">
+
+										<div id="cpuPlaceHolder" class="flot-placeholder"></div>
+
+									</div>
+
+								</div>
+
 							</div>
-							<!-- end: DYNAMIC TABLE PANEL -->
+
+							<!-- end: INTERACTIVITY PANEL -->
+
 						</div>
+
 					</div>
-					<!-- end: PAGE CONTENT-->
+
+
 				</div>
 			</div>
 			<!-- end: PAGE -->
@@ -303,6 +184,52 @@ function ValidateForm()
 			</div>
 		</div>
 		<!-- end: FOOTER -->
+
+		<?php
+
+		$oStats = new Stats();
+		$cpu = $oStats->getStats("cpu");
+
+		$totalString = "";
+		$usedString = "";
+		$labelString = "";
+		$cpuMaxString = "";
+
+		if ( !empty($cpu) ) {
+			$x = 1;
+			foreach( $cpu as $line) {
+
+				$used = $line["used"];
+				$used = round($used, 2);
+
+				$usedString = $usedString."[".$x.",".$used."],";
+				$cpuMaxString = $cpuMaxString."[".$x.",100],";
+			
+				$labelString = $labelString."[".$x.",'".$line["date"]."'],";
+			
+				$x++;
+			}
+		}
+		?>
+
+		<script language="javascript">
+		
+		var cpuLabels = [
+                    <?php print $labelString; ?>
+                ];
+
+
+		var cpuUsage = [
+		    <?php print $usedString; ?>
+		];
+
+		var cpuMax = [
+		    <?php print $cpuMaxString; ?>
+		];
+
+		</script>
+
+
 		<!-- start: MAIN JAVASCRIPTS -->
 		<!--[if lt IE 9]>
 		<script src="/assets/plugins/respond.min.js"></script>
@@ -321,15 +248,18 @@ function ValidateForm()
 		<script src="/assets/js/main.js"></script>
 		<!-- end: MAIN JAVASCRIPTS -->
 		<!-- start: JAVASCRIPTS REQUIRED FOR THIS PAGE ONLY -->
-		<script type="text/javascript" src="/assets/plugins/select2/select2.min.js"></script>
-		<script type="text/javascript" src="/assets/plugins/DataTables/media/js/jquery.dataTables.min.js"></script>
-		<script type="text/javascript" src="/assets/plugins/DataTables/media/js/DT_bootstrap.js"></script>
-		<script src="/assets/js/table-data.js"></script>
+		<script src="/assets/plugins/flot/jquery.flot.js"></script>
+		<script src="/assets/plugins/flot/jquery.flot.resize.js"></script>
+		<script src="/assets/plugins/flot/jquery.flot.categories.js"></script>
+		<script src="/assets/plugins/flot/jquery.flot.pie.js"></script>
+		<script src="/assets/js/cpuChart.js"></script>
 		<!-- end: JAVASCRIPTS REQUIRED FOR THIS PAGE ONLY -->
+
+
 		<script>
 			jQuery(document).ready(function() {
 				Main.init();
-				TableData.init();
+				cpuChart.init();
 			});
 		</script>
 	</body>

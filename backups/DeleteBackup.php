@@ -1,5 +1,7 @@
 <?php
 
+require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
+
 $Type = "adhoc";
 
 if(isset($_REQUEST["Type"]))
@@ -28,4 +30,4 @@ else
 	header("Location: ".$Type.".php?Notes=File deleted!");
 }
 
-?>
+

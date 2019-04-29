@@ -7,6 +7,7 @@ $oUser = new User();
 $oEmail = new Email();
 $oDomain = new Domain();
 
+require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 
 $oSimpleNonce = new SimpleNonce();
 

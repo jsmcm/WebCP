@@ -24,8 +24,49 @@ if($oDatabase->FieldExists("packages", "user_id", array("int")) == false)
 	}
 }
 
-if($oDatabase->TableExists("reseller_relationships") == false)
-{
+
+if($oDatabase->TableExists("server_stats") == false) {
+	$TableName = "server_stats";
+
+	$TableInfoArray[0]["name"] = "id";
+	$TableInfoArray[0]["type"] = "int";
+	$TableInfoArray[0]["key"] = "primary key auto_increment";
+	$TableInfoArray[0]["default"] = "";
+
+	$TableInfoArray[1]["name"] = "stat_type";
+	$TableInfoArray[1]["type"] = "text";
+	$TableInfoArray[1]["key"] = "";
+	$TableInfoArray[1]["default"] = "";
+
+	$TableInfoArray[2]["name"] = "total";
+	$TableInfoArray[2]["type"] = "float";
+	$TableInfoArray[2]["key"] = "";
+	$TableInfoArray[2]["default"] = "";
+
+	$TableInfoArray[3]["name"] = "used";
+	$TableInfoArray[3]["type"] = "float";
+	$TableInfoArray[3]["key"] = "";
+	$TableInfoArray[3]["default"] = "";
+
+	$TableInfoArray[4]["name"] = "available";
+	$TableInfoArray[4]["type"] = "float";
+	$TableInfoArray[4]["key"] = "";
+	$TableInfoArray[4]["default"] = "";
+
+	$TableInfoArray[5]["name"] = "date";
+	$TableInfoArray[5]["type"] = "datetime";
+	$TableInfoArray[5]["key"] = "";
+	$TableInfoArray[5]["default"] = "";
+
+	$TableInfoArray[6]["name"] = "deleted";
+	$TableInfoArray[6]["type"] = "int";
+	$TableInfoArray[6]["key"] = "";
+	$TableInfoArray[6]["default"] = "0";
+
+	$oDatabase->CreateTableFromArray($TableName, $TableInfoArray);
+}
+
+if($oDatabase->TableExists("reseller_relationships") == false) {
 	$TableName = "reseller_relationships";
 
 	$TableInfoArray[0]["name"] = "id";
@@ -104,6 +145,10 @@ if($ClientID < 1)
 }
 	
 $oLog->WriteLog("DEBUG", "/domains/index.php -> client_id set, continuing");
+
+$serverAccountsCreated = $oDomain->GetAccountsCreatedCount();
+$serverAccountsAllowed = $validationArray["allowed"];
+$serverLicenseType = $validationArray["type"];
 
 $Accounts = 0;
 if($oUser->Role == "admin")
@@ -666,12 +711,16 @@ if($Traffic == 0)
 										{
 											$BlockReason = $BlockReason."Max number of accounts created<br>";
 										}
-									
+
+										if ( $serverLicenseType == "free" && ($serverAccountsCreated >= $serverAccountsAllowed) ) {
+											$BlockReason = "You can only create ".$serverAccountsAllowed." accounts on the free plan. Please <a href=\"https://webcp.io\" target=\"_new\">upgrade</a> if you need to add more accounts";
+										}
+
 										if($BlockReason == "")
 										{		
 										?>
-										<a class="btn btn-primary" href="AddDomain.php"><i class="fa fa-plus"></i>
-										Add new Domain</a>
+											<a class="btn btn-primary" href="AddDomain.php"><i class="fa fa-plus"></i>
+											Add new Domain</a>
 										<?php
 										}
 										else
@@ -688,11 +737,11 @@ if($Traffic == 0)
 							if($oUser->Role == "admin")
 							{
 							?>
-							<b>
-							<a href="https://api.webcp.io/com.php" target="_new">Click here to order .com, .net. .org, etc domain names</a>
-							<br>
-							<a href="https://api.webcp.io/coza.php" target="_new">Click here to order co.za domain names</a>
-							</b>
+								<b>
+								<a href="https://api.webcp.io/com.php" target="_new">Click here to order .com, .net. .org, etc domain names</a>
+								<br>
+								<a href="https://api.webcp.io/coza.php" target="_new">Click here to order co.za domain names</a>
+								</b>
 							<?php
 							}
 							?>

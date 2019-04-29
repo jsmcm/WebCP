@@ -81,8 +81,44 @@ class Utils
 				
 	}
  	
-	function GetValidationHash($LicenseKey)
+	function getValidationData($hash)
 	{
+		if ( file_exists("/tmp/webcp/getValidationData_".$hash) ) {
+			
+			if( (time() - filemtime("/tmp/webcp/getValidationData_".$hash)) > 3600 ) {
+				unlink("/tmp/webcp/getValidationData_".$hash);
+			} else {
+				$data = file_get_contents("/tmp/webcp/getValidationData_".$hash);
+				return $data;
+			}
+
+		}
+
+
+                $options = array(
+                'uri' => 'https://api.webcp.io/',
+                'location' => 'https://api.webcp.io/updates/2.0.0/check.php',
+                'trace' => 1);
+
+                $client = new SoapClient(NULL, $options);
+                $data = $client->getValidationData($hash);
+		
+		file_put_contents("/tmp/webcp/getValidationData_".$hash, $data);
+
+		return $data;
+	}
+ 	
+	function getValidationKey($LicenseKey)
+	{
+		if ( file_exists("/tmp/webcp/getValidationKey_".$LicenseKey) ) {
+
+			if( (time() - filemtime("/tmp/webcp/getValidationKey_".$LicenseKey)) > 3600 ) {
+				unlink("/tmp/webcp/getValidationKey_".$LicenseKey);
+			} else {
+				return file_get_contents("/tmp/webcp/getValidationKey_".$LicenseKey);
+			}
+		}
+
 		$oDomain = new Domain();
 
 		$AccountsCreated = $oDomain->GetAccountsCreatedCount();
@@ -90,11 +126,14 @@ class Utils
 		//print "AccountsCreated: ".$AccountsCreated."<p>";
                 $options = array(
                 'uri' => 'https://api.webcp.io/',
-                'location' => 'https://api.webcp.io/updates/check.php',
+                'location' => 'https://api.webcp.io/updates/2.0.0/check.php',
                 'trace' => 1);
 
                 $client = new SoapClient(NULL, $options);
-                return $client->GetValidationHash($LicenseKey, $AccountsCreated);
+		$key = $client->getValidationKey($LicenseKey);
+
+		file_put_contents("/tmp/webcp/getValidationKey_".$LicenseKey, $key);
+		return $key;
 	}
 
         
