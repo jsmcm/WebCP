@@ -150,7 +150,7 @@ $c = curl_init();
 curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
 curl_setopt($c, CURLOPT_POSTFIELDS,  $PostData);
 curl_setopt($c, CURLOPT_POST, 1);
-curl_setopt($c, CURLOPT_URL, "http://".$_POST["URL"].":20020/write.php");
+curl_setopt($c, CURLOPT_URL, "http://".$_POST["URL"].":10060/write.php");
 curl_exec($c);
 
 curl_close($c);

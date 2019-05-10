@@ -66,7 +66,7 @@ $NonceValues = $oSimpleNonce->GenerateNonce($Action, $Meta);
 
 $c = curl_init();
 curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
-curl_setopt($c, CURLOPT_URL, "http://".$URL.":20020/read.php?Nonce=".$NonceValues["Nonce"]."&TimeStamp=".$NonceValues["TimeStamp"]);
+curl_setopt($c, CURLOPT_URL, "http://".$URL.":10060/read.php?Nonce=".$NonceValues["Nonce"]."&TimeStamp=".$NonceValues["TimeStamp"]);
 $ResultString = trim(curl_exec($c));
 curl_close($c);
 
