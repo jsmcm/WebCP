@@ -1,0 +1,5 @@
+* 2.0.7 *
+ - Added this readme
+ - Changed server port number for cron manager and editor to work on cloudflare
+ - Removed license checks from webcron
+ - Fixed error on daily / monthly backup pages which didn't read the license file correctly

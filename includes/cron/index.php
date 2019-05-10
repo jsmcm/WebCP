@@ -1,5 +1,5 @@
 <?php
-//d$Debug = true;
+//$Debug = true;
 $Debug = false;
 
 if(!file_exists($_SERVER["DOCUMENT_ROOT"]."/includes/cron/tmp/"))
@@ -26,7 +26,6 @@ if($oDNS->IPExists($_SERVER["REMOTE_ADDR"]) == false)
 	}
 }
 
-require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 
 function LoopDirectory($DirBase, $InSub = 0, $Debug=false)
 {
