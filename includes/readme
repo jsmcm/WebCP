@@ -1,4 +1,5 @@
 * 2.0.7 *
+= released 2019-05-10 =
  - Added this readme
  - Changed server port number for cron manager and editor to work on cloudflare
  - Removed license checks from webcron
