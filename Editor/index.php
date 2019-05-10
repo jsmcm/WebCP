@@ -229,7 +229,7 @@ if($ClientID < 1)
                                                                                         {
                                                                                                 print "<tr>";
 
-                                                                                                print "<td><a target=\"_blank\" href=\"http://".$Array[$x]["domain_name"].":20010/login.php?Nonce=".$NonceValues["Nonce"]."&TimeStamp=".$NonceValues["TimeStamp"]."\" style=\"background:transparent; color:#4D81CC; border: 0;\">".$Array[$x]["domain_name"]."</a></td>\r\n";
+                                                                                                print "<td><a target=\"_blank\" href=\"http://".$Array[$x]["domain_name"].":10050/login.php?Nonce=".$NonceValues["Nonce"]."&TimeStamp=".$NonceValues["TimeStamp"]."\" style=\"background:transparent; color:#4D81CC; border: 0;\">".$Array[$x]["domain_name"]."</a></td>\r\n";
                                                                                                 print "</tr>";
                                                                                         }
 										}
