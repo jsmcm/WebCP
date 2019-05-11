@@ -35,7 +35,6 @@ if ( $validationData === false ) {
 
 $validationArray = json_decode($validationData, true);
 
-
 if ( ($oUtils->ValidateHash($validationArray["hash"], $LicenseKey) !== true) || $validationArray["status"] != "valid" ) {
 	header("location: index.php?Notes=License failed, please try logging in again or contact support");
 	exit();

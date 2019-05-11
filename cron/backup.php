@@ -37,7 +37,14 @@ $c = curl_init();
 curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
 curl_setopt($c, CURLOPT_POSTFIELDS,  $PostData);
 curl_setopt($c, CURLOPT_POST, 1);
-curl_setopt($c, CURLOPT_URL, "http://".$URL.":10060/read.php");
+
+
+if ( file_exists("/etc/letsencrypt/renewal/".$_POST["URL"].".conf") ) {
+        curl_setopt($c, CURLOPT_URL, "https://".$_POST["URL"].":2083/read.php");
+        curl_setopt($c, CURLOPT_SSL_VERIFYPEER, false);  
+} else {
+        curl_setopt($c, CURLOPT_URL, "http://".$_POST["URL"].":2082/read.php");
+}
 
 $ResultString = trim(curl_exec($c));
 curl_close($c);

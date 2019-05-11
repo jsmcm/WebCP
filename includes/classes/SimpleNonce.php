@@ -13,7 +13,7 @@ Version: 1.0.0
 **********************************************************************/
 class SimpleNonce 
 {
-    protected $NonceSalt = "YourSaltHere";
+    protected $NonceSalt = "YourSaltHered";
     protected $NonceExpiryTime = 600; // In seconds. 3600 = 1 hour
     protected $Path;
     function __construct() 
