@@ -241,7 +241,7 @@ if($ClientID < 1)
 											print "<tr>";
 											print "<td>".$Array[$x]["cpDatabaseName"]."</td>\r\n";	
 											print "<td>".$Array[$x]["DatabaseUsername"]."</td>\r\n";	
-											if ( file_exists("/etc/letsencrypt/renewal/".$Array[$x]["domain_name"].".conf") ) {
+											if ( file_exists("/etc/letsencrypt/renewal/".$_SERVER["SERVER_NAME"].".conf") ) {
 												print "<td class=\"hidden-xs\"><a href=\"https://".$_SERVER["SERVER_NAME"].":2096\" target=\"_new\">phpMyAdmin</a></td>\r\n";
 											} else {
 												print "<td class=\"hidden-xs\"><a href=\"http://".$_SERVER["SERVER_NAME"].":2095\" target=\"_new\">phpMyAdmin</a></td>\r\n";
