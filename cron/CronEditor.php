@@ -59,14 +59,21 @@ if(file_exists($_SERVER["DOCUMENT_ROOT"]."/cron/max_jobs.dat"))
 
 $Action = "getUserCron";
 $Meta = array();
-array_push($Meta, $_SERVER["SERVER_ADDR"]);
+array_push($Meta, $URL);
 
 $NonceValues = $oSimpleNonce->GenerateNonce($Action, $Meta);
 
-
 $c = curl_init();
 curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
-curl_setopt($c, CURLOPT_URL, "http://".$URL.":20020/read.php?Nonce=".$NonceValues["Nonce"]."&TimeStamp=".$NonceValues["TimeStamp"]);
+if ( file_exists("/etc/letsencrypt/renewal/".$URL.".conf") ) {
+	curl_setopt($c, CURLOPT_URL, "https://".$URL.":2083/read.php?Nonce=".$NonceValues["Nonce"]."&TimeStamp=".$NonceValues["TimeStamp"]);
+	curl_setopt($c, CURLOPT_SSL_VERIFYPEER, false);
+} else {
+	curl_setopt($c, CURLOPT_URL, "http://".$URL.":2082/read.php?Nonce=".$NonceValues["Nonce"]."&TimeStamp=".$NonceValues["TimeStamp"]);
+}
+
+
+
 $ResultString = trim(curl_exec($c));
 curl_close($c);
 

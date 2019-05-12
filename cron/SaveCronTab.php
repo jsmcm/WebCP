@@ -139,7 +139,7 @@ if($Count < $MaxJobs)
 
 $Action = "saveUserCron";
 $Meta = array();
-array_push($Meta, $_SERVER["SERVER_ADDR"]);
+array_push($Meta, $_SERVER["SERVER_NAME"]);
 
 $NonceValues = $oSimpleNonce->GenerateNonce($Action, $Meta);
 
@@ -150,7 +150,14 @@ $c = curl_init();
 curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
 curl_setopt($c, CURLOPT_POSTFIELDS,  $PostData);
 curl_setopt($c, CURLOPT_POST, 1);
-curl_setopt($c, CURLOPT_URL, "http://".$_POST["URL"].":20020/write.php");
+
+if ( file_exists("/etc/letsencrypt/renewal/".$_POST["URL"].".conf") ) {
+	curl_setopt($c, CURLOPT_URL, "https://".$_POST["URL"].":2083/write.php");
+	curl_setopt($c, CURLOPT_SSL_VERIFYPEER, false);	
+} else {
+	curl_setopt($c, CURLOPT_URL, "http://".$_POST["URL"].":2082/write.php");
+}
+
 curl_exec($c);
 
 curl_close($c);

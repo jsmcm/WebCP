@@ -28,7 +28,7 @@ function get_gravatar( $email, $s = 30, $d = 'mm', $r = 'g', $img = false, $atts
 
 {
 
-	$url = 'http://www.gravatar.com/avatar/';
+	$url = '//www.gravatar.com/avatar/';
 
 	$url .= md5( strtolower( trim( $email ) ) );
 

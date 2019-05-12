@@ -287,7 +287,12 @@ if($ClientID < 1)
 											
 											print "<tr>";
 											print "<td>".$Array[$x]["local_part"]."@".$Array[$x]["fqdn"]."</td>\r\n";	
-											print "<td class=\"hidden-xs\"><a href=\"http://".$Array[$x]["fqdn"]."/mail\" target=\"_blank\">http://".$Array[$x]["fqdn"]."/mail</a></td>\r\n";	
+											if ( file_exists("/etc/letsencrypt/renewal/".$Array[$x]["fqdn"].".conf") ) {
+												print "<td class=\"hidden-xs\"><a href=\"https://".$Array[$x]["fqdn"].":2087\" target=\"_blank\">http://".$Array[$x]["fqdn"]."/webmail</a></td>\r\n";	
+											} else {
+												print "<td class=\"hidden-xs\"><a href=\"http://".$Array[$x]["fqdn"].":2086\" target=\"_blank\">http://".$Array[$x]["fqdn"]."/webmail</a></td>\r\n";	
+											}
+
 											print "<td class=\"hidden-xs\">   <a href=\"#full-width\" onclick=\"MakeSettingsDivVisible('".$Array[$x]["fqdn"]."', '".$Array[$x]["local_part"]."@".$Array[$x]["fqdn"]."');\" data-toggle=\"modal\" class=\"demo btn btn-blue\">View Settings</a></td>\r\n";
 												
 
