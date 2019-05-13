@@ -139,7 +139,7 @@ if($Count < $MaxJobs)
 
 $Action = "saveUserCron";
 $Meta = array();
-array_push($Meta, $_SERVER["SERVER_NAME"]);
+array_push($Meta, $_POST["URL"]);
 
 $NonceValues = $oSimpleNonce->GenerateNonce($Action, $Meta);
 
