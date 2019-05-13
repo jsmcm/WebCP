@@ -56,10 +56,7 @@ if( ($DomainOwnerID != $ClientID) && ($oUser->Role != "admin") )
 $oDomain->UpdateDomainPackage($DomainID, $PackageID);
 
 $DiskSpace = $oPackage->GetPackageAllowance("DiskSpace", $PackageID);
-print "Disk Space = ".$DiskSpace."<p>";
 $oFTP->UpdateDomainFTPDiskQuotas($DomainID, $DiskSpace);
 $oPackage->CreateDiskQuotaScriptForDomain($DomainID, $DiskSpace);
 
 header("Location: index.php?Notes=Package updated");
-
-?>
