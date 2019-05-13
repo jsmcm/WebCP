@@ -119,7 +119,6 @@
      
     	 	if($BlockIP == true)
      		{  	 
-          		mail("john@softsmart.co.za", $SiteName."404 - Firewalled!", "URL: ".$URL."\r\nIP: ".$_SERVER["REMOTE_ADDR"]."\r\nCountryCode: ".$CountryCode);
  
           		$ch = curl_init();
           		curl_setopt($ch, CURLOPT_URL, $FirewallAddress.":10025/fail2ban/BanFromEmail.php?Silence=1&IP=".$_SERVER["REMOTE_ADDR"]);

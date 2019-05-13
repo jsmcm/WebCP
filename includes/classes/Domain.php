@@ -1803,7 +1803,7 @@ class Domain
 
                                 $options = array(
                                 'uri' => $IPAddress,
-                                'location' => 'http://'.$HostName.':10025/API/dns/DNS.php',
+                                'location' => 'http://'.$HostName.':8880/API/dns/DNS.php',
                                 'trace' => 1);
 
 				$Message = json_encode(array("Password" => $Password, "SubDomain" => $SubDomain, "ParentDomainName" => $ParentDomainName, "IPv4" => $oDNS->GetDomainIP($ParentDomainName), "IPv6" => ""));
@@ -1942,7 +1942,7 @@ class Domain
 				
 				$options = array(
 				'uri' => $IPAddress,
-				'location' => 'http://'.$HostName.':10025/API/dns/DNS.php',
+				'location' => 'http://'.$HostName.':8880/API/dns/DNS.php',
 				'trace' => 1);
 
 				$Message = json_encode(array("Password" => $Password, "DomainName" => $ParkedDomain, "IPv4" => $oDNS->GetDomainIP($ParentDomainName), "IPv6" => ""));
@@ -2068,7 +2068,7 @@ class Domain
 				
 				$options = array(
 				'uri' => $IPAddress,
-				'location' => 'http://'.$HostName.':10025/API/dns/DNS.php',
+				'location' => 'http://'.$HostName.':8880/API/dns/DNS.php',
 				'trace' => 1);
 
 				$Message = json_encode(array("Password" => $Password, "DomainName" => $DomainName, "IPv4" => $oDNS->GetDomainIP($DomainName), "IPv6" => ""));
@@ -2389,7 +2389,7 @@ class Domain
 
                                 $options = array(
 					'uri' => $IPAddress,
-					'location' => 'http://'.$HostName.':10025/API/dns/DNS.php',
+					'location' => 'http://'.$HostName.':8880/API/dns/DNS.php',
 					'trace' => 1
 				);
 
@@ -2579,7 +2579,7 @@ class Domain
 
                                 $options = array(
                                 'uri' => $IPAddress,
-                                'location' => 'http://'.$HostName.':10025/API/dns/DNS.php',
+                                'location' => 'http://'.$HostName.':8880/API/dns/DNS.php',
                                 'trace' => 1);
 
                                 $Message = json_encode(array("Password" => $Password, "SubDomain" => $SubDomain, "ParentDomainName" => $ParentDomainName));
@@ -2695,7 +2695,7 @@ class Domain
 
                                 $options = array(
                                 'uri' => $IPAddress,
-                                'location' => 'http://'.$HostName.':10025/API/dns/DNS.php',
+                                'location' => 'http://'.$HostName.':8880/API/dns/DNS.php',
                                 'trace' => 1);
 
                                 $Message = json_encode(array("Password" => $Password, "DomainName" => $DomainName));

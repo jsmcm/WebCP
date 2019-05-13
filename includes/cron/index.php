@@ -35,11 +35,12 @@ function LoopDirectory($DirBase, $InSub = 0, $Debug=false)
 
 	$ServerName = filter_var($_SERVER["SERVER_NAME"], FILTER_SANITIZE_STRING);
 
-	$Port = "10025";
+	$Port = "8880";
 	$HTTP = "http";
 	if( (isset($_SERVER["HTTPS"])) && ($_SERVER["HTTPS"] == "on"))
 	{
 		$HTTP = "https";
+		$Port = "8443";
 	}
 
 	if($Debug == true)
