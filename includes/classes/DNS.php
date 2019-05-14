@@ -1469,7 +1469,7 @@ class DNS
 		{
 		        $options = array(
 		        'uri' => $SlaveArray[$x]["IPAddress"],
-		        'location' => 'http://'.$SlaveArray[$x]["HostName"].':10025/API/dns/DNS.php',
+		        'location' => 'http://'.$SlaveArray[$x]["HostName"].':8880/API/dns/DNS.php',
 		        'trace' => 1);
 
 		        $Message = json_encode(array("Password" => $SlaveArray[$x]["Password"], "Domain" => $DomainName));
@@ -2021,7 +2021,7 @@ class DNS
 		{
 		        $options = array(
 				'uri' => $SlaveArray[$x]["IPAddress"],
-				'location' => 'http://'.$SlaveArray[$x]["HostName"].':10025/API/dns/DNS.php',
+				'location' => 'http://'.$SlaveArray[$x]["HostName"].':8880/API/dns/DNS.php',
 				'trace' => 1
 			);
 

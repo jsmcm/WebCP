@@ -4,21 +4,6 @@ include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 
 $oSettings = new Settings();
 
-/*
- * if(isset($_SERVER["HTTP_REFERER"]))
-{
-	if( substr($_SERVER["HTTP_REFERER"], 7, strpos($_SERVER["HTTP_REFERER"], ":10025") - 7) != $_SERVER["SERVER_NAME"])
-	{
-		print "Oops, are you sure you should be here? Contact support if you need help";
-		exit();
-	}
-}
-else
-{
-		print "Oops, are you sure you should be here? Contact support if you need help";
-		exit();
-}
- */
 ?>
 <!DOCTYPE html>
 
