@@ -464,7 +464,6 @@ class FTP
 		$this->GetDomainInfo($DomainUserName, $DomainID, $Uid);
 
 		
-		include_once(dirname(__FILE__)."/class.Utils.php");
 		$oUtils = new Utils();
 		$Quota = $oUtils->ConvertToScale($Quota, 'b', 'm');
 		

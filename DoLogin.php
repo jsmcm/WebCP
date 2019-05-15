@@ -36,7 +36,11 @@ if ( $validationData === false ) {
 $validationArray = json_decode($validationData, true);
 
 if ( ($oUtils->ValidateHash($validationArray["hash"], $LicenseKey) !== true) || $validationArray["status"] != "valid" ) {
-	header("location: index.php?Notes=License failed, please try logging in again or contact support");
+ 	if ( file_exists("/tmp/webcp/getValidationKey_".$LicenseKey) ) {
+        	unlink("/tmp/webcp/getValidationKey_".$LicenseKey);
+        }
+
+	header("location: index.php?Notes=License failed, please try logging in again or contact support.<p>Note: We have a known bug which reports this error from time to time. Usually logging in again resolves it.</p>");
 	exit();
 }
 
