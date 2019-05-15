@@ -3,6 +3,7 @@
  - Fixed output started bug in domains/DoEditPackage.php
  - Fixed typo in mail screen, showed domain/mail instead of domain/webmail
  - On license failed during login we delete the validation key cache to not cache errors
+ - Suspend account now works with web, mail, ftp and database
 
 * 2.0.8 *
 = release: 2019-05-10 =

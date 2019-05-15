@@ -83,6 +83,62 @@ class MySQL
 		return 1;
 	}
 	
+	
+	function unSuspendUserAccounts($domainUserName)
+	{
+
+		try {
+			$pdo_query = $this->DatabaseConnection->prepare("UPDATE mysql.user SET User = substr(User, 11) where User LIKE 'suspended_".$domainUserName."_%';");	
+			$pdo_query->execute();
+	
+		} catch(PDOException $e) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.MySQL.php -> unSuspendUserAccounts 1; Error = ".$e);
+		}	
+		
+
+
+		try {
+			$pdo_query = $this->DatabaseConnection->prepare("flush privileges");
+			
+			$pdo_query->execute();
+	
+		} catch(PDOException $e) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.MySQL.php -> unSuspendUserAccounts 2(); Error = ".$e);
+		}	
+		
+		return true;
+	}
+
+	function suspendUserAccounts($domainUserName)
+	{
+
+		try {
+			$pdo_query = $this->DatabaseConnection->prepare("UPDATE mysql.user SET User = concat('suspended_', User) where User LIKE '".$domainUserName."_%';");	
+			$pdo_query->execute();
+	
+		} catch(PDOException $e) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.MySQL.php -> suspendUserAccounts 1; Error = ".$e);
+		}	
+		
+
+
+		try {
+			$pdo_query = $this->DatabaseConnection->prepare("flush privileges");
+			
+			$pdo_query->execute();
+	
+		} catch(PDOException $e) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.MySQL.php -> suspendUserAccounts 2(); Error = ".$e);
+		}	
+		
+		return true;
+	}
+
+	
 	 
 	function DeleteUserNameHosts($UserName)
 	{

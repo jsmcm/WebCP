@@ -117,7 +117,7 @@ class Domain
 		$myfile = $_SERVER["DOCUMENT_ROOT"]."/nm/".$UserName.".unsuspend";
 		$fh = fopen($myfile, 'a');
 		fwrite($fh, $UserName);
-		fclose();
+		fclose($fh);
 	}
 
 
@@ -131,7 +131,7 @@ class Domain
 		$myfile = $_SERVER["DOCUMENT_ROOT"]."/nm/".$UserName.".suspend";
 		$fh = fopen($myfile, 'a');
 		fwrite($fh, $UserName);
-		fclose();
+		fclose($fh);
 	}
 
 
@@ -163,6 +163,7 @@ class Domain
 	function Unsuspend($DomainID)
 	{
 		$oFTP = new FTP();
+		$oMySQL = new MySQL();
 		
 		$oFTP->ManageSuspension($DomainID, 1);
 
@@ -184,6 +185,8 @@ class Domain
 		$InfoArray = array();
 		$this->GetDomainInfo($DomainID, $InfoArray);
 		
+		$oMySQL->unSuspendUserAccounts($InfoArray["UserName"]);
+		
 		$this->MakeUnsuspendFile($InfoArray["UserName"]);
 
 		return 1;
@@ -193,12 +196,12 @@ class Domain
 	function Suspend($DomainID)
 	{
 		$oFTP = new FTP();
-		
+		$oMySQL = new MySQL();
+
 		$oFTP->ManageSuspension($DomainID, 0);
 
 
-		try
-		{
+		try {
 			$query = $this->DatabaseConnection->prepare("UPDATE domains SET suspended = 1 WHERE id = :id");
 
 			$query->bindParam(":id", $DomainID);
@@ -206,9 +209,7 @@ class Domain
 			$query->execute();
 
 
-		}
-		catch(PDOException $e)
-		{
+		} catch(PDOException $e) {
 			$oLog = new Log();
 			$oLog->WriteLog("error", "/class.Domain.php -> Suspend(); Error = ".$e);
 		}
@@ -216,6 +217,8 @@ class Domain
 
 		$InfoArray = array();
 		$this->GetDomainInfo($DomainID, $InfoArray);
+
+		$oMySQL->suspendUserAccounts($InfoArray["UserName"]);
 
 		$this->MakeSuspendFile($InfoArray["UserName"]);
 
