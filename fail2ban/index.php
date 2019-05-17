@@ -286,10 +286,6 @@ if($oUser->Role != "admin")
 
 
 						<div class="col-md-12">
-							<a style="width:300px" class="btn btn-info btn-block btn-lg" href="perm.php" target="_NEW">
-							Manage Permanent Entries <i class="fa fa-arrow-circle-right"></i>
-							</a>
-							<p>
 							<!-- start: DYNAMIC TABLE PANEL -->
 							<div class="panel panel-default">
 									

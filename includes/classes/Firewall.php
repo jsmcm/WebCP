@@ -59,8 +59,103 @@ class Firewall
 		return -1;
 		
 	}
+	
+	function GetPermBanList(&$BanArray, &$ArrayCount, $Role, $UserID)
+        {
+		
+		$ArrayCount = 0;
+                $BanArray = array();
+	
+		$oReseller = new Reseller();
+		if($Role != "admin")
+		{
+		        $FirewallControl = "";
+		        if($Role == "reseller")
+		        {
+		                $FirewallControl = $oReseller->GetResellerSetting($UserID, "FirewallControl");
+		        }
+		        if($FirewallControl != "on")
+		        {
+		                return;
+		        }
+		}
 
- 
+
+		$deleteArray = array();                
+		$ArrayCount = 0;
+		
+		try
+		{
+			$query = $this->DatabaseConnection->prepare("SELECT * FROM fail2ban WHERE triggered = 'perm' ORDER BY ban_time DESC;");
+			
+			$query->execute();
+	
+			while($result = $query->fetch(PDO::FETCH_ASSOC))
+			{
+				$BanArray[$ArrayCount]["ID"] = $result["id"];
+				$BanArray[$ArrayCount]["IP"] = $result["ip"];
+				$BanArray[$ArrayCount]["Reverse"] = $result["reverse"];
+				$BanArray[$ArrayCount]["Direction"] = $result["direction"];
+
+
+				$BanArray[$ArrayCount]["BanTime"] = $result["ban_time"];
+				$BanArray[$ArrayCount]["Message"] = $result["message"];
+				$BanArray[$ArrayCount]["Logs"] = $result["logs"];
+
+
+				if($BanArray[$ArrayCount]["Reverse"] == "")
+				{
+					if ( ! strstr( $result["ip"], "/" ) ) {
+						//gethostbyaddr print "Looking up IP<p>";
+						$BanArray[$ArrayCount]["Reverse"] = gethostbyaddr($result["ip"]);
+						$this->EditInfo($BanArray[$ArrayCount]["ID"], $BanArray[$ArrayCount]["Reverse"], "reverse");
+					}
+				}
+
+				$BanArray[$ArrayCount]["CountryCode"] = $result["country_code"];
+
+				$BanArray[$ArrayCount]["Country"] = $result["country"];
+				
+				if ( ! strstr( $result["ip"], "/" ) ) {
+				
+					if($BanArray[$ArrayCount]["CountryCode"] == "") {
+						$options = array(
+						'uri' => 'https://api.webcp.io',
+						'location' => 'https://api.webcp.io/Country.php',
+						'trace' => 1);
+				
+						$client = new SoapClient(NULL, $options);
+					
+						$CountryData = json_decode($client->GetCountryData($result["ip"]));
+					
+						$CountryCode = $CountryData->CountryCode;
+						$CountryName = $CountryData->CountryName;
+					
+
+						$BanArray[$ArrayCount]["CountryCode"] = $CountryCode;
+						$this->EditInfo($BanArray[$ArrayCount]["ID"], $CountryCode, "country_code");
+
+						$BanArray[$ArrayCount]["Country"] = $CountryName;
+						$this->EditInfo($BanArray[$ArrayCount]["ID"], $CountryName, "country");
+
+					}
+
+				}
+
+				$ArrayCount++;
+			}
+	
+		}
+		catch(PDOException $e)
+		{
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Firewall.php -> GetPermBanList(); Error = ".$e);
+		}
+
+	
+        }
+
+
         function GetBanList(&$BanArray, &$ArrayCount, $Role, $UserID)
         {
 		
@@ -87,7 +182,7 @@ class Firewall
 		
 		try
 		{
-			$query = $this->DatabaseConnection->prepare("SELECT * FROM csf ORDER BY triggered ASC;");
+			$query = $this->DatabaseConnection->prepare("SELECT * FROM fail2ban WHERE triggered not in ('webcp-spamhause', 'perm') ORDER BY ban_time DESC;");
 			
 			$query->execute();
 	
@@ -134,42 +229,42 @@ class Firewall
 					$BanArray[$ArrayCount]["Type"] = "Perm";
 				}
 
-				
-				if($BanArray[$ArrayCount]["Reverse"] == "")
-				{
-					//gethostbyaddr print "Looking up IP<p>";
-					$BanArray[$ArrayCount]["Reverse"] = gethostbyaddr($result["ip"]);
-					$this->EditInfo($BanArray[$ArrayCount]["ID"], $BanArray[$ArrayCount]["Reverse"], "reverse");
-					
+
+				if ( ! strstr( $result["ip"], "/") ) {
+					if($BanArray[$ArrayCount]["Reverse"] == "") {
+						//gethostbyaddr print "Looking up IP<p>";
+						$BanArray[$ArrayCount]["Reverse"] = gethostbyaddr($result["ip"]);
+						$this->EditInfo($BanArray[$ArrayCount]["ID"], $BanArray[$ArrayCount]["Reverse"], "reverse");
+					}
 				}
 
 				$BanArray[$ArrayCount]["CountryCode"] = $result["country_code"];
 
 				$BanArray[$ArrayCount]["Country"] = $result["country"];
 				
-				if($BanArray[$ArrayCount]["CountryCode"] == "")
-				{
-					$options = array(
-					'uri' => 'https://webcp.io',
-					'location' => 'https://webcp.io/Country.php',
-					'trace' => 1);
+				if ( ! strstr( $result["ip"], "/") ) {
+					if($BanArray[$ArrayCount]["CountryCode"] == "") {
+						$options = array(
+						'uri' => 'https://api.webcp.io',
+						'location' => 'https://api.webcp.io/Country.php',
+						'trace' => 1);
 				
-					$client = new SoapClient(NULL, $options);
+						$client = new SoapClient(NULL, $options);
 					
-					$CountryData = json_decode($client->GetCountryData($result["ip"]));
+						$CountryData = json_decode($client->GetCountryData($result["ip"]));
 					
-					$CountryCode = $CountryData->CountryCode;
-					$CountryName = $CountryData->CountryName;
-					
+						$CountryCode = $CountryData->CountryCode;
+						$CountryName = $CountryData->CountryName;
+						
 
-					$BanArray[$ArrayCount]["CountryCode"] = $CountryCode;
-					$this->EditInfo($BanArray[$ArrayCount]["ID"], $CountryCode, "country_code");
+						$BanArray[$ArrayCount]["CountryCode"] = $CountryCode;
+						$this->EditInfo($BanArray[$ArrayCount]["ID"], $CountryCode, "country_code");
 
 
 
-					$BanArray[$ArrayCount]["Country"] = $CountryName;
-					$this->EditInfo($BanArray[$ArrayCount]["ID"], $CountryName, "country");
-
+						$BanArray[$ArrayCount]["Country"] = $CountryName;
+						$this->EditInfo($BanArray[$ArrayCount]["ID"], $CountryName, "country");
+					}
 				}
 				
 				$ArrayCount++;
@@ -187,6 +282,7 @@ class Firewall
 
         }
 
+ 
 	function deleteRecords($idArray)
 	{
 		if( is_array($idArray) && !empty($idArray) ) 
@@ -208,37 +304,13 @@ class Firewall
 	
 	}
 
-	function ManualBan($IP)
-	{
-
-		$FileName = $_SERVER["DOCUMENT_ROOT"]."/fail2ban/tmp/add.ban";
-		
-		$fh = fopen($FileName, 'a') or die("can't open file");
-		fwrite($fh, $IP.",604800\n");
-		fclose($fh);
-
-	}
-
-
-	function ManualUnban($IP)
-	{
-	
-		$FileName = $_SERVER["DOCUMENT_ROOT"]."/fail2ban/tmp/remove.ban";
-		
-		$fh = fopen($FileName, 'a') or die("can't open file");
-		fwrite($fh, $IP."\n");
-		fclose($fh);
-
-	}
-
-	
 
 	function EditInfo($ID, $Info, $Field)
 	{
 
 		try
 		{
-			$query = $this->DatabaseConnection->prepare("UPDATE csf SET ".$Field." = :info WHERE id = :id;");
+			$query = $this->DatabaseConnection->prepare("UPDATE fail2ban SET ".$Field." = :info WHERE id = :id;");
 			
 			$query->bindParam(":info", $Info);
 			$query->bindParam(":id", $ID);
