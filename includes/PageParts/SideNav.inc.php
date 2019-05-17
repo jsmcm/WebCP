@@ -723,18 +723,22 @@
 				<?php
 				if(strstr($_SERVER["SCRIPT_FILENAME"], "/passwd/index.php"))
 				{
-					print "<li class=\"active open\">";
+					//print "<li class=\"active open\">";
 				}
 				else
 				{
-					print "<li>";
+					//print "<li>";
 				}
-				?>
+?>
+
+<?php
+	/*
 				<a href="/passwd/index.php">
 					<span class="title"> Password Protect Directories </span>
 				</a>
 			</li>
-
+	*/
+?>
 			<?php
 			$FirewallControl = "";
 			if($oUser->Role == "reseller")
@@ -760,6 +764,20 @@
 				?>
 				<a href="/fail2ban/index.php">
 					<span class="title"> Firewall </span>
+				</a>
+				</li>
+				
+				<?php
+				if(strstr($_SERVER["SCRIPT_FILENAME"], "/fail2ban/perm.php")) {
+					print "<li class=\"active open\">";
+				}
+				else
+				{
+					print "<li>";
+				}
+				?>
+				<a href="/fail2ban/perm.php">
+					<span class="title"> Perm Bans </span>
 				</a>
 				</li>
 

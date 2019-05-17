@@ -120,6 +120,9 @@ if(isset($oUser))
 			print "<li>";
 			print "<a href=\"/fail2ban/index.php\">Firewall</a>";
 			print "</li>";
+			print "<li>";
+			print "<a href=\"/fail2ban/index.php\">Firewall</a>";
+			print "</li>";
 		}
 
 		print "</ul>";
