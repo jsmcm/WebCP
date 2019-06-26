@@ -21,7 +21,6 @@ if($ClientID < 1)
 
 $ID = $_REQUEST["ID"];
 $IP = $_REQUEST["IP"];
-$Service = $_REQUEST["Service"];
 
 $Role = $oUser->Role;
 if($oUser->Role != "admin")
@@ -38,25 +37,21 @@ if($oUser->Role != "admin")
         }
 }
 
-
-
-	if ( $Service == "webcp-manual" ) {
-		if ( file_exists(dirname(__DIR__)."/nm/".$IP.".ban") ) {
-			unlink(dirname(__DIR__)."/nm/".$IP.".ban");
-		}
-	}
-
 	$IP = str_replace("/", "_", $IP);
 
-	file_put_contents(dirname(__DIR__)."/nm/".$IP.".unban", $Service);
+	if ( file_exists(dirname(__DIR__)."/nm/".$IP.".permban") ) {
+		unlink(dirname(__DIR__)."/nm/".$IP.".permban");
+	}
+
+	file_put_contents(dirname(__DIR__)."/nm/".$IP.".permunban", "");
 
 	$x = 0;
-        while( file_exists( dirname(__DIR__)."/nm/".$IP.".unban" ) ) {
+        while( file_exists( dirname(__DIR__)."/nm/".$IP.".permunban" ) ) {
                 if($x++ > 20)
                         break;
 
                 sleep(2);
         }
 
-header("Location: index.php?Notes=Check%20in%202%20mins%20to%20make%20sure%20its%20been%20deleted");
+header("Location: perm.php?Notes=Check%20in%202%20mins%20to%20make%20sure%20its%20been%20deleted");
 

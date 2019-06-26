@@ -24,3 +24,4 @@ installer/wordpress/current_version.txt
 restore/tmp/
 restore/tmp/*
 emails/trace/bw_log.txt
+fail2ban/perm.dat

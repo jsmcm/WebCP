@@ -81,7 +81,7 @@ if($ClientID < 1)
 		function MakeSettingsDivVisible(domain, email)
 		{
 			SettingsHeading = "Settings for " + email;
-			Settings ="Incoming Mail Server: <b>mail." + domain + "</b><br>Outgoing Mail Server: <b>mail." + domain + "</b><p>";
+			Settings ="Incoming Mail Server: <b>" + domain + "</b><br>Outgoing Mail Server: <b>" + domain + "</b><p>";
 			Settings = Settings + "User Name: <b>" + email + "</b> (full email address)<br>Password: <b>The password you selected</b><p>SMTP Port: <b>25 or 587</b><br>POP3 Port: <b>110</b><br>IMAP Port <b>143</b><p>";
 			Settings = Settings + "In your email program, you must select the option that outgoing mail requires authentication, then select to use the same username and password as the incoming mail server.";
 
