@@ -5,6 +5,8 @@
  - On license failed during login we delete the validation key cache to not cache errors
  - Suspend account now works with web, mail, ftp and database
  - Fixed fail2ban
+ - Changed mail settings modal to show mail host as naked domain (for SSL)
+ - Autocreate SSL after domain set up (if possible) 
 
 * 2.0.8 *
 = release: 2019-05-10 =
