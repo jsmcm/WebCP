@@ -1,5 +1,5 @@
 * 2.0.9 *
-= release:  = 
+= release: 2019-06-26 = 
  - Fixed output started bug in domains/DoEditPackage.php
  - Fixed typo in mail screen, showed domain/mail instead of domain/webmail
  - On license failed during login we delete the validation key cache to not cache errors
