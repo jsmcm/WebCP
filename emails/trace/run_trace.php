@@ -1,6 +1,6 @@
 <?php
 
-include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
+include_once "/var/www/html/webcp/vendor/autoload.php";
 
 $serverName = gethostname();
 
@@ -1213,4 +1213,3 @@ unlink($LockFile);
 //print "\r\nArray: \r\n";
 //print_r($UserNameArray);
 
-?>
