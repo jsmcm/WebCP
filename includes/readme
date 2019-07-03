@@ -1,6 +1,6 @@
 * 2.0.10 *
-= release: =
- - Changed include vendor to hardcoded include path (rather than _SERVER) because of CLI PHP
+= release: 2019-07-03 =
+ - Changed include vendor to hardcoded include path (rather than _SERVER) because of CLI PHP in mail trace
 
 * 2.0.9 *
 = release: 2019-06-26 = 
