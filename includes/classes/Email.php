@@ -3238,7 +3238,7 @@ class Email
 
 	function AddAutoReply($ClientID, $MailBoxID, $Subject, $MessageBody, $Frequency, $StartDate, $EndDate)
 	{
-
+		$InsertID = 0;
 		try
 		{
 			$query = $this->DatabaseConnection->prepare("INSERT INTO vacations VALUES (0, :client_id, :mail_box_id, :subject, :message_body, :start_date, :end_date, 1, :frequency, 0);");
