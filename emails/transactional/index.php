@@ -272,7 +272,7 @@ if (isset($settings["default"])) {
 								 </div>
 
 								<div class="col-sm-8">
-									<i>If set to yes then all new domains will use Sendgrid. If set to know they new domains will not be created using Sendgrid. In either case you can manually edit <a href="/emails/transactional/sendgrid.php">domains using Sendgrid</a>
+									<i>If set to yes then all new domains will use Sendgrid. If set to no then new domains will not be created using Sendgrid. In either case you can manually edit <a href="/emails/transactional/sendgrid.php">domains using Sendgrid</a>
 								</div>
 		                                     	</div>
 

@@ -3,6 +3,7 @@
  - Fixed auto reply
  - Fixed spamguard
  - Fixed email rate limiting
+ - Fixed SendGrid
 
 * 2.0.10 *
 = release: 2019-07-03 =

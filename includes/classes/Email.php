@@ -187,7 +187,7 @@ class Email
 		$domains = array();
 
 		try {
-			$query = $this->DatabaseConnection->prepare("SELECT fqdn FROM email_options, domains WHERE option_name = 'domain_transactional_email' AND email_options.deleted = 0 AND option_value = 'sendgrid' AND extra1 = domains.id;");
+			$query = $this->DatabaseConnection->prepare("SELECT fqdn FROM email_options, domains WHERE option_name = 'domain_transactional_email' AND email_options.deleted = 0 AND domains.deleted = 0 AND option_value = 'sendgrid' AND extra1 = domains.id;");
 			$query->execute();
 	
 			while ($result = $query->fetch(PDO::FETCH_ASSOC)) {
