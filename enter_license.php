@@ -97,6 +97,7 @@ $oSettings = new Settings();
 				?>
 
 				<h3>Enter your server's license key</h3>
+				<a href="https://webcp.io/why-do-i-need-a-license" target="_new">Why do I need a license?</a>
 
 				<p>
 
