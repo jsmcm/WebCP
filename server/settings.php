@@ -394,7 +394,7 @@ $UpgradeType = $oSettings->GetUpgradeType();
 
 
 
-					<div class="col-md-12">
+					<!--div class="col-md-12">
 
 						<div class="panel panel-default">
 
@@ -430,7 +430,7 @@ $UpgradeType = $oSettings->GetUpgradeType();
 							</div>
 
 						</div>
-					</div>
+					</div-->
 					
 
 

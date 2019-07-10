@@ -1,30 +1,26 @@
 <?php
 
 
-//$Debug = true;
-$Debug = false;
+$Debug = true;
+//$Debug = false;
 
-if(!file_exists($_SERVER["DOCUMENT_ROOT"]."/includes/cron/tmp/"))
-{
+if(!file_exists($_SERVER["DOCUMENT_ROOT"]."/includes/cron/tmp/")) {
         mkdir($_SERVER["DOCUMENT_ROOT"]."/includes/cron/tmp/", 0755);
 }
 
 
-if(file_exists($_SERVER["DOCUMENT_ROOT"]."/includes/cron/tmp/OutboundSpam.lock"))
-{
+if(file_exists($_SERVER["DOCUMENT_ROOT"]."/includes/cron/tmp/OutboundSpam.lock")) {
         // if its older than 10 minutes something's gone wrong, delete it.
         $datetime1 = new DateTime(date("Y-m-d H:i:s", filemtime($_SERVER["DOCUMENT_ROOT"]."/includes/cron/tmp/OutboundSpam.lock")));
         $datetime2 = new DateTime(date("Y-m-d H:i:s"));
         $interval = $datetime1->diff($datetime2);
 
-        if( (int)$interval->format('%i') > 10)
-        {
+        if( (int)$interval->format('%i') > 10) {
                 // The previous instance stalled...
                 unlink($_SERVER["DOCUMENT_ROOT"]."/includes/cron/tmp/OutboundSpam.lock");
         }
 
-        if($Debug == false)
-        {
+        if($Debug == false) {
                 exit();
         }
         print "Lock file exists, BUT in debug so continuing<p>";
@@ -40,6 +36,7 @@ $oUser = new User();
 $oEmail = new Email();
 $oUtils = new Utils();
 $oFirewall = new Firewall();
+$oDomain = new Domain();
 
 $TempFirewallArray = array();
 $TemplBlockEmailArray = array();
@@ -118,29 +115,38 @@ if($Debug == true)
 	print "<p>";
 }
 
-if($SpamAction == "block")
-{
-	foreach($FirewallArray as $IP)
-	{
-		$oFirewall->ManualBan($IP);
+if($SpamAction == "block") {
+	foreach($FirewallArray as $IP) {
+		//touch( dirname(__FILE__)."/../../nm/".$IP, 0755 );
 	}
 }
 
 $BlockEmailArray = $oUtils->FixEmailFromEximAuthDataArray($BlockEmailArray);
 
-if($Debug == true)
-{
+if($Debug == true) {
 	print "Converted BE: <br>";
 	print_r($BlockEmailArray);
 	print "<p>";
 }
 
+print "Spamaction = ".$SpamAction."<p>";
+
 if($SpamAction == "block")
 {
 	$BlockEmailArray = $oEmail->RemoveAlreadySuspendedFromArray($BlockEmailArray);
+	
+	print_r($BlockEmailArray);
+	print "<p>";
 	foreach($BlockEmailArray as $EmailAddress)
 	{
 		$oEmail->SuspendEmail(-1, "admin", $EmailAddress);
+		$domainId = $oDomain->GetDomainIDFromDomainName(substr($EmailAddress, strpos($EmailAddress, "@") + 1));
+
+		if ( $domainId > -1 ) {
+
+			$oDomain->GetDomainInfo($domainId, $infoArray);
+			touch ( dirname(__FILE__)."/../../nm/".$infoArray["UserName"].".mailpasswordtt", 0755 );
+		}
 	}
 }
 

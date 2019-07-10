@@ -187,7 +187,7 @@ class Email
 		$domains = array();
 
 		try {
-			$query = $this->DatabaseConnection->prepare("SELECT fqdn FROM email_options, domains WHERE option_name = 'domain_transactional_email' AND email_options.deleted = 0 AND option_value = 'sendgrid' AND extra1 = domains.id;");
+			$query = $this->DatabaseConnection->prepare("SELECT fqdn FROM email_options, domains WHERE option_name = 'domain_transactional_email' AND email_options.deleted = 0 AND domains.deleted = 0 AND option_value = 'sendgrid' AND extra1 = domains.id;");
 			$query->execute();
 	
 			while ($result = $query->fetch(PDO::FETCH_ASSOC)) {
@@ -1736,16 +1736,8 @@ class Email
 		
 			
 			$query->execute();
-	
-			while($result = $query->fetch(PDO::FETCH_ASSOC))
-			{
-				fwrite($FilePointer, $this->GetLocalPartEmailForwardingText($ClientID, $DomainID, $result["source_local_part"]));
-				fwrite($FilePointer, "\n\n");
-			}
-	
-		}
-		catch(PDOException $e)
-		{
+
+		} catch(PDOException $e) {
 			$oLog = new Log();
 			$oLog->WriteLog("error", "/class.Email.php -> SaveEmailOptions(); Error = ".$e);
 		}	
@@ -3238,7 +3230,7 @@ class Email
 
 	function AddAutoReply($ClientID, $MailBoxID, $Subject, $MessageBody, $Frequency, $StartDate, $EndDate)
 	{
-
+		$InsertID = 0;
 		try
 		{
 			$query = $this->DatabaseConnection->prepare("INSERT INTO vacations VALUES (0, :client_id, :mail_box_id, :subject, :message_body, :start_date, :end_date, 1, :frequency, 0);");

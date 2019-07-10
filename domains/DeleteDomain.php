@@ -3,6 +3,7 @@ session_start();
 
 include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 $oUser = new User();
+$oEmail = new Email();
 
 require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 
@@ -25,8 +26,10 @@ if( ($ClientID != $DomainOwnerClientID) && ($oUser->Role != 'admin') )
 //print "DomainOwnerClientID: ".$DomainOwnerClientID."<br>";
 //print "DomainID: ".$_REQUEST["DomainID"]."<br>";
 
-if($oDomain->DeleteDomain($DomainOwnerClientID, $_REQUEST["DomainID"], $Error) == 1)
-{
+if($oDomain->DeleteDomain($DomainOwnerClientID, $_REQUEST["DomainID"], $Error) == 1) {
+
+	$oEmail->makeSendgridEximSettings();
+
 	$Notes="Domain Deleted";
 }
 else

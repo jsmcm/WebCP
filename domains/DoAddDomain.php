@@ -4,6 +4,7 @@ session_start();
 include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 
 $oUser = new User();
+$oEmail = new Email();
 $oDomain = new Domain();
 $oLog = new Log();
 
@@ -96,6 +97,16 @@ $infoArray = array();
 $oDomain->GetDomainInfo($domainId, $infoArray);
 
 file_put_contents(dirname(__DIR__)."/nm/".$DomainName.".freessl_tmp", "PrimaryDomainID=".$domainId."\nType=".$_POST["DomainType"]."\nPath=".$infoArray["Path"]."\nDomainID=".$domainId."\nDomainName=".$DomainName."\nDomainUserName=".$infoArray["UserName"]."\nEmailAddress=".$oUser->EmailAddress."\n");
+
+$sendGridSettings = $oEmail->getSendgridSettings();
+$sendgridDefault = "";
+
+if (isset($sendGridSettings["default"])) {
+        $sendgridDefault = trim($sendGridSettings["default"]);
+	if ( $sendgridDefault == "checked" ) {
+		$oEmail->makeSendgridEximSettings();
+	}
+}
 
 $oLog->WriteLog("DEBUG", "AddDomain Succeeded");
 
