@@ -32,8 +32,10 @@ $oEmail->SaveEmailOptions("max_recipients", $maxRecipients, $domainName);
 
 if ( $domainName == "" ) {
 	file_put_contents("/var/www/html/mail/ratelimit", $maxPerHour);
+	file_put_contents("/var/www/html/mail/maxrecipients", $maxRecipients);
 } else {
 	file_put_contents("/var/www/html/mail/domains/".$domainName."/ratelimit", $maxPerHour);
+	file_put_contents("/var/www/html/mail/domains/".$domainName."/maxrecipients", $maxRecipients);
 }
 
 $ReturnURL = $_SERVER["HTTP_REFERER"];

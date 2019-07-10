@@ -4,7 +4,8 @@
  - Fixed spamguard
  - Fixed email rate limiting
  - Fixed SendGrid
-
+ - Fixed max recipients in email
+ 
 * 2.0.10 *
 = release: 2019-07-03 =
  - Changed include vendor to hardcoded include path (rather than _SERVER) because of CLI PHP in mail trace
