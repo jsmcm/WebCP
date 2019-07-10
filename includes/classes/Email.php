@@ -1736,16 +1736,8 @@ class Email
 		
 			
 			$query->execute();
-	
-			while($result = $query->fetch(PDO::FETCH_ASSOC))
-			{
-				fwrite($FilePointer, $this->GetLocalPartEmailForwardingText($ClientID, $DomainID, $result["source_local_part"]));
-				fwrite($FilePointer, "\n\n");
-			}
-	
-		}
-		catch(PDOException $e)
-		{
+
+		} catch(PDOException $e) {
 			$oLog = new Log();
 			$oLog->WriteLog("error", "/class.Email.php -> SaveEmailOptions(); Error = ".$e);
 		}	
