@@ -1,5 +1,5 @@
 * 2.0.11 *
-= release: =
+= release: 2019-07-10 =
  - Fixed auto reply
  - Fixed spamguard
  - Fixed email rate limiting
