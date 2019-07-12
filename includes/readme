@@ -1,3 +1,9 @@
+* 2.1.0 *
+= releaes: =
+ - Added nonces to certain pages (eg, suspend, delete domains)
+ - Added domain settings page
+ - Added php selector
+
 * 2.0.11 *
 = release: 2019-07-10 =
  - Fixed auto reply

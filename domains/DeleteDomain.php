@@ -4,6 +4,7 @@ session_start();
 include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 $oUser = new User();
 $oEmail = new Email();
+$oSimpleNonce = new SimpleNonce();
 
 require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 
@@ -26,14 +27,36 @@ if( ($ClientID != $DomainOwnerClientID) && ($oUser->Role != 'admin') )
 //print "DomainOwnerClientID: ".$DomainOwnerClientID."<br>";
 //print "DomainID: ".$_REQUEST["DomainID"]."<br>";
 
-if($oDomain->DeleteDomain($DomainOwnerClientID, $_REQUEST["DomainID"], $Error) == 1) {
+$domainName = filter_var($_REQUEST["domainName"], FILTER_SANITIZE_STRING);
+$domainId = intVal( $_REQUEST["DomainID"] );
+$clientId = $ClientID;
+$clientRole = $oUser->Role;
+
+$timeStamp = filter_var($_REQUEST["timeStamp"], FILTER_SANITIZE_STRING);
+$nonce = filter_var($_REQUEST["nonce"], FILTER_SANITIZE_STRING);
+
+$nonceArray = [
+        $domainName,
+        $domainId,
+        $clientRole,
+        $clientId
+];
+
+$nonceResult = $oSimpleNonce->VerifyNonce($nonce, "deleteDomain", $timeStamp, $nonceArray);
+        
+if ( $nonceResult === false ) {
+        header("Location: index.php?Notes=Security nonce failed&NoteType=error");
+        exit();
+}
+
+
+
+if($oDomain->DeleteDomain($DomainOwnerClientID, $domainId, $Error) == 1) {
 
 	$oEmail->makeSendgridEximSettings();
 
 	$Notes="Domain Deleted";
-}
-else
-{	
+} else {	
 	$Notes="Domain cannot be deleted";
 }
 
