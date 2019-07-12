@@ -1,5 +1,5 @@
 * 2.1.0 *
-= releaes: =
+= releaes: 2019-07-12 =
  - Added nonces to certain pages (eg, suspend, delete domains)
  - Added domain settings page
  - Added php selector
