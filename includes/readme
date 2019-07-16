@@ -1,5 +1,9 @@
+* 2.1.1 *
+= release =
+ - Added script version into footer
+
 * 2.1.0 *
-= releaes: 2019-07-12 =
+= release: 2019-07-12 =
  - Added nonces to certain pages (eg, suspend, delete domains)
  - Added domain settings page
  - Added php selector
