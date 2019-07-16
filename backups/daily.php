@@ -11,21 +11,17 @@ $oSettings = new Settings();
 require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 
 
-if( ! file_exists("./daily"))
-{
-	mkdir("./daily", 0755);
+if( ! file_exists("../../backups/daily")) {
+	mkdir("../../backups/daily", 0755, true);
 }
-if( ! file_exists("./weekly"))
-{
-        mkdir("./weekly", 0755);
+if( ! file_exists("../../backups/weekly")) {
+        mkdir("../../backups/weekly", 0755);
 }
-if( ! file_exists("./adhoc"))
-{
-        mkdir("./adhoc", 0755);
+if( ! file_exists("../../backups/adhoc")) {
+        mkdir("../../backups/adhoc", 0755);
 }
-if( ! file_exists("./tmp"))
-{
-        mkdir("./tmp", 0755);
+if( ! file_exists("../../backups/tmp")) {
+        mkdir("../../backups/tmp", 0755);
 }
 
 
@@ -241,7 +237,7 @@ if($Role != "admin")
 
 	<?php
 	
-	if ($handle = opendir($_SERVER["DOCUMENT_ROOT"]."/backups/daily/"))
+	if ($handle = opendir($_SERVER["DOCUMENT_ROOT"]."/../backups/daily/"))
 	{
 
 		/* This is the correct way to loop over the directory. */
@@ -259,9 +255,9 @@ if($Role != "admin")
 
                                         
 
-					print "<td>".date ("Y-m-d H:i:s", filemtime($_SERVER["DOCUMENT_ROOT"]."/backups/daily/".$file))."</td>";
+					print "<td>".date ("Y-m-d H:i:s", filemtime($_SERVER["DOCUMENT_ROOT"]."/../backups/daily/".$file))."</td>";
 
-				        $sizeOfFile = filesize($_SERVER["DOCUMENT_ROOT"]."/backups/daily/".$file);
+				        $sizeOfFile = filesize($_SERVER["DOCUMENT_ROOT"]."/../backups/daily/".$file);
 					print "<td>".$oUtils->ConvertFromBytes($sizeOfFile)."</td>";	
 
 
@@ -269,7 +265,7 @@ if($Role != "admin")
                         print "<td class=\"center\">";
                         print "<div class=\"visible-md visible-lg hidden-sm hidden-xs\">";
 
-                        print "<a href=\"/restore/DoRestore.php?URL=/backups/daily.php&FileName=".$_SERVER["DOCUMENT_ROOT"]."/backups/daily/".$file."\" class=\"btn btn-green tooltips\" data-placement=\"top\" data-original-title=\"Restore File\"><i class=\"fa fa-cloud-upload fa fa-white\" style=\"color:white;\"></i></a>\n";
+                        print "<a href=\"/restore/DoRestore.php?URL=/../backups/daily.php&FileName=".$_SERVER["DOCUMENT_ROOT"]."/../backups/daily/".$file."\" class=\"btn btn-green tooltips\" data-placement=\"top\" data-original-title=\"Restore File\"><i class=\"fa fa-cloud-upload fa fa-white\" style=\"color:white;\"></i></a>\n";
 			print "<a href=\"DeleteBackup.php?Type=daily&File=".$file."\" onclick=\"return ValidateDelete('".$file."'); return false;\" class=\"btn btn-bricky tooltips\" data-placement=\"top\" data-original-title=\"Delete File\"><i class=\"fa fa-times fa fa-white\" style=\"color:white;\"></i></a>\n";
 
                         print "</div>";
@@ -282,7 +278,7 @@ if($Role != "admin")
 
                         print "<ul role=\"menu\" class=\"dropdown-menu pull-right\">";
                         print "<li role=\"presentation\">";
-                        print "<a role=\"menuitem\" tabindex=\"-1\" href=\"/restore/DoRestore.php?FileName=".$_SERVER["DOCUMENT_ROOT"]."/backups/daily/".$file."\">";
+                        print "<a role=\"menuitem\" tabindex=\"-1\" href=\"/restore/DoRestore.php?FileName=".$_SERVER["DOCUMENT_ROOT"]."/../backups/daily/".$file."\">";
                         print "<i class=\"fa fa-cloud-upload\"></i> Restore File";
                         print "</a>";
                         print "</li>";
