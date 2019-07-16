@@ -3,8 +3,8 @@ session_start();
 
 $Debug = false;
 
-if (!file_exists($_SERVER["DOCUMENT_ROOT"]."/backups/tmp/")) {
-    mkdir($_SERVER["DOCUMENT_ROOT"]."/backups/tmp/", 0755);
+if (!file_exists($_SERVER["DOCUMENT_ROOT"]."/../backups/tmp/")) {
+    mkdir($_SERVER["DOCUMENT_ROOT"]."/../backups/tmp/", 0755);
 }
 
 if (!file_exists($_SERVER["DOCUMENT_ROOT"]."/includes/cron/tmp/")) {
@@ -491,7 +491,7 @@ for($DomainCount = 0; $DomainCount < $DomainBackupListCount; $DomainCount++)
 		$RandomString = $RandomString.rand(0,9);
 		$RandomString = $RandomString.rand(0,9);
 	
-		while(is_dir($_SERVER["DOCUMENT_ROOT"]."/backups/tmp/".$RandomString))
+		while(is_dir($_SERVER["DOCUMENT_ROOT"]."/../backups/tmp/".$RandomString))
 		{
 			$RandomString = date("Y-m-d_H-i-s")."_";
 			$RandomString = $RandomString.rand(0,9);
@@ -502,11 +502,11 @@ for($DomainCount = 0; $DomainCount < $DomainBackupListCount; $DomainCount++)
 			$RandomString = $RandomString.rand(0,9);
 		}
 	
-	//print "<p>Making: '".$_SERVER["DOCUMENT_ROOT"]."/backups/tmp/".$RandomString."'<p>";
-	mkdir($_SERVER["DOCUMENT_ROOT"]."/backups/tmp/".$RandomString, 0755);
-	chmod($_SERVER["DOCUMENT_ROOT"]."/backups/tmp/".$RandomString, 0755);
+	//print "<p>Making: '".$_SERVER["DOCUMENT_ROOT"]."/../backups/tmp/".$RandomString."'<p>";
+	mkdir($_SERVER["DOCUMENT_ROOT"]."/../backups/tmp/".$RandomString, 0755);
+	chmod($_SERVER["DOCUMENT_ROOT"]."/../backups/tmp/".$RandomString, 0755);
 	
-	$fp = fopen($_SERVER["DOCUMENT_ROOT"]."/backups/tmp/".$RandomString."/".$DomainArray["UserName"].".xml", "w");
+	$fp = fopen($_SERVER["DOCUMENT_ROOT"]."/../backups/tmp/".$RandomString."/".$DomainArray["UserName"].".xml", "w");
 	fwrite($fp, $XMLContent->asXML());
 	fclose($fp);
 	
@@ -563,5 +563,3 @@ for($DomainCount = 0; $DomainCount < $DomainBackupListCount; $DomainCount++)
 	
 	fclose($fp);
 }
-exit();	
-?>

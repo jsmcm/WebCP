@@ -946,7 +946,7 @@
 
 	<?php
 
-	if( (strstr($_SERVER["SCRIPT_FILENAME"], "/backups/")) || (strstr($_SERVER["SCRIPT_FILENAME"], "/restore/")) )
+	if( (strstr($_SERVER["SCRIPT_FILENAME"], "/../backups/")) || (strstr($_SERVER["SCRIPT_FILENAME"], "/restore/")) )
 	{
 		print "<li class=\"active\">";
 	}
