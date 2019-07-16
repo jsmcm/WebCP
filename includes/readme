@@ -1,6 +1,7 @@
 * 2.1.1 *
-= release =
+= release: 2019-07-16 =
  - Added script version into footer
+ - Moved backups one above webcp
 
 * 2.1.0 *
 = release: 2019-07-12 =
