@@ -11,6 +11,7 @@ $oLog = new Log();
 $oSettings = new Settings();
 $oReseller = new Reseller();
 $oDatabase = new Database();
+$oSimpleNonce = new SimpleNonce();
 
 require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 
@@ -551,12 +552,7 @@ if($Traffic == 0)
 
 												<th>Package</th>
 		<th>Redirect <a href="https://webcp.io/http-redirect/" target="_new"><img src="/img/help.png" width="20px"></a></th>											
-												<?php
-												if(($oUser->Role == "admin") || ($oUser->Role == "reseller"))
-												{
-													print "<th>&nbsp;</th>";
-												}
-												?>
+															<th>&nbsp;</th>
 												
 											</tr>
 										</thead>
@@ -629,23 +625,36 @@ if($Traffic == 0)
                 print "<td><a href=\"#\" id=\"wwwredirect_".$Array[$x]["id"]."\" data-type=\"select\" data-pk=\"".$Array[$x]["id"]."\" data-value=\"".$domainRedirect."\" data-original-title=\"Select Redirect\"></a></td>\r\n";
 
 												
-												if(($oUser->Role == "admin") || ($oUser->Role == "reseller"))
 												{
 
 													print "<td class=\"center\">";
 													print "<div class=\"visible-md visible-lg hidden-sm hidden-xs\">";
-														
+
+  $nonceArray = [	
+	  $Array[$x]["domain_name"],
+	  $Array[$x]["id"],
+	  $oUser->Role,
+	  $oUser->ClientID
+  ];
+													$deleteDomainNonce = $oSimpleNonce->GenerateNonce("deleteDomain", $nonceArray);
+													$suspendDomainNonce = $oSimpleNonce->GenerateNonce("suspendDomain", $nonceArray);
+													$domainSettingsNonce = $oSimpleNonce->GenerateNonce("domainSettings", $nonceArray);
+
+if(($oUser->Role == "admin") || ($oUser->Role == "reseller"))
 														if($Array[$x]["Suspended"] == 1)
 														{
-															print "<a href=\"ManageSuspension.php?ChangeTo=0&DomainID=".$Array[$x]["id"]."\" onclick=\"return ConfirmChange(0, '".$Array[$x]["domain_name"]."'); return false;\" class=\"btn btn-green tooltips\" data-placement=\"top\" data-original-title=\"Unsuspend Domain\"><i class=\"fa clip-spinner-4 fa fa-white\" style=\"color:white;\"></i></a>\n";
+															print "<a href=\"ManageSuspension.php?nonce=".$suspendDomainNonce["Nonce"]."&timeStamp=".$suspendDomainNonce["TimeStamp"]."&ChangeTo=0&DomainID=".$Array[$x]["id"]."&domainName=".$Array[$x]["domain_name"]."\" onclick=\"return ConfirmChange(0, '".$Array[$x]["domain_name"]."'); return false;\" class=\"btn btn-green tooltips\" data-placement=\"top\" data-original-title=\"Unsuspend Domain\"><i class=\"fa clip-spinner-4 fa fa-white\" style=\"color:white;\"></i></a>\n";
 														}
 														else
 														{
-															print "<a href=\"ManageSuspension.php?ChangeTo=1&DomainID=".$Array[$x]["id"]."\" onclick=\"return ConfirmChange(1, '".$Array[$x]["domain_name"]."'); return false;\" class=\"btn btn-green tooltips\" data-placement=\"top\" data-original-title=\"Suspend Domain\"><i class=\"fa fa-ban fa fa-white\" style=\"color:white;\"></i></a>\n";
+															print "<a href=\"ManageSuspension.php?nonce=".$suspendDomainNonce["Nonce"]."&timeStamp=".$suspendDomainNonce["TimeStamp"]."&ChangeTo=1&DomainID=".$Array[$x]["id"]."&domainName=".$Array[$x]["domain_name"]."\" onclick=\"return ConfirmChange(1, '".$Array[$x]["domain_name"]."'); return false;\" class=\"btn btn-green tooltips\" data-placement=\"top\" data-original-title=\"Suspend Domain\"><i class=\"fa fa-ban fa fa-white\" style=\"color:white;\"></i></a>\n";
 														}
 														
-														print "<a href=\"DeleteDomain.php?DomainID=".$Array[$x]["id"]."\" onclick=\"return ConfirmDelete('".$Array[$x]["domain_name"]."'); return false;\" class=\"btn btn-bricky tooltips\" data-placement=\"top\" data-original-title=\"Delete Domain\"><i class=\"fa fa-times fa fa-white\" style=\"color:white;\"></i></a>\n";
-													print "</div>";
+														print "<a href=\"DeleteDomain.php?nonce=".$deleteDomainNonce["Nonce"]."&timeStamp=".$deleteDomainNonce["TimeStamp"]."&DomainID=".$Array[$x]["id"]."&domainName=".$Array[$x]["domain_name"]."\" onclick=\"return ConfirmDelete('".$Array[$x]["domain_name"]."'); return false;\" class=\"btn btn-bricky tooltips\" data-placement=\"top\" data-original-title=\"Delete Domain\"><i class=\"fa fa-times fa fa-white\" style=\"color:white;\"></i></a>\n";
+
+}
+														print "<a href=\"settings.php?nonce=".$domainSettingsNonce["Nonce"]."&timeStamp=".$domainSettingsNonce["TimeStamp"]."&DomainID=".$Array[$x]["id"]."&domainName=".$Array[$x]["domain_name"]."\" class=\"btn btn-teal tooltips\" data-placement=\"top\" data-original-title=\"Domain Settings\"><i class=\"fa fa-gear fa fa-white\" style=\"color:white;\"></i></a>\n";
+												print "</div>";
 													print "<div class=\"visible-xs visible-sm hidden-md hidden-lg\">";
 														print "<div class=\"btn-group\">";
 															print "<a class=\"btn btn-primary dropdown-toggle btn-sm\" data-toggle=\"dropdown\" href=\"#\">";
@@ -653,10 +662,12 @@ if($Traffic == 0)
 															print "</a>";
 															print "<ul role=\"menu\" class=\"dropdown-menu pull-right\">";
 															
+															
+															if(($oUser->Role == "admin") || ($oUser->Role == "reseller")) {
 																if($Array[$x]["Suspended"] == 1)
 																{
 																	print "<li role=\"presentation\">";
-																		print "<a role=\"menuitem\" tabindex=\"-1\" href=\"ManageSuspension.php?ChangeTo=0&DomainID=".$Array[$x]["id"]."\" onclick=\"return ConfirmChange(0, '".$Array[$x]["domain_name"]."'); return false;\">";
+																		print "<a role=\"menuitem\" tabindex=\"-1\" href=\"ManageSuspension.php?nonce=".$suspendDomainNonce["Nonce"]."&timeStamp=".$suspendDomainNonce["TimeStamp"]."&ChangeTo=0&DomainID=".$Array[$x]["id"]."&domainName=".$Array[$x]["domain_name"]."\" onclick=\"return ConfirmChange(0, '".$Array[$x]["domain_name"]."'); return false;\">";
 																		print "<i class=\"fa clip-spinner-4\"></i> Unsuspend Domain";
 																		print "</a>";
 																	print "</li>";
@@ -664,21 +675,28 @@ if($Traffic == 0)
 																else
 																{
 																	print "<li role=\"presentation\">";
-																		print "<a role=\"menuitem\" tabindex=\"-1\" href=\"ManageSuspension.php?ChangeTo=1&DomainID=".$Array[$x]["id"]."\" onclick=\"return ConfirmChange(1, '".$Array[$x]["domain_name"]."'); return false;\">";
+																		print "<a role=\"menuitem\" tabindex=\"-1\" href=\"ManageSuspension.php?nonce=".$suspendDomainNonce["Nonce"]."&timeStamp=".$suspendDomainNonce["TimeStamp"]."&ChangeTo=1&DomainID=".$Array[$x]["id"]."&domainName=".$Array[$x]["domain_name"]."\" onclick=\"return ConfirmChange(1, '".$Array[$x]["domain_name"]."'); return false;\">";
 																		print "<i class=\"fa fa-ban\"></i> Suspend Domain";
 																		print "</a>";
 																	print "</li>";
 																}
 																
 																print "<li role=\"presentation\">";
-																	print "<a role=\"menuitem\" tabindex=\"-1\" href=\"DeleteDomain.php?DomainID=".$Array[$x]["id"]."\" onclick=\"return ConfirmDelete('".$Array[$x]["domain_name"]."'); return false;\">";
-																		print "<i class=\"fa fa-times\"></i> Delete Domain";
+																	print "<a role=\"menuitem\" tabindex=\"-1\" href=\"DeleteDomain.php?nonce=".$deleteDomainNonce["Nonce"]."&timeStamp=".$deleteDomainNonce["TimeStamp"]."&DomainID=".$Array[$x]["id"]."&domainName=".$Array[$x]["domain_name"]."\" onclick=\"return ConfirmDelete('".$Array[$x]["domain_name"]."'); return false;\">";
+																	print "<i class=\"fa fa-times\"></i> Delete Domain";
 																	print "</a>";
 																print "</li>";																
-															print "</ul>";
+		}
+														print "<li role=\"presentation\">";
+															print "<a role=\"menuitem\" tabindex=\"-1\" href=\"settings.php?nonce=".$domainSettingsNonce["Nonce"]."&timeStamp=".$domainSettingsNonce["TimeStamp"]."&DomainID=".$Array[$x]["id"]."&domainName=".$Array[$x]["domain_name"]."\">";
+													$deleteDomainNonce = $oSimpleNonce->GenerateNonce("deleteDomain", $nonceArray);
+															print "<i class=\"fa fa-gear\"></i> Domain Settings";
+															print "</a>";
+														print "</li>";																
+											
+		print "</ul>";
 														print "</div>";
 													print "</div></td>";				
-												}
 											
 										
 												print "</tr>";

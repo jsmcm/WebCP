@@ -92,6 +92,3 @@ touch(dirname(__DIR__)."/nm/".$UserName.".mailpassword");
 
 header("location: index.php?NoteType=Success&Notes=Password changed");
 
-?>
-
-
