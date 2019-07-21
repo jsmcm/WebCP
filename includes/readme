@@ -2,6 +2,9 @@
 = release: 2019-07-16 =
  - Added script version into footer
  - Moved backups one above webcp
+ - Moved logs one above webcp
+ - DNS connections now try ssl first and fall back to non ssl
+ - fixed spelling mistake on dkim setup page
 
 * 2.1.0 *
 = release: 2019-07-12 =

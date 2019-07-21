@@ -9,6 +9,7 @@ $oDomain = new Domain();
 $oUtils = new Utils();
 $oSettings = new Settings();
 $oReseller = new Reseller();
+$oSimpleNonce = new SimpleNonce();
 
 
 require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
@@ -262,7 +263,14 @@ $Role = $oUser->Role;
 				{
 					print "<tr>";
 
-					print "<td><a href=\"/../backups/adhoc/".$file."\">".$file."</a></td>";	
+					$metaDataArray = [
+						$ClientID,
+						$Role
+					];
+
+					$nonce = $oSimpleNonce->GenerateNonce("backups/download", $metaDataArray);
+
+					print "<td><a href=\"download.php?backupFile=/../backups/adhoc/".$file."&nonce=".$nonce["Nonce"]."&timeStamp=".$nonce["TimeStamp"]."\">".$file."</a></td>";	
       					
 
 					print "<td>".$oDomain->GetDomainName(substr($file, 0, strpos($file, "_")))."</td>";	

@@ -198,7 +198,7 @@ else
 					<div class="row">
 					
 						<div class="col-md-12">
-							<b>Note: </b> You cannot simply turn DKIM on. You MUST create the DNS record with your DNS provivider (if you're using WebCP's built in DNS its automatic and then you can just turn it on here!)
+							<b>Note: </b> You cannot simply turn DKIM on. You MUST create the DNS record with your DNS provider (if you're using WebCP's built in DNS its automatic and then you can just turn it on here!)
 
 <p>&nbsp;<br>
 Once you've turned DKIM on here you must create a <b>txt</b> record for: 

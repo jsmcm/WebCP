@@ -470,8 +470,16 @@ if( $ServerType == "")
 									?>
 								</div>
 							</div>
+
+							<?php
+							if ( $ServerType == "master" ) {
+							?>
 							[ <a href="RecreateAllZones.php">Recreate all zones</a> ]
 							<p>
+							<?php
+							}
+							?>
+
 							<?php
 							if($oUser->Role == "admin")
 							{
