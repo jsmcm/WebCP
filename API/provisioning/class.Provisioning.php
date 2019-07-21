@@ -1,4 +1,7 @@
 <?php
+
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
+
 class Provisioning
 { 
 
@@ -431,6 +434,8 @@ class Provisioning
         public function ProvisionAccount($LoginEmailAddress, $LoginPassword, $FirstName, $Surname, $EmailAddress, $Password, $PackageName, $DomainName, $DomainUserName)
         {  
 
+		//file_put_contents(dirname(__FILE__)."/log.log", "loginEmailAddress: ".$LoginEmailAddress."\r\nLoginPassword: ".$LoginPassword."\r\nFirstName: ".$FirstName."\r\nSurname: ".$Surname."\r\nEmailAddress: ".$EmailAddress."\r\nPassword: ".$Password."\r\nPackageName: ".$PackageName."\r\nDomainName: ".$DomainName."\r\nDomainUserName: ".$DomainUserName."\r\n\r\n", FILE_APPEND);
+
         	$oLog = new Log();
 
 		$ReturnArray = array();
@@ -448,7 +453,8 @@ class Provisioning
 			return $ReturnArray;
 		}
 		
-
+	
+		
 		/*****************************************************************************
 		*	
 		* CHECK IF REMOTE SERVER IS ALLOWED HERE!

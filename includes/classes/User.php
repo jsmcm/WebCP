@@ -907,6 +907,28 @@ class User
 		
 	}
 	
+	function changePassword($password, $email)
+	{
+
+		
+		try {
+			$query = $this->DatabaseConnection->prepare("UPDATE admin SET password = :password WHERE email_address = :email");
+
+			$password = md5($password);
+
+			$query->bindParam(":email", $email);
+			$query->bindParam(":password", $password);
+
+			$query->execute();
+		} catch(PDOException $e) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "class.User.php -> changePassword(); Error = ".$e);
+		}
+
+		return 1;
+		
+	}
+	
 	
 	function PlainTextChangePassword($Password, $ClientID)
 	{
