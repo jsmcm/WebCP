@@ -1503,7 +1503,7 @@ class DNS
 
 			$this->SetSlaveStatus($SlaveArray[$x]["ID"], $SlaveStatus);
 		} catch (Exception $e) {
-			return false
+			return false;
 		}
 
 		return true;
