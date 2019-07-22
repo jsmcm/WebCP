@@ -1,10 +1,14 @@
-* 2.1.1 *
+* 2.1.2 *
+= release: =
+ - DNS connections now try ssl first and fall back to non ssl
+ - Fixed spelling mistake on dkim setup page
+ - DNS - Txt records check for enclosing ""
+ 
+ * 2.1.1 *
 = release: 2019-07-16 =
  - Added script version into footer
  - Moved backups one above webcp
  - Moved logs one above webcp
- - DNS connections now try ssl first and fall back to non ssl
- - fixed spelling mistake on dkim setup page
 
 * 2.1.0 *
 = release: 2019-07-12 =

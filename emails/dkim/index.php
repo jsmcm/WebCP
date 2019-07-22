@@ -169,28 +169,25 @@ function DomainInArray($LookInArray, $Domain)
 
 <?php
 $PublicKey = "";
-if( file_exists("/etc/exim4/dkim.public.key") )
-{
+if( file_exists("/etc/exim4/dkim.public.key") ) {
 	$PublicKey = file_get_contents("/etc/exim4/dkim.public.key");
 
 	$x = strpos($PublicKey, "-----BEGIN PUBLIC KEY-----");
 
-	if( $x !== false)
-	{
+	if( $x !== false) {
 		$PublicKey = trim(substr($PublicKey, $x + strlen("-----BEGIN PUBLIC KEY-----")));
 	}
 
-	
 	$x = strpos($PublicKey, "--");
 		
-	if( $x !== false)
-	{
+	if( $x !== false) {
 		$PublicKey = trim(substr($PublicKey, 0, $x));
 	}
 
-}
-else
-{
+	$PublicKey = str_replace("\r\n", "", $PublicKey);
+	$PublicKey = str_replace("\n", "", $PublicKey);
+
+} else {
 	print "<h2>Dkim keys not yet set up. This could take up to 24 hours. If you've waited more than 24 hours, please contact WebCP.pw support</h2>";
 	exit();
 }
@@ -202,8 +199,8 @@ else
 
 <p>&nbsp;<br>
 Once you've turned DKIM on here you must create a <b>txt</b> record for: 
-<p>&nbsp;<p><b>x._domainkey.<i>YOUR_DOMAIN</i></b> with a value of:<p>&nbsp;<p>
-v=DKIM1; k=rsa; p=<?php print $PublicKey; ?></p>
+<p>&nbsp;<p><b>x._domainkey.<i>YOUR_DOMAIN</i></b> with a value of:<p>&nbsp;
+<p style="-ms-word-break: break-all; word-break: break-all; word-break: break-word;">v=DKIM1; k=rsa; p=<?php print $PublicKey; ?></p>
 
 <p>&nbsp;<br>
 <b>NOTE:</b> Switch <i>YOUR_DOMAIN</i> for your actual domain, eg, x._domainkey.example.com

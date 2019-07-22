@@ -1537,6 +1537,9 @@ class DNS
 				$dkimKey = trim(substr($dkimKey, 0, $x));
 			}
 
+			$dkimKey = str_replace("\r\n", "", $dkimKey);
+			$dkimKey = str_replace("\n", "", $dkimKey);
+		
 		}
 
 		$message = json_encode(array("Password" => $password, "DomainName" => $domainName, "IPv4" => $this->GetDomainIP($domainName), "IPv6" => "", "dkimKey" => $dkimKey));
@@ -1652,13 +1655,13 @@ class DNS
 				}
 
 				if ( $spf != "" ) {
-					$this->AddRRS($SOAID, $DomainName, "txt", "v=spf1 a mx ".$spf." -all", "", "", "", "", "", "", "", "", "", $TTL);
+					$this->AddRRS($SOAID, $DomainName, "txt", "\"v=spf1 a mx ".$spf." -all\"", "", "", "", "", "", "", "", "", "", $TTL);
 					
 				}
 
 				
 				if ( $dkimKey != "" ) {
-					$this->AddRRS($SOAID, "x._domainkey.".$DomainName, "txt", "v=DKIM1; k=rsa; p=".$dkimKey, "", "", "", "", "", "", "", "", "", $TTL);
+					$this->AddRRS($SOAID, "x._domainkey.".$DomainName, "txt", "\"v=DKIM1; k=rsa; p=".$dkimKey."\"", "", "", "", "", "", "", "", "", "", $TTL);
 				}
 
 

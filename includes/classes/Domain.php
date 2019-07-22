@@ -1259,6 +1259,7 @@ class Domain
 
 		return "";
 	}
+	
 	function DeleteDomain($ClientID, $DomainID, &$Error)
 	{
 		$oLog = new Log();
@@ -2072,6 +2073,9 @@ class Domain
 						$dkimKey = trim(substr($dkimKey, 0, $x));
 					}
 
+					$dkimKey = str_replace("\r\n", "", $dkimKey);
+					$dkimKey = str_replace("\n", "", $dkimKey);
+				
 				}
 
 				$x = $oDNS->AddZone($DomainName, $oDNS->GetDomainIP($DomainName), "", $dkimKey);	
