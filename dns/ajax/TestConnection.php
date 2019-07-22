@@ -57,7 +57,7 @@ if($oDNS->GetSlaveData($ID, $HostName, $IPAddress, $Password, $PublicKey) != $ID
 
                 try {
                         $client = new SoapClient(NULL, $options);
-                        return $client->TestSlaveAuth($password);
+                        return $client->TestAuth($password);
                 } catch (Exception $e) {
                         $oLog->WriteLog("dns", $e->getMessage());
                         return -5;
