@@ -30,3 +30,4 @@ API/conf/server_list.txt
 fail2ban/tmp/*
 modules/
 modules/*
+.bash_history

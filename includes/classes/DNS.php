@@ -1,23 +1,21 @@
 <?php
 /*********************************************************************
 *********************************************************************/
-if(!isset($_SESSION)) 
-{
-     session_start();
+if(!isset($_SESSION)) {
+    session_start();
 }
 
 include_once("/var/www/html/webcp/vendor/autoload.php");
 
 class DNS
 {
-        var $oDatabase = null;
-        var $DatabaseConnection = null;
-
+	var $oDatabase = null;
+	var $DatabaseConnection = null;
 
 	function __construct()
-        {
-                $this->oDatabase = new Database();
-                $this->DatabaseConnection = $this->oDatabase->GetConnection();
+	{
+		$this->oDatabase = new Database();
+		$this->DatabaseConnection = $this->oDatabase->GetConnection();
 	}
 
 	function FillIPArray()
@@ -1465,35 +1463,51 @@ class DNS
 				
 	function CreateZoneOnSlaves($DomainName, $SlaveArray, $SlaveArrayCount)
 	{
-		for($x = 0; $x < $SlaveArrayCount; $x++)
-		{
-		        $options = array(
-		        'uri' => $SlaveArray[$x]["IPAddress"],
-		        'location' => 'http://'.$SlaveArray[$x]["HostName"].':8880/API/dns/DNS.php',
-		        'trace' => 1);
 
-		        $Message = json_encode(array("Password" => $SlaveArray[$x]["Password"], "Domain" => $DomainName));
-
-			$EncryptedMessage = "";
-		        openssl_public_encrypt($Message, $EncryptedMessage, $SlaveArray[$x]["PublicKey"]);
-
-		        $Message = base64_encode($EncryptedMessage);
-			try
-			{
-			        $client = new SoapClient(NULL, $options);
-			        $Result = $client->CreateZoneOnSlave($Message);
-
-				$SlaveStatus = "error";
-				if($Result > 0)
-				{
-					$SlaveStatus = "success";
-				}
-				$this->SetSlaveStatus($SlaveArray[$x]["ID"], $SlaveStatus);
-			}
-			catch (Exception $e)
-			{
+		for($x = 0; $x < $SlaveArrayCount; $x++) {
+			
+			$port = 8443;
+			$result = $this->createSlaveZone( $DomainName, $SlaveArray[$x]["IPAddress"], $SlaveArray[$x]["HostName"], $port, $SlaveArray[$x]["Password"], $SlaveArray[$x]["PublicKey"]);
+			
+			if ( $result == false && $port == 8443 ) {
+				//try without SSL
+				$port = 8880;
+				$result = $this->createSlaveZone( $DomainName, $SlaveArray[$x]["IPAddress"], $SlaveArray[$x]["HostName"], $port, $SlaveArray[$x]["Password"], $SlaveArray[$x]["PublicKey"]);
 			}
 		}
+	}
+
+	private function createSlaveZone($domainName, $ipAddress, $hostName, $port, $password, $publicKey)
+	{
+		$options = array(
+		'uri' => $ipAddress,
+		'location' => 'http'.(($port=="8443")?'s':'').'://'.$hostName.':'.$port.'/API/dns/DNS.php',
+		'trace' => 1);
+
+		$message = json_encode(array("Password" => $password, "Domain" => $domainName));
+
+		$encryptedMessage = "";
+		openssl_public_encrypt($message, $encryptedMessage, $publicKey);
+
+		$message = base64_encode($encryptedMessage);
+
+		try {
+			
+			$client = new SoapClient(NULL, $options);
+			$Result = $client->CreateZoneOnSlave($message);
+
+			$SlaveStatus = "error";
+			if($Result > 0) {
+				$SlaveStatus = "success";
+			}
+
+			$this->SetSlaveStatus($SlaveArray[$x]["ID"], $SlaveStatus);
+		} catch (Exception $e) {
+			return false
+		}
+
+		return true;
+
 	}
 
 	function AddZone($DomainName, $IPv4Address, $IPv6Address)
@@ -2017,39 +2031,53 @@ class DNS
 
 	function DeleteZoneOnSlaves($DomainName, $SlaveArray, $SlaveArrayCount)
 	{
-		for($x = 0; $x < $SlaveArrayCount; $x++)
-		{
-		        $options = array(
-				'uri' => $SlaveArray[$x]["IPAddress"],
-				'location' => 'http://'.$SlaveArray[$x]["HostName"].':8880/API/dns/DNS.php',
-				'trace' => 1
-			);
+		for($x = 0; $x < $SlaveArrayCount; $x++) {
 
-		        $Message = json_encode(array("Password" => $SlaveArray[$x]["Password"], "Domain" => $DomainName));
+			$port = 8443;
+			$result = $this->deleteSlaveZone( $DomainName, $SlaveArray[$x]["IPAddress"], $SlaveArray[$x]["HostName"], $port, $SlaveArray[$x]["Password"], $SlaveArray[$x]["PublicKey"]);
 
-			$EncryptedMessage = "";
-		        openssl_public_encrypt($Message, $EncryptedMessage, $SlaveArray[$x]["PublicKey"]);
+			if ( $result == false && $port == 8443 ) {
+				// retry without SSL
 
-		        $Message = base64_encode($EncryptedMessage);
-			try
-			{
-			        $client = new SoapClient(NULL, $options);
-			        $Result = $client->DeleteZoneOnSlave($Message);
-
-				$SlaveStatus = "error";
-				if($Result > 0)
-				{
-					$SlaveStatus = "success";
-				}
-				$this->SetSlaveStatus($SlaveArray[$x]["ID"], $SlaveStatus);
-			}
-			catch (Exception $e)
-			{
-					print_r($e);
+				$port = 8880;
+				$result = $this->deleteSlaveZone( $DomainName, $SlaveArray[$x]["IPAddress"], $SlaveArray[$x]["HostName"], $port, $SlaveArray[$x]["Password"], $SlaveArray[$x]["PublicKey"]);
 			}
 		}
 	}
 	
+	private function deleteSlaveZone( $domainName, $ipAddress, $hostName, $port, $password, $publicKey)
+	{
+		$options = array(
+			'uri' => $ipAddress,
+			'location' => 'http'.(($port=="8443")?'s':'').'://'.$hostName.':'.$port.'/API/dns/DNS.php',
+			'trace' => 1
+		);
+
+		$message = json_encode(array("Password" => $password, "Domain" => $domainName));
+
+		$encryptedMessage = "";
+		openssl_public_encrypt($message, $encryptedMessage, $publicKey);
+
+		$message = base64_encode($encryptedMessage);
+
+		try {
+			$client = new SoapClient(NULL, $options);
+			$Result = $client->DeleteZoneOnSlave($message);
+
+			$SlaveStatus = "error";
+			if($Result > 0) {
+				$SlaveStatus = "success";
+			}
+			$this->SetSlaveStatus($SlaveArray[$x]["ID"], $SlaveStatus);
+		} catch (Exception $e) {
+			//print_r($e);
+
+			return false;
+		}
+
+		return true;
+	}
+
 	function DeleteZone($DomainName)
 	{
 	
