@@ -1510,75 +1510,119 @@ class DNS
 
 	}
 
-	function AddZone($DomainName, $IPv4Address, $IPv6Address)
-	{
-		
-	        $TTL = $this->GetSetting("ttl");
-	        if( (is_numeric($TTL) == false) || ($TTL < 0) )
-	        {
-	                $TTL = 7200;
-	        }
-	
-	        $NegativeTTL = $this->GetSetting("negative_ttl");
-	        if( (is_numeric($NegativeTTL) == false) || ($NegativeTTL < 0) )
-	        {
-	                $NegativeTTL = 7200;
-	        }
-	
-	        $Refresh = $this->GetSetting("refresh");
-	        if( (is_numeric($Refresh) == false) || ($Refresh < 0) )
-	        {
-	                $Refresh = 1800;
-	        }
-	
-	        $Retry = $this->GetSetting("retry");
-	        if( (is_numeric($Retry) == false) || ($Retry < 0) )
-	        {
-	                $Retry = 7200;
-		        }
-	
-	        $Expire = $this->GetSetting("expire");
-	        if( (is_numeric($Expire) == false) || ($Expire < 0) )
-	        {
-	                $Expire = 1209600;
-	        }
 
-	        $EmailAddress = $this->GetSetting("email_address");
-		if($EmailAddress == "")
-		{
+	public function createMasterZone($domainName, $ipAddress, $hostName, $port, $password, $publicKey)
+	{
+		$oLog = new Log();
+
+		$options = array(
+			'uri' => $ipAddress,
+			'location' => 'http'.(($port=="8443")?'s':'').'://'.$hostName.':'.$port.'/API/dns/DNS.php',
+			'trace' => 1
+		);
+
+		$dkimKey = "";
+		if( file_exists("/etc/exim4/dkim.public.key") ) {
+			$dkimKey = file_get_contents("/etc/exim4/dkim.public.key");
+
+			$x = strpos($dkimKey, "-----BEGIN PUBLIC KEY-----");
+
+			if( $x !== false) {
+				$dkimKey = trim(substr($dkimKey, $x + strlen("-----BEGIN PUBLIC KEY-----")));
+			}
+
+			$x = strpos($dkimKey, "--");
+				
+			if( $x !== false) {
+				$dkimKey = trim(substr($dkimKey, 0, $x));
+			}
+
+		}
+
+		$message = json_encode(array("Password" => $password, "DomainName" => $domainName, "IPv4" => $this->GetDomainIP($domainName), "IPv6" => "", "dkimKey" => $dkimKey));
+				
+		$encryptedMessage = "";
+		openssl_public_encrypt($message, $encryptedMessage, $publicKey);
+
+		$message = base64_encode($encryptedMessage);
+
+		try {
+			
+			$client = new SoapClient(NULL, $options);
+			$Result = $client->AddZoneForSlave($message);
+			
+			if($Result < 1) {
+				$oLog->WriteLog("DEBUG", "Error registering DNS, return code: ".$Result);
+			}
+
+		} catch (Exception $e) {
+			return false;
+		}
+
+		return true;
+
+	}
+
+
+
+	function AddZone($DomainName, $IPv4Address, $IPv6Address, $dkimKey="")
+	{
+	
+		$TTL = $this->GetSetting("ttl");
+		if( (is_numeric($TTL) == false) || ($TTL < 0) ) {
+			$TTL = 7200;
+		}
+
+		$NegativeTTL = $this->GetSetting("negative_ttl");
+		if( (is_numeric($NegativeTTL) == false) || ($NegativeTTL < 0) ) {
+			$NegativeTTL = 7200;
+		}
+
+		$Refresh = $this->GetSetting("refresh");
+		if( (is_numeric($Refresh) == false) || ($Refresh < 0) ) {
+			$Refresh = 1800;
+		}
+
+		$Retry = $this->GetSetting("retry");
+		if( (is_numeric($Retry) == false) || ($Retry < 0) ) {
+			$Retry = 7200;
+		}
+
+		$Expire = $this->GetSetting("expire");
+		if( (is_numeric($Expire) == false) || ($Expire < 0) ) {
+			$Expire = 1209600;
+		}
+
+		$EmailAddress = $this->GetSetting("email_address");
+		if($EmailAddress == "") {
 			$EmailAddress = "dns@admin.email";
 		}
-		
+	
 		$EmailAddress = str_replace("@", ".", $EmailAddress);
-	        
+		
 		$PrimaryNameServer = $this->GetSetting("primary_name_server");
-		if($PrimaryNameServer == "")
-		{
+		if($PrimaryNameServer == "") {
 			$PrimaryNameServer = $_SERVER["SERVER_NAME"];
 		}
-		
+	
 
-		if($DomainName == "")
-		{
+		if($DomainName == "") {
 			return -3;
 		}
-		if( ($IPv4Address == "") && ($IPv6Address == "") )
-		{
+
+		if( ($IPv4Address == "") && ($IPv6Address == "") ) {
 			return -4;
 		}
 
 		$x = $this->ValidateDomainName($DomainName);
 
-		if($x < 1)
-		{
+		if($x < 1) {
 			return $x;
 		}
-		
+	
 		$DomainName = $DomainName.".";
 
-		if($this->DomainExists($DomainName) == -1)
-		{
-
+		if($this->DomainExists($DomainName) == -1) {
 
 			$SlaveArray = array();
 			$SlaveArrayCount = 0;
@@ -1589,17 +1633,34 @@ class DNS
 
 			$SerialNumber = date("Ymd")."01";
 			$SOAID = $this->__AddSOA(1, $DomainName, $TTL, $PrimaryNameServer.".", $EmailAddress, $SerialNumber, $Refresh, $Retry, $Expire, $NegativeTTL);
-			if($SOAID > 0)
-			{
-				if($IPv4Address != "")
-				{
+
+			if($SOAID > 0) {
+
+				$spf = "";
+
+				if($IPv4Address != "") {
 					$this->AddRRS($SOAID, $DomainName, "A", $IPv4Address, "", "", "", "", "", "", "", "", "", $TTL);
+
+					$spf = $spf."ip4:".$IPv4Address." ";
 				}
 
-				if($IPv6Address != "")
-				{
+	
+				if($IPv6Address != "") {
 					$this->AddRRS($SOAID, $DomainName, "AAAA", $IPv6Address);
+
+					$spf = $spf."ip6:".$IPv6Address." ";
 				}
+
+				if ( $spf != "" ) {
+					$this->AddRRS($SOAID, $DomainName, "txt", "v=spf1 a mx ".$spf." -all", "", "", "", "", "", "", "", "", "", $TTL);
+					
+				}
+
+				
+				if ( $dkimKey != "" ) {
+					$this->AddRRS($SOAID, "x._domainkey.".$DomainName, "txt", "v=DKIM1; k=rsa; p=".$dkimKey, "", "", "", "", "", "", "", "", "", $TTL);
+				}
+
 
 				$this->AddRRS($SOAID, "www", "CNAME", $DomainName, "", "", "", "", "", "", "", "", "", $TTL);
 				$this->AddRRS($SOAID, "ftp", "CNAME", $DomainName, "", "", "", "", "", "", "", "", "", $TTL);
@@ -1613,26 +1674,18 @@ class DNS
 				$this->AddRRS($SOAID, $DomainName, "NS", $this->AddLastPeriod($PrimaryNameServer), "", "", "", "", "", "", "", "", "", $TTL);
 
 
-				if( (isset($SlaveArray[0]["HostName"])) && ($SlaveArray[0]["HostName"] != "") )
-				{
+				if( (isset($SlaveArray[0]["HostName"])) && ($SlaveArray[0]["HostName"] != "") ) {
 					$this->AddRRS($SOAID, $DomainName, "NS", $this->AddLastPeriod($SlaveArray[0]["HostName"]), "", "", "", "", "", "", "", "", "", $TTL);
 				}
 
 				$this->MakeZoneDataFile();
 				$this->MakeZoneFile($DomainName);
 
-			
-
-	
 				return 1;
-			}
-			else
-			{	
+			} else {	
 				return -1;
 			}
-		}
-		else
-		{
+		} else {
 			return -2;
 		}
 	}

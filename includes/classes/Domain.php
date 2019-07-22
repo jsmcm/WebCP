@@ -2039,7 +2039,6 @@ class Domain
 		}
 		catch(PDOException $e)
 		{
-			$oLog = new Log();
 			$oLog->WriteLog("error", "/class.Domain.php -> AddDomain(); Error = ".$e);
 		}
 		
@@ -2052,9 +2051,30 @@ class Domain
 		{
 			$ServerType = $oDNS->GetSetting("server_type");
 
+			$oLog->WriteLog("Domains", "Server Type: ".$ServerType);
+
 			if($ServerType == "master")
 			{
-				$x = $oDNS->AddZone($DomainName, $oDNS->GetDomainIP($DomainName), "");	
+
+				$dkimKey = "";
+				if( file_exists("/etc/exim4/dkim.public.key") ) {
+					$dkimKey = file_get_contents("/etc/exim4/dkim.public.key");
+
+					$x = strpos($dkimKey, "-----BEGIN PUBLIC KEY-----");
+
+					if( $x !== false) {
+						$dkimKey = trim(substr($dkimKey, $x + strlen("-----BEGIN PUBLIC KEY-----")));
+					}
+
+					$x = strpos($dkimKey, "--");
+						
+					if( $x !== false) {
+						$dkimKey = trim(substr($dkimKey, 0, $x));
+					}
+
+				}
+
+				$x = $oDNS->AddZone($DomainName, $oDNS->GetDomainIP($DomainName), "", $dkimKey);	
 				if($x < 1)
 				{
 					$oLog->WriteLog("DEBUG", "Error registering DNS, return code: ".$x);
@@ -2068,31 +2088,16 @@ class Domain
 				$Password = $oDNS->GetSetting("master_password");
 				$PublicKey = $oDNS->GetSetting("master_public_key");
 
-				
-				$options = array(
-				'uri' => $IPAddress,
-				'location' => 'http://'.$HostName.':8880/API/dns/DNS.php',
-				'trace' => 1);
+				$port = 8443;
+			
+				$result = $oDNS->createMasterZone($DomainName, $IPAddress, $HostName, $port, $Password, $PublicKey);
+				if ( $result == false ) {
+					// try non-ssl
+					$port = 8880;
 
-				$Message = json_encode(array("Password" => $Password, "DomainName" => $DomainName, "IPv4" => $oDNS->GetDomainIP($DomainName), "IPv6" => ""));
-				$EncryptedMessage = "";
-				openssl_public_encrypt($Message, $EncryptedMessage, $PublicKey);
-				
-				$Message = base64_encode($EncryptedMessage);
-				try
-				{
-					$client = new SoapClient(NULL, $options);
-					$Result = $client->AddZoneForSlave($Message);
-				
-					if($Result < 1)
-					{
-						$oLog->WriteLog("DEBUG", "Error registering DNS, return code: ".$Result);
-						$Error = "<p><b>Domain DNS could not be registered, return code: ".$Result.". Please contact support</b>";
-					}
+					$result = $oDNS->createMasterZone($DomainName, $IPAddress, $HostName, $port, $Password, $PublicKey);
 				}
-				catch (Exception $e)
-				{
-				}
+
 
 			}
 			else
