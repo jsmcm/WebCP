@@ -832,58 +832,48 @@ class DNS
 
 	function ValidateDomainName($DomainName, $FQDN=true)
 	{
-	        $DomainName = strtolower($DomainName);
-	
-	        // check for double period
-	        if(strstr($DomainName, ".."))
-	        {
-	                return -1;
-	        }
-	
-	        // First char must be alphanum
-	        if( (substr($DomainName, 0, 1) < 'a') || (substr($DomainName, 0, 1) > 'z') )
-	        {
-	                if( (substr($DomainName, 0, 1) < '0') || (substr($DomainName, 0, 1) > '9') )
-	                {
-	                        return -2;
-	                }
-	        }
+		if ( $DomainName == "@" ) {
+			return true;
+		}
+		$DomainName = strtolower($DomainName);
 
-	        for($x = 0; $x < strlen($DomainName); $x++)
-	        {
-	                if( (substr($DomainName, $x, 1) < 'a') || (substr($DomainName, $x, 1) > 'z') )
-	                {
-	                        if( (substr($DomainName, $x, 1) < '0') || (substr($DomainName, $x, 1) > '9') )
-	                        {
-	                                if( (substr($DomainName, $x, 1) != '-') && (substr($DomainName, $x, 1) != '.') && (substr($DomainName, $x, 1) != '_') )
-	                                {
-	                                        return -3;
-	                                }
-	                        }
-	                }
-	        }
-
-	        if(strlen($DomainName) > 100)
-	        {
-	                return -4;
-	        }
-
-		if($FQDN == true)
-		{
-		        if(strlen($DomainName) < 4)
-		        {
-		                return -5;
-		        }
-
-		        // must contain at least 1 .
-		        if(!strstr($DomainName, "."))
-	        	{       
-	         	       return -6;
-		        }
+		// check for double period
+		if(strstr($DomainName, "..")) {
+			return -1;
 		}
 
-	
-	        return 1;
+		// First char must be alphanum
+		if( (substr($DomainName, 0, 1) < 'a') || (substr($DomainName, 0, 1) > 'z') ) {
+			if( (substr($DomainName, 0, 1) < '0') || (substr($DomainName, 0, 1) > '9') ) {
+				return -2;
+			}
+		}
+
+		for($x = 0; $x < strlen($DomainName); $x++) {
+			if( (substr($DomainName, $x, 1) < 'a') || (substr($DomainName, $x, 1) > 'z') ) {
+				if( (substr($DomainName, $x, 1) < '0') || (substr($DomainName, $x, 1) > '9') ) {
+					if( (substr($DomainName, $x, 1) != '-') && (substr($DomainName, $x, 1) != '.') && (substr($DomainName, $x, 1) != '_') ) {
+						return -3;
+					}
+				}
+			}
+		}
+
+		if(strlen($DomainName) > 100) {
+			return -4;
+		}
+
+		if($FQDN == true) {
+			if(strlen($DomainName) < 4) {
+				return -5;
+			}
+
+			// must contain at least 1 .
+			if(!strstr($DomainName, ".")) {       
+				return -6;
+			}
+		}
+		return 1;
 	}
 
 
@@ -1655,13 +1645,13 @@ class DNS
 				}
 
 				if ( $spf != "" ) {
-					$this->AddRRS($SOAID, $DomainName, "txt", "\"v=spf1 a mx ".$spf." -all\"", "", "", "", "", "", "", "", "", "", $TTL);
+					$this->AddRRS($SOAID, $DomainName, "TXT", "\"v=spf1 a mx ".$spf." -all\"", "", "", "", "", "", "", "", "", "", $TTL);
 					
 				}
 
 				
 				if ( $dkimKey != "" ) {
-					$this->AddRRS($SOAID, "x._domainkey.".$DomainName, "txt", "\"v=DKIM1; k=rsa; p=".$dkimKey."\"", "", "", "", "", "", "", "", "", "", $TTL);
+					$this->AddRRS($SOAID, "x._domainkey.".$DomainName, "TXT", "\"v=DKIM1; k=rsa; p=".$dkimKey."\"", "", "", "", "", "", "", "", "", "", $TTL);
 				}
 
 

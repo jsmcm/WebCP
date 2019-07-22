@@ -169,16 +169,13 @@ if( ! is_numeric($TTL))
 			Domain = "<?php print $oDNS->RemoveLastPeriod($SOADataArray["Domain"]); ?>";
 
 
-			if(ControlType == 'new')
-			{
+			if(ControlType == 'new') {
 				Name = document.getElementById("New_Name_" + ID);
 				TTL = document.getElementById("New_TTL_" + ID);
 				Type = document.getElementById("New_Type_" + ID);
 				Priority = document.getElementById("New_Priority_" + ID);
 				Record = document.getElementById("New_Record_" + ID);
-			}
-			else
-			{
+			} else {
 				Name = document.getElementById("Name_" + ID);
 				TTL = document.getElementById("TTL_" + ID);
 				Type = document.getElementById("Type_" + ID);
@@ -186,99 +183,70 @@ if( ! is_numeric($TTL))
 				Record = document.getElementById("Record_" + ID);
 			}
 			
-			if( (Name.value == "") && (Record.value == ""))
-			{
+			if( (Name.value == "") && (Record.value == "")) {
 				return Return;
 			}
 
-			if(Name.value.substr(Name.value.length - Domain.length) == Domain)
-			{
+			if(Name.value.substr(Name.value.length - Domain.length) == Domain) {
 				Name.value = Name.value + ".";
 			}
 
-			if(ValidateDomain(Name.value, false) == false)
-			{
+			if(ValidateDomain(Name.value, false) == false) {
 				Name.style.border = "2px red solid";
 				Return = false;
 			}
 
-                        if( isNaN(TTL.value))
-                        {
-                                TTL.style.border = "2px red solid";
+			if( isNaN(TTL.value)) {
+				TTL.style.border = "2px red solid";
 				Return = false;
-                        }
-                        else if(TTL.value == "")
-                        {
-                                TTL.style.border = "2px red solid";
-                        	Return = false;
-                        }
-                        else if(parseInt(TTL.value) < 0)
-                        {
-        	               	TTL.style.border = "2px red solid";
- 	                       	Return = false;
-                        }
-
-			if(Type.value == "A" || Type.value == "AAAA")
-			{
-				if(Type.value == "A")
-				{
-					if(ValidateIPv4(Record.value) == false)
-					{
-						Record.style.border = "2px red solid";
-						Return = false;
-					}
-				}		
-				else if(Type.value == "AAAA")
-				{
-					if(ValidateIPv6(Record.value) == false)
-					{
-						Record.style.border = "2px red solid";
-						Return = false;
-					}
-				}		
+			} else if(TTL.value == "") {
+				TTL.style.border = "2px red solid";
+				Return = false;
+			} else if(parseInt(TTL.value) < 0) {
+				TTL.style.border = "2px red solid";
+				Return = false;
 			}
-			else		
-			{
+
+			if(Type.value == "A" || Type.value == "AAAA") {
+				if(Type.value == "A") {
+					if(ValidateIPv4(Record.value) == false) {
+						Record.style.border = "2px red solid";
+						Return = false;
+					}
+				} else if(Type.value == "AAAA") {
+					if(ValidateIPv6(Record.value) == false) {
+						Record.style.border = "2px red solid";
+						Return = false;
+					}
+				}		
+			} else {
 				// Record should be a domain
-				if(Record.value.length > 0)
-				{
-					if(Type.value != "TXT")
-					{
-						if(Record.value.substr(Record.value.length - 1, 1) != ".")
-						{
+				if(Record.value.length > 0) {
+					if(Type.value != "TXT") {
+						if(Record.value.substr(Record.value.length - 1, 1) != ".") {
 							Record.value = Record.value + ".";
 						}
 					
-						if(ValidateDomain(Record.value, true) == false)
-						{
+						if(ValidateDomain(Record.value, true) == false) {
 							Record.style.border = "2px red solid";
 							Return = false;
 						}
 					}
-				}
-				else
-				{
+				} else {
 					Record.style.border = "2px red solid";
 					Return = false;	
 				}
 			}
 
-			if(Type.value == "MX")
-			{
+			if(Type.value == "MX") {
 				// priority must be a non negative number
-				if( isNaN(Priority.value))
-				{
+				if( isNaN(Priority.value)) {
 					Priority.value = 0;									
 					Priority.style.border = "2px red solid";
 					Return = false;
-				}
-				else if(Priority.value == "")
-				{
+				} else if(Priority.value == "") {
 					Priority.value = 0;									
-				}
-
-				else if(parseInt(Priority.value) < 0)
-				{
+				} else if(parseInt(Priority.value) < 0) {
 					Priority.value = 0;									
 					Priority.style.border = "2px red solid";
 					Return = false;
@@ -347,15 +315,16 @@ if( ! is_numeric($TTL))
 
 		function ValidateDomain(Domain, FQDN)
 		{
+			if ( Domain == "@" ) {
+				return true;
+			}
 
-		if(/^[a-z0-9.\-_]+$/i.test(Domain))
-		{
-		}
-		else
-		{
-			alert(Domain + " is false at 1");
-			return false;
-		}
+			if(/^[a-z0-9.\-_]+$/i.test(Domain))
+			{
+			} else {
+				
+				return false;
+			}
 
 			if(Domain.indexOf("..") > -1)
 			{
