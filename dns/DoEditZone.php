@@ -77,11 +77,11 @@ foreach($_POST as $key => $val) {
 				$first = substr( $Record, 0, 1);
 				$last = substr( $Record, strlen($Record) - 1, 1);
 
-				if ( $first != "\" ) {
+				if ( $first != "\"" ) {
 					$Record = "\"".$Record;
 				}
 				
-				if ( $last != "\" ) {
+				if ( $last != "\"" ) {
 					$Record = $Record."\"";
 				}
 				
