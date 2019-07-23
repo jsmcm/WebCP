@@ -25,3 +25,9 @@ restore/tmp/
 restore/tmp/*
 emails/trace/bw_log.txt
 fail2ban/perm.dat
+API/2.0.0/log.log
+API/conf/server_list.txt
+fail2ban/tmp/*
+modules/
+modules/*
+.bash_history

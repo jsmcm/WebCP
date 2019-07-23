@@ -18,4 +18,4 @@ $Role = $oUser->Role;
 
 $oDNS->RecreateAllZoneInfo();
 
-header("location: index.php?NoteType=Message&Notes=Zones recreated<br>".$Error);
+header("location: index.php?NoteType=Message&Notes=Zones recreated");

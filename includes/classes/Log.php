@@ -35,51 +35,44 @@ class Log
 
 		$Severity = strtoupper($Severity);
 
-		if(!is_dir($_SERVER["DOCUMENT_ROOT"]."/logs"))
-		{
-	
+		if(!is_dir($_SERVER["DOCUMENT_ROOT"]."/../logs")) {
 
-			mkdir($_SERVER["DOCUMENT_ROOT"]."/logs");
-			chmod($_SERVER["DOCUMENT_ROOT"]."/logs", 0755);
+			mkdir($_SERVER["DOCUMENT_ROOT"]."/../logs");
+			chmod($_SERVER["DOCUMENT_ROOT"]."/../logs", 0755);
 		}
 
-		$RunLog = $_SERVER["DOCUMENT_ROOT"]."/logs/runlog";
+		$RunLog = $_SERVER["DOCUMENT_ROOT"]."/../logs/runlog";
 		
 		
-		$CriticalLog = $_SERVER["DOCUMENT_ROOT"]."/logs/criticallog";
+		$CriticalLog = $_SERVER["DOCUMENT_ROOT"]."/../logs/criticallog";
 
 		$WriteLog = true;
 
-		if($Severity == "DEBUG")
-		{
+		if($Severity == "DEBUG") {
 			// This log level should NEVER be turned on in production systems, it exposes user name and passwords in the log files
 			//$WriteLog = false;
 		}
 
-		if($WriteLog == true)
-		{
+		if($WriteLog == true) {
 
 			$FileHandle = fopen($RunLog, 'a');	
 			fwrite($FileHandle, date("Y-m-d H:i:s")." - ".$Severity." - ".$Message."\r\n");
 			fclose($FileHandle);
 
-			if(strtolower($Severity) == "critical")
-			{
+			if(strtolower($Severity) == "critical") {
 				$FileHandle = fopen($CriticalLog, 'a');	
 				fwrite($FileHandle, date("Y-m-d H:i:s")." - ".$Severity." - ".$Message."\r\n");
 				fclose($FileHandle);
 			}
 		}
 
-		if(file_exists($RunLog))
-		{
+		if(file_exists($RunLog)) {
 			chmod($RunLog, 0755);
 			chown($RunLog, "www-data");
 			chgrp($RunLog, "www-data");
 		}
 
-		if(file_exists($CriticalLog))
-		{
+		if(file_exists($CriticalLog)) {
 			chmod($CriticalLog, 0755);
 			chown($CriticalLog, "www-data");
 			chgrp($CriticalLog, "www-data");

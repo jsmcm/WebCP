@@ -101,13 +101,11 @@ class API_DNS
 
 		$ServerType = $oDNS->GetSetting("server_type");
 		
-		if( $ServerType != "master")
-		{
+		if( $ServerType != "master") {
 			return -2;
 		}
 
-		if( ! file_exists($_SERVER["DOCUMENT_ROOT"]."/includes/protected/key.private"))
-		{
+		if( ! file_exists($_SERVER["DOCUMENT_ROOT"]."/includes/protected/key.private")) {
 			return -3;
 		}
 
@@ -132,7 +130,12 @@ class API_DNS
 			{
 				return -6;
 			}
-			$Return = $oDNS->AddZone($Data->DomainName, $Data->IPv4, $Data->IPv6);
+
+			$dkimKey = "";
+			if ( isset($Data->dkimKey) ) {
+				$dkimKey = $Data->dkimKey;
+			}
+			$Return = $oDNS->AddZone($Data->DomainName, $Data->IPv4, $Data->IPv6, $dkimKey);
 		}
 
 		return $Return;

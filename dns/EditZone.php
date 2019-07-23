@@ -169,16 +169,13 @@ if( ! is_numeric($TTL))
 			Domain = "<?php print $oDNS->RemoveLastPeriod($SOADataArray["Domain"]); ?>";
 
 
-			if(ControlType == 'new')
-			{
+			if(ControlType == 'new') {
 				Name = document.getElementById("New_Name_" + ID);
 				TTL = document.getElementById("New_TTL_" + ID);
 				Type = document.getElementById("New_Type_" + ID);
 				Priority = document.getElementById("New_Priority_" + ID);
 				Record = document.getElementById("New_Record_" + ID);
-			}
-			else
-			{
+			} else {
 				Name = document.getElementById("Name_" + ID);
 				TTL = document.getElementById("TTL_" + ID);
 				Type = document.getElementById("Type_" + ID);
@@ -186,99 +183,70 @@ if( ! is_numeric($TTL))
 				Record = document.getElementById("Record_" + ID);
 			}
 			
-			if( (Name.value == "") && (Record.value == ""))
-			{
+			if( (Name.value == "") && (Record.value == "")) {
 				return Return;
 			}
 
-			if(Name.value.substr(Name.value.length - Domain.length) == Domain)
-			{
+			if(Name.value.substr(Name.value.length - Domain.length) == Domain) {
 				Name.value = Name.value + ".";
 			}
 
-			if(ValidateDomain(Name.value, false) == false)
-			{
+			if(ValidateDomain(Name.value, false) == false) {
 				Name.style.border = "2px red solid";
 				Return = false;
 			}
 
-                        if( isNaN(TTL.value))
-                        {
-                                TTL.style.border = "2px red solid";
+			if( isNaN(TTL.value)) {
+				TTL.style.border = "2px red solid";
 				Return = false;
-                        }
-                        else if(TTL.value == "")
-                        {
-                                TTL.style.border = "2px red solid";
-                        	Return = false;
-                        }
-                        else if(parseInt(TTL.value) < 0)
-                        {
-        	               	TTL.style.border = "2px red solid";
- 	                       	Return = false;
-                        }
-
-			if(Type.value == "A" || Type.value == "AAAA")
-			{
-				if(Type.value == "A")
-				{
-					if(ValidateIPv4(Record.value) == false)
-					{
-						Record.style.border = "2px red solid";
-						Return = false;
-					}
-				}		
-				else if(Type.value == "AAAA")
-				{
-					if(ValidateIPv6(Record.value) == false)
-					{
-						Record.style.border = "2px red solid";
-						Return = false;
-					}
-				}		
+			} else if(TTL.value == "") {
+				TTL.style.border = "2px red solid";
+				Return = false;
+			} else if(parseInt(TTL.value) < 0) {
+				TTL.style.border = "2px red solid";
+				Return = false;
 			}
-			else		
-			{
+
+			if(Type.value == "A" || Type.value == "AAAA") {
+				if(Type.value == "A") {
+					if(ValidateIPv4(Record.value) == false) {
+						Record.style.border = "2px red solid";
+						Return = false;
+					}
+				} else if(Type.value == "AAAA") {
+					if(ValidateIPv6(Record.value) == false) {
+						Record.style.border = "2px red solid";
+						Return = false;
+					}
+				}		
+			} else {
 				// Record should be a domain
-				if(Record.value.length > 0)
-				{
-					if(Type.value != "TXT")
-					{
-						if(Record.value.substr(Record.value.length - 1, 1) != ".")
-						{
+				if(Record.value.length > 0) {
+					if(Type.value != "TXT") {
+						if(Record.value.substr(Record.value.length - 1, 1) != ".") {
 							Record.value = Record.value + ".";
 						}
 					
-						if(ValidateDomain(Record.value, true) == false)
-						{
+						if(ValidateDomain(Record.value, true) == false) {
 							Record.style.border = "2px red solid";
 							Return = false;
 						}
 					}
-				}
-				else
-				{
+				} else {
 					Record.style.border = "2px red solid";
 					Return = false;	
 				}
 			}
 
-			if(Type.value == "MX")
-			{
+			if(Type.value == "MX") {
 				// priority must be a non negative number
-				if( isNaN(Priority.value))
-				{
+				if( isNaN(Priority.value)) {
 					Priority.value = 0;									
 					Priority.style.border = "2px red solid";
 					Return = false;
-				}
-				else if(Priority.value == "")
-				{
+				} else if(Priority.value == "") {
 					Priority.value = 0;									
-				}
-
-				else if(parseInt(Priority.value) < 0)
-				{
+				} else if(parseInt(Priority.value) < 0) {
 					Priority.value = 0;									
 					Priority.style.border = "2px red solid";
 					Return = false;
@@ -347,15 +315,16 @@ if( ! is_numeric($TTL))
 
 		function ValidateDomain(Domain, FQDN)
 		{
+			if ( Domain == "@" ) {
+				return true;
+			}
 
-		if(/^[a-z0-9.\-_]+$/i.test(Domain))
-		{
-		}
-		else
-		{
-			alert(Domain + " is false at 1");
-			return false;
-		}
+			if(/^[a-z0-9.\-_]+$/i.test(Domain))
+			{
+			} else {
+				
+				return false;
+			}
 
 			if(Domain.indexOf("..") > -1)
 			{
@@ -530,35 +499,34 @@ if( ! is_numeric($TTL))
 								<input type="hidden" name="SOAID" value="<?php print $SOADataArray["ID"]; ?>">
 							
 								<?php
-								for($x = 0; $x < $ZoneDataArrayCount; $x++)
-								{
+								for($x = 0; $x < $ZoneDataArrayCount; $x++) {
 									print "<tr id=\"tr_".$ZoneDataArray[$x]["ID"]."\">\r\n";
-										print "<td><input onkeypress=\"ResetBorder(this);\" type=\"text\" name=\"Name_".$ZoneDataArray[$x]["ID"]."\" id=\"Name_".$ZoneDataArray[$x]["ID"]."\" value=\"".$ZoneDataArray[$x]["Domain"]."\" onkeyup=\"AddNewBoxes(".($x + 1).");\" onblur=\"ValidateRow(".$ZoneDataArray[$x]["ID"].", '');\"></td>\r\n";
-										print "<td class=\"narrow\"><input onkeypress=\"ResetBorder(this);\" type=\"number\" name=\"TTL_".$ZoneDataArray[$x]["ID"]."\" id=\"TTL_".$ZoneDataArray[$x]["ID"]."\" value=\"".$ZoneDataArray[$x]["TTL"]."\" onblur=\"ValidateRow(".$ZoneDataArray[$x]["ID"].", '');\"></td>\r\n";
-										print "<td class=\"narrow\"><input  disabled class=\"\" type=\"text\" name=\"Class_".$ZoneDataArray[$x]["ID"]."\" id=\"Class_".$ZoneDataArray[$x]["ID"]."\" value=\"".$ZoneDataArray[$x]["Class"]."\"></td>\r\n";
-										print "<td class=\"narrow\">";
-					
-										print "<select onblur=\"ValidateRow(".$ZoneDataArray[$x]["ID"].", '');\" name=\"Type_".$ZoneDataArray[$x]["ID"]."\" id=\"Type_".$ZoneDataArray[$x]["ID"]."\">";
-										print "<option value=\"A\" ".(($ZoneDataArray[$x]["Type"] == "A")? " selected ": "").">A</option>";
-										print "<option value=\"AAAA\" ".(($ZoneDataArray[$x]["Type"] == "AAAA")? " selected ": "").">AAAA</option>";
-										print "<option value=\"CNAME\" ".(($ZoneDataArray[$x]["Type"] == "CNAME")? " selected ": "").">CNAME</option>";
-										print "<option value=\"NS\" ".(($ZoneDataArray[$x]["Type"] == "NS")? " selected ": "").">NS</option>";
-										print "<option value=\"MX\" ".(($ZoneDataArray[$x]["Type"] == "MX")? " selected ": "").">MX</option>";
-										print "<option value=\"TXT\" ".(($ZoneDataArray[$x]["Type"] == "TXT")? " selected ": "").">TXT</option>";
+									print "<td><input onkeypress=\"ResetBorder(this);\" type=\"text\" name=\"Name_".$ZoneDataArray[$x]["ID"]."\" id=\"Name_".$ZoneDataArray[$x]["ID"]."\" value=\"".$ZoneDataArray[$x]["Domain"]."\" onkeyup=\"AddNewBoxes(".($x + 1).");\" onblur=\"ValidateRow(".$ZoneDataArray[$x]["ID"].", '');\"></td>\r\n";
+									print "<td class=\"narrow\"><input onkeypress=\"ResetBorder(this);\" type=\"number\" name=\"TTL_".$ZoneDataArray[$x]["ID"]."\" id=\"TTL_".$ZoneDataArray[$x]["ID"]."\" value=\"".$ZoneDataArray[$x]["TTL"]."\" onblur=\"ValidateRow(".$ZoneDataArray[$x]["ID"].", '');\"></td>\r\n";
+									print "<td class=\"narrow\"><input  disabled class=\"\" type=\"text\" name=\"Class_".$ZoneDataArray[$x]["ID"]."\" id=\"Class_".$ZoneDataArray[$x]["ID"]."\" value=\"".$ZoneDataArray[$x]["Class"]."\"></td>\r\n";
+									print "<td class=\"narrow\">";
+				
+									print "<select onblur=\"ValidateRow(".$ZoneDataArray[$x]["ID"].", '');\" name=\"Type_".$ZoneDataArray[$x]["ID"]."\" id=\"Type_".$ZoneDataArray[$x]["ID"]."\">";
+									print "<option value=\"A\" ".(($ZoneDataArray[$x]["Type"] == "A")? " selected ": "").">A</option>";
+									print "<option value=\"AAAA\" ".(($ZoneDataArray[$x]["Type"] == "AAAA")? " selected ": "").">AAAA</option>";
+									print "<option value=\"CNAME\" ".(($ZoneDataArray[$x]["Type"] == "CNAME")? " selected ": "").">CNAME</option>";
+									print "<option value=\"NS\" ".(($ZoneDataArray[$x]["Type"] == "NS")? " selected ": "").">NS</option>";
+									print "<option value=\"MX\" ".(($ZoneDataArray[$x]["Type"] == "MX")? " selected ": "").">MX</option>";
+									print "<option value=\"TXT\" ".(($ZoneDataArray[$x]["Type"] == "TXT")? " selected ": "").">TXT</option>";
 
-										print "</select>";
-										print "</td>\r\n";
+									print "</select>";
+									print "</td>\r\n";
 
-										$Priority = "";
-										$Record = $ZoneDataArray[$x]["Value1"];
-										if($ZoneDataArray[$x]["Type"] == "MX")
-										{
-											$Priority = $ZoneDataArray[$x]["Value1"];
-											$Record = $ZoneDataArray[$x]["Value2"];
-										}
-										print "<td class=\"narrow\"><input onkeyup=\"ResetBorder(this);\" onblur=\"ValidateRow(".$ZoneDataArray[$x]["ID"].", '');\" type=\"number\" name=\"Priority_".$ZoneDataArray[$x]["ID"]."\" id=\"Priority_".$ZoneDataArray[$x]["ID"]."\" value=\"".$Priority."\"></td>\r\n";
-										print "<td><input onkeyup=\"ResetBorder(this);\" type=\"text\"  onblur=\"ValidateRow(".$ZoneDataArray[$x]["ID"].", '');\" name=\"Record_".$ZoneDataArray[$x]["ID"]."\" id=\"Record_".$ZoneDataArray[$x]["ID"]."\" value=\"".htmlspecialchars($Record)."\"></td>\r\n";
-										print "<td><a role=\"menuitem\" onclick=\"return DeleteRow(".$ZoneDataArray[$x]["ID"].", ''); return false;\"><i class=\"fa fa-times\"></i> Delete Row</a></td>\r\n";
+									$Priority = "";
+									$Record = $ZoneDataArray[$x]["Value1"];
+									if($ZoneDataArray[$x]["Type"] == "MX") {
+										$Priority = $ZoneDataArray[$x]["Value1"];
+										$Record = $ZoneDataArray[$x]["Value2"];
+									}
+									
+									print "<td class=\"narrow\"><input onkeyup=\"ResetBorder(this);\" onblur=\"ValidateRow(".$ZoneDataArray[$x]["ID"].", '');\" type=\"number\" name=\"Priority_".$ZoneDataArray[$x]["ID"]."\" id=\"Priority_".$ZoneDataArray[$x]["ID"]."\" value=\"".$Priority."\"></td>\r\n";
+									print "<td><input onkeyup=\"ResetBorder(this);\" type=\"text\"  onblur=\"ValidateRow(".$ZoneDataArray[$x]["ID"].", '');\" name=\"Record_".$ZoneDataArray[$x]["ID"]."\" id=\"Record_".$ZoneDataArray[$x]["ID"]."\" value=\"".htmlspecialchars($Record)."\"></td>\r\n";
+									print "<td><a role=\"menuitem\" onclick=\"return DeleteRow(".$ZoneDataArray[$x]["ID"].", ''); return false;\"><i class=\"fa fa-times\"></i> Delete Row</a></td>\r\n";
 									print "</tr>\r\n";
 								}
 
