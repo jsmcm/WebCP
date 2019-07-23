@@ -1703,32 +1703,29 @@ class DNS
 	function AddRRS($SOAID, $Domain, $Type, $Value1, $Value2="", $Value3="", $Value4="", $Value5="", $Value6="", $Value7="", $Value8="", $Value9="", $Value10="", $TTL="", $Class="IN")
 	{
 		
-		if($TTL == "")
-		{
+		if($TTL == "") {
 			$TTL = $this->GetSetting("ttl");
 		}
 	        
-		if( (is_numeric($TTL) == false) || ($TTL < 0) )
-	        {
-	                $TTL = 7200;
-	        }
+		if( (is_numeric($TTL) == false) || ($TTL < 0) ) {
+			$TTL = 7200;
+		}
 	
 
-		try
-		{
+		try {
 			$query = $this->DatabaseConnection->prepare("INSERT INTO rrs VALUES (0, :soa_id, :domain, :ttl, :class, :type, :value1, :value2, :value3, :value4, :value5, :value6, :value7, :value8, :value9, :value10, 0)");
 			
-			$Value1 = html_entity_decode($Value1);
-			$Value2 = html_entity_decode($Value2);
-			$Value3 = html_entity_decode($Value3);
-			$Value4 = html_entity_decode($Value4);
-			$Value5 = html_entity_decode($Value5);
+			$Value1 = htmlspecialchars_decode($Value1);
+			$Value2 = htmlspecialchars_decode($Value2);
+			$Value3 = htmlspecialchars_decode($Value3);
+			$Value4 = htmlspecialchars_decode($Value4);
+			$Value5 = htmlspecialchars_decode($Value5);
 			
-			$Value6 = html_entity_decode($Value6);
-			$Value7 = html_entity_decode($Value7);
-			$Value8 = html_entity_decode($Value8);
-			$Value9 = html_entity_decode($Value9);
-			$Value10 = html_entity_decode($Value10);
+			$Value6 = htmlspecialchars_decode($Value6);
+			$Value7 = htmlspecialchars_decode($Value7);
+			$Value8 = htmlspecialchars_decode($Value8);
+			$Value9 = htmlspecialchars_decode($Value9);
+			$Value10 = htmlspecialchars_decode($Value10);
 			
 			$query->bindParam(":soa_id", $SOAID);
 			$query->bindParam(":domain", $Domain);
@@ -1750,33 +1747,30 @@ class DNS
 		
 			$query->execute();
 			return $this->DatabaseConnection->lastInsertId();
+		} catch(PDOException $e) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.DNS.php -> AddRRS(); Error = ".$e);
 		}
-                catch(PDOException $e)
-                {
-                        $oLog = new Log();
-                        $oLog->WriteLog("error", "/class.DNS.php -> AddRRS(); Error = ".$e);
-                }
 	
 		return 0;	
 	}
 
 	function EditRRS($ID, $Domain, $Type, $Value1, $Value2="", $Value3="", $Value4="", $Value5="", $Value6="", $Value7="", $Value8="", $Value9="", $Value10="", $TTL=7200, $Class="IN")
 	{
-		try
-		{
+		try {
 			$query = $this->DatabaseConnection->prepare("UPDATE rrs SET domain = :domain, ttl = :ttl, class = :class, type = :type, value1 = :value1, value2 = :value2, value3 = :value3, value4 = :value4, value5 = :value5, value6 = :value6, value7 = :value7, value8 = :value8, value9 = :value9, value10 = :value10 WHERE id = :id;");
 			
-			$Value1 = html_entity_decode($Value1);
-			$Value2 = html_entity_decode($Value2);
-			$Value3 = html_entity_decode($Value3);
-			$Value4 = html_entity_decode($Value4);
-			$Value5 = html_entity_decode($Value5);
+			$Value1 = htmlspecialchars_decode($Value1);
+			$Value2 = htmlspecialchars_decode($Value2);
+			$Value3 = htmlspecialchars_decode($Value3);
+			$Value4 = htmlspecialchars_decode($Value4);
+			$Value5 = htmlspecialchars_decode($Value5);
 			
-			$Value6 = html_entity_decode($Value6);
-			$Value7 = html_entity_decode($Value7);
-			$Value8 = html_entity_decode($Value8);
-			$Value9 = html_entity_decode($Value9);
-			$Value10 = html_entity_decode($Value10);
+			$Value6 = htmlspecialchars_decode($Value6);
+			$Value7 = htmlspecialchars_decode($Value7);
+			$Value8 = htmlspecialchars_decode($Value8);
+			$Value9 = htmlspecialchars_decode($Value9);
+			$Value10 = htmlspecialchars_decode($Value10);
 
 
 			$query->bindParam(":id", $ID);
@@ -1797,12 +1791,10 @@ class DNS
 			$query->bindParam(":value10", $Value10);
 			
 			$query->execute();
+		} catch(PDOException $e) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.DNS.php -> EditRRS(); Error = ".$e);
 		}
-                catch(PDOException $e)
-                {
-                        $oLog = new Log();
-                        $oLog->WriteLog("error", "/class.DNS.php -> EditRRS(); Error = ".$e);
-                }
 		
 	}
 

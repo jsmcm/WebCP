@@ -46,7 +46,7 @@ foreach($_POST as $key => $val) {
 		$TTL = filter_var($_POST[$New."TTL_".$ID], FILTER_SANITIZE_NUMBER_INT);
 		$Type = filter_var($_POST[$New."Type_".$ID], FILTER_SANITIZE_STRING);
 		$Priority = filter_var($_POST[$New."Priority_".$ID], FILTER_SANITIZE_NUMBER_INT);
-		$Record = filter_var($_POST[$New."Record_".$ID], FILTER_SANITIZE_STRING);
+		$Record = htmlspecialchars_decode(filter_var($_POST[$New."Record_".$ID], FILTER_SANITIZE_STRING));
 
 		if($Name == "" && $Record == "") {
 			if($New == "") {

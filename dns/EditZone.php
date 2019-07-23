@@ -499,35 +499,34 @@ if( ! is_numeric($TTL))
 								<input type="hidden" name="SOAID" value="<?php print $SOADataArray["ID"]; ?>">
 							
 								<?php
-								for($x = 0; $x < $ZoneDataArrayCount; $x++)
-								{
+								for($x = 0; $x < $ZoneDataArrayCount; $x++) {
 									print "<tr id=\"tr_".$ZoneDataArray[$x]["ID"]."\">\r\n";
-										print "<td><input onkeypress=\"ResetBorder(this);\" type=\"text\" name=\"Name_".$ZoneDataArray[$x]["ID"]."\" id=\"Name_".$ZoneDataArray[$x]["ID"]."\" value=\"".$ZoneDataArray[$x]["Domain"]."\" onkeyup=\"AddNewBoxes(".($x + 1).");\" onblur=\"ValidateRow(".$ZoneDataArray[$x]["ID"].", '');\"></td>\r\n";
-										print "<td class=\"narrow\"><input onkeypress=\"ResetBorder(this);\" type=\"number\" name=\"TTL_".$ZoneDataArray[$x]["ID"]."\" id=\"TTL_".$ZoneDataArray[$x]["ID"]."\" value=\"".$ZoneDataArray[$x]["TTL"]."\" onblur=\"ValidateRow(".$ZoneDataArray[$x]["ID"].", '');\"></td>\r\n";
-										print "<td class=\"narrow\"><input  disabled class=\"\" type=\"text\" name=\"Class_".$ZoneDataArray[$x]["ID"]."\" id=\"Class_".$ZoneDataArray[$x]["ID"]."\" value=\"".$ZoneDataArray[$x]["Class"]."\"></td>\r\n";
-										print "<td class=\"narrow\">";
-					
-										print "<select onblur=\"ValidateRow(".$ZoneDataArray[$x]["ID"].", '');\" name=\"Type_".$ZoneDataArray[$x]["ID"]."\" id=\"Type_".$ZoneDataArray[$x]["ID"]."\">";
-										print "<option value=\"A\" ".(($ZoneDataArray[$x]["Type"] == "A")? " selected ": "").">A</option>";
-										print "<option value=\"AAAA\" ".(($ZoneDataArray[$x]["Type"] == "AAAA")? " selected ": "").">AAAA</option>";
-										print "<option value=\"CNAME\" ".(($ZoneDataArray[$x]["Type"] == "CNAME")? " selected ": "").">CNAME</option>";
-										print "<option value=\"NS\" ".(($ZoneDataArray[$x]["Type"] == "NS")? " selected ": "").">NS</option>";
-										print "<option value=\"MX\" ".(($ZoneDataArray[$x]["Type"] == "MX")? " selected ": "").">MX</option>";
-										print "<option value=\"TXT\" ".(($ZoneDataArray[$x]["Type"] == "TXT")? " selected ": "").">TXT</option>";
+									print "<td><input onkeypress=\"ResetBorder(this);\" type=\"text\" name=\"Name_".$ZoneDataArray[$x]["ID"]."\" id=\"Name_".$ZoneDataArray[$x]["ID"]."\" value=\"".$ZoneDataArray[$x]["Domain"]."\" onkeyup=\"AddNewBoxes(".($x + 1).");\" onblur=\"ValidateRow(".$ZoneDataArray[$x]["ID"].", '');\"></td>\r\n";
+									print "<td class=\"narrow\"><input onkeypress=\"ResetBorder(this);\" type=\"number\" name=\"TTL_".$ZoneDataArray[$x]["ID"]."\" id=\"TTL_".$ZoneDataArray[$x]["ID"]."\" value=\"".$ZoneDataArray[$x]["TTL"]."\" onblur=\"ValidateRow(".$ZoneDataArray[$x]["ID"].", '');\"></td>\r\n";
+									print "<td class=\"narrow\"><input  disabled class=\"\" type=\"text\" name=\"Class_".$ZoneDataArray[$x]["ID"]."\" id=\"Class_".$ZoneDataArray[$x]["ID"]."\" value=\"".$ZoneDataArray[$x]["Class"]."\"></td>\r\n";
+									print "<td class=\"narrow\">";
+				
+									print "<select onblur=\"ValidateRow(".$ZoneDataArray[$x]["ID"].", '');\" name=\"Type_".$ZoneDataArray[$x]["ID"]."\" id=\"Type_".$ZoneDataArray[$x]["ID"]."\">";
+									print "<option value=\"A\" ".(($ZoneDataArray[$x]["Type"] == "A")? " selected ": "").">A</option>";
+									print "<option value=\"AAAA\" ".(($ZoneDataArray[$x]["Type"] == "AAAA")? " selected ": "").">AAAA</option>";
+									print "<option value=\"CNAME\" ".(($ZoneDataArray[$x]["Type"] == "CNAME")? " selected ": "").">CNAME</option>";
+									print "<option value=\"NS\" ".(($ZoneDataArray[$x]["Type"] == "NS")? " selected ": "").">NS</option>";
+									print "<option value=\"MX\" ".(($ZoneDataArray[$x]["Type"] == "MX")? " selected ": "").">MX</option>";
+									print "<option value=\"TXT\" ".(($ZoneDataArray[$x]["Type"] == "TXT")? " selected ": "").">TXT</option>";
 
-										print "</select>";
-										print "</td>\r\n";
+									print "</select>";
+									print "</td>\r\n";
 
-										$Priority = "";
-										$Record = $ZoneDataArray[$x]["Value1"];
-										if($ZoneDataArray[$x]["Type"] == "MX")
-										{
-											$Priority = $ZoneDataArray[$x]["Value1"];
-											$Record = $ZoneDataArray[$x]["Value2"];
-										}
-										print "<td class=\"narrow\"><input onkeyup=\"ResetBorder(this);\" onblur=\"ValidateRow(".$ZoneDataArray[$x]["ID"].", '');\" type=\"number\" name=\"Priority_".$ZoneDataArray[$x]["ID"]."\" id=\"Priority_".$ZoneDataArray[$x]["ID"]."\" value=\"".$Priority."\"></td>\r\n";
-										print "<td><input onkeyup=\"ResetBorder(this);\" type=\"text\"  onblur=\"ValidateRow(".$ZoneDataArray[$x]["ID"].", '');\" name=\"Record_".$ZoneDataArray[$x]["ID"]."\" id=\"Record_".$ZoneDataArray[$x]["ID"]."\" value=\"".htmlspecialchars($Record)."\"></td>\r\n";
-										print "<td><a role=\"menuitem\" onclick=\"return DeleteRow(".$ZoneDataArray[$x]["ID"].", ''); return false;\"><i class=\"fa fa-times\"></i> Delete Row</a></td>\r\n";
+									$Priority = "";
+									$Record = $ZoneDataArray[$x]["Value1"];
+									if($ZoneDataArray[$x]["Type"] == "MX") {
+										$Priority = $ZoneDataArray[$x]["Value1"];
+										$Record = $ZoneDataArray[$x]["Value2"];
+									}
+									
+									print "<td class=\"narrow\"><input onkeyup=\"ResetBorder(this);\" onblur=\"ValidateRow(".$ZoneDataArray[$x]["ID"].", '');\" type=\"number\" name=\"Priority_".$ZoneDataArray[$x]["ID"]."\" id=\"Priority_".$ZoneDataArray[$x]["ID"]."\" value=\"".$Priority."\"></td>\r\n";
+									print "<td><input onkeyup=\"ResetBorder(this);\" type=\"text\"  onblur=\"ValidateRow(".$ZoneDataArray[$x]["ID"].", '');\" name=\"Record_".$ZoneDataArray[$x]["ID"]."\" id=\"Record_".$ZoneDataArray[$x]["ID"]."\" value=\"".htmlspecialchars($Record)."\"></td>\r\n";
+									print "<td><a role=\"menuitem\" onclick=\"return DeleteRow(".$ZoneDataArray[$x]["ID"].", ''); return false;\"><i class=\"fa fa-times\"></i> Delete Row</a></td>\r\n";
 									print "</tr>\r\n";
 								}
 
