@@ -61,6 +61,34 @@ $(function(){
     });   
 
 
+    
+    $('[id^="ssh_key_authorise_"]').editable({
+        params: function(params) {
+            params.nonce_timestamp = $(this).editable().data('nonce-timestamp');
+            params.nonce_value = $(this).editable().data('nonce-value');
+            params.domain_id = $(this).editable().data('domain-id');
+            
+            return params;
+    
+        },
+        source: [
+            {value: '0', text: 'Not authorised'},
+            {value: '1', text: 'Authorised'}
+        ],
+        display: function(value, sourceData) {
+
+             var colors = {"": "gray", "0": "red", "1": "green"},
+                 elem = $.grep(sourceData, function(o){return o.value == value;});
+                 
+             if(elem.length) {    
+                 $(this).text(elem[0].text).css("color", colors[value]); 
+             } else {
+                 $(this).empty(); 
+             }
+        }   
+    });   
+
+
     $('[id^="ssl_redirect_"]').editable({
 
         source: [

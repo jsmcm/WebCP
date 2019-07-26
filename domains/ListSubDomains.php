@@ -5,63 +5,66 @@ include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 $oUser = new User();
 $oPackage = new Package();
 $oSettings = new Settings();
+$oSimpleNonce = new SimpleNonce();
 
 require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 
 $ClientID = $oUser->getClientId();
-if($ClientID < 1)
-{
+if($ClientID < 1) {
 	header("Location: /index.php");
 	exit();
 }
 	
 $DomainID = 0;
-if(isset($_REQUEST["DomainID"]))
-{
+if(isset($_REQUEST["DomainID"])) {
 	$DomainID = $_REQUEST["DomainID"];
 }
 
-if( (! is_numeric($DomainID)) || ($DomainID < 1) )
-{
+if( (! is_numeric($DomainID)) || ($DomainID < 1) ) {
 	header("Location: /index.php");
 	exit();
 }
 
 
 	$oDomain = new Domain();
-        $ClientID = $oUser->ClientID;
-        $DomainOwnerClientID = $oDomain->GetDomainOwner($DomainID);
-        $PrimaryDomainName = $oDomain->GetDomainNameFromDomainID($DomainID);
+	$ClientID = $oUser->ClientID;
+	$DomainOwnerClientID = $oDomain->GetDomainOwner($DomainID);
+
+	$nonceArray = [
+		$oUser->Role,
+		$oUser->getClientId(),
+		$DomainID
+	];
+	
+	$nonce = $oSimpleNonce->GenerateNonce("getDomainNameFromDomainID", $nonceArray);
+	$PrimaryDomainName = $oDomain->GetDomainNameFromDomainID($DomainID, $nonce);
 
 	//print "ClientID: ".$ClientID."<p>";
 	//print "DomainOwnerClientID: ".$DomainOwnerClientID."<p>";
 	//print "Role: ".$oUser->Role."<p>";
 
-	if( ($DomainOwnerClientID != $ClientID) && ($oUser->Role == 'client') )
-	{
+	if( ($DomainOwnerClientID != $ClientID) && ($oUser->Role == 'client') ) {
 		die("You do not have permission to be here...");
 	}
 
 
-        $DomainUserName = "";
-        $SubDomainAllowance = -1;
-        $SubDomainUsage = -1;
+	$DomainUserName = "";
+	$SubDomainAllowance = -1;
+	$SubDomainUsage = -1;
 
-        if($DomainID > -1)
-        {
-                $DomainInfoArray = array();
-                $oDomain->GetDomainInfo($DomainID, $DomainInfoArray);
+	if($DomainID > -1) {
+		$DomainInfoArray = array();
+		$oDomain->GetDomainInfo($DomainID, $DomainInfoArray);
 
-                $DomainUserName = $DomainInfoArray["UserName"];
-                $SubDomainAllowance = $oPackage->GetPackageAllowance("SubDomains", $DomainInfoArray["PackageID"]);
-                $SubDomainUsage = $oPackage->GetSubDomainUsage($DomainUserName);
+		$DomainUserName = $DomainInfoArray["UserName"];
+		$SubDomainAllowance = $oPackage->GetPackageAllowance("SubDomains", $DomainInfoArray["PackageID"]);
+		$SubDomainUsage = $oPackage->GetSubDomainUsage($DomainUserName);
 
-                //print "SubDomainAllowance: ".$SubDomainAllowance."<br>";
-                //print "SubDomainUsage: ".$SubDomainUsage."<br>";
-                //print "DomainID: ".$DomainID."<br>";
-                //print "DomainUserName: ".$DomainUserName."<br>";
-
-        }
+		//print "SubDomainAllowance: ".$SubDomainAllowance."<br>";
+		//print "SubDomainUsage: ".$SubDomainUsage."<br>";
+		//print "DomainID: ".$DomainID."<br>";
+		//print "DomainUserName: ".$DomainUserName."<br>";
+	}
 
 
 

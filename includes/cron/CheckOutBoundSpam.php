@@ -145,7 +145,7 @@ if($SpamAction == "block")
 		if ( $domainId > -1 ) {
 
 			$oDomain->GetDomainInfo($domainId, $infoArray);
-			touch ( dirname(__FILE__)."/../../nm/".$infoArray["UserName"].".mailpasswordtt", 0755 );
+			touch ( dirname(__FILE__)."/../../nm/".$infoArray["UserName"].".mailpassword", 0755 );
 		}
 	}
 }

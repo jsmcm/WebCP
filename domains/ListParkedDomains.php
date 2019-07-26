@@ -4,44 +4,53 @@ session_start();
 include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 
 $oUser = new User();
-
 $oPackage = new Package();
-
 $oSettings = new Settings();
+$oSimpleNonce = new SimpleNonce();
 
 require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 
 $ClientID = $oUser->getClientId();
-if($ClientID < 1)
-{
+if($ClientID < 1) {
 	header("Location: /index.php");
 	exit();
 }
 	
 $DomainID = 0;
-if(isset($_REQUEST["DomainID"]))
-{
-	$DomainID = $_REQUEST["DomainID"];
+if(isset($_REQUEST["DomainID"])) {
+	$DomainID = intVal($_REQUEST["DomainID"]);
 }
 
-if( (! is_numeric($DomainID)) || ($DomainID < 1) )
-{
+if( (! is_numeric($DomainID)) || ($DomainID < 1) ) {
 	header("Location: /index.php");
 	exit();
 }
 
 	$oDomain = new Domain();
-        $ClientID = $oUser->ClientID;
-        $DomainOwnerClientID = $oDomain->GetDomainOwner($DomainID);
-        $PrimaryDomainName = $oDomain->GetDomainNameFromDomainID($DomainID);
+	$ClientID = $oUser->ClientID;
+	$DomainOwnerClientID = $oDomain->GetDomainOwner($DomainID);
+
+	$nonceArray = [
+		$oUser->Role,$nonceArray = [
+			$oUser->Role,
+			$oUser->getClientId(),
+			$DomainID
+		];
+		
+		$nonce = $oSimpleNonce->GenerateNonce("getDomainNameFromDomainID", $nonceArray);
+		$oUser->getClientId(),
+		$DomainID
+	];
+	
+	$nonce = $oSimpleNonce->GenerateNonce("getDomainNameFromDomainID", $nonceArray);
+	$PrimaryDomainName = $oDomain->GetDomainNameFromDomainID($DomainID, $nonce);
 
 	//print "ClientID: ".$ClientID."<p>";
 	//print "DomainOwnerClientID: ".$DomainOwnerClientID."<p>";
 	//print "Role: ".$oUser->Role."<p>";
 
-	if( ($DomainOwnerClientID != $ClientID) && ($oUser->Role != 'admin') )
-	{
-		die("You do not have permission to be here...");
+	if( ($DomainOwnerClientID != $ClientID) && ($oUser->Role != 'admin') ) {
+		throw new Exception("You do not have permission to be here...");
 	}
 
 

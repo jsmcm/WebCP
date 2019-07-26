@@ -7,18 +7,17 @@ $oDNS = new DNS();
 $oSettings = new Settings();
 $oUtils = new Utils();
 $oDatabase = new Database();
+$oSimpleNonce = new SimpleNonce();
 
 require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 
 $ClientID = $oUser->getClientId();
-if($ClientID < 1)
-{
+if($ClientID < 1) {
 	header("Location: /index.php");
 	exit();
 }
 
-if($oUser->Role != "admin")
-{
+if($oUser->Role != "admin") {
 	header("location: /domains/index.php?Notes=You don't have permission to be there&NoteType=error");
 	exit();
 }
@@ -26,171 +25,7 @@ if($oUser->Role != "admin")
 
 $oDNS->GenerateKeyFiles();
 
-if($oDatabase->TableExists("soa") == false)
-{
-        $TableName = "soa";
-
-        $TableInfoArray[0]["name"] = "id";
-        $TableInfoArray[0]["type"] = "int";
-        $TableInfoArray[0]["key"] = "primary key auto_increment";
-        $TableInfoArray[0]["default"] = "";
-
-        $TableInfoArray[1]["name"] = "client_id";
-        $TableInfoArray[1]["type"] = "int";
-        $TableInfoArray[1]["key"] = "";
-        $TableInfoArray[1]["default"] = "";
-
-        $TableInfoArray[2]["name"] = "domain";
-        $TableInfoArray[2]["type"] = "tinytext";
-        $TableInfoArray[2]["key"] = "";
-        $TableInfoArray[2]["default"] = "";
-
-        $TableInfoArray[3]["name"] = "ttl";
-        $TableInfoArray[3]["type"] = "int";
-        $TableInfoArray[3]["key"] = "";
-        $TableInfoArray[3]["default"] = "";
-
-        $TableInfoArray[4]["name"] = "name_server";
-        $TableInfoArray[4]["type"] = "tinytext";
-        $TableInfoArray[4]["key"] = "";
-        $TableInfoArray[4]["default"] = "";
-
-        $TableInfoArray[5]["name"] = "email_address";
-        $TableInfoArray[5]["type"] = "tinytext";
-        $TableInfoArray[5]["key"] = "";
-        $TableInfoArray[5]["default"] = "";
-
-        $TableInfoArray[6]["name"] = "serial_number";
-        $TableInfoArray[6]["type"] = "int";
-        $TableInfoArray[6]["key"] = "";
-        $TableInfoArray[6]["default"] = "";
-
-        $TableInfoArray[7]["name"] = "refresh";
-        $TableInfoArray[7]["type"] = "int";
-        $TableInfoArray[7]["key"] = "";
-        $TableInfoArray[7]["default"] = "";
-        $TableInfoArray[8]["name"] = "retry";
-        $TableInfoArray[8]["type"] = "int";
-        $TableInfoArray[8]["key"] = "";
-        $TableInfoArray[8]["default"] = "";
-
-        $TableInfoArray[9]["name"] = "expire";
-        $TableInfoArray[9]["type"] = "int";
-        $TableInfoArray[9]["key"] = "";
-        $TableInfoArray[9]["default"] = "";
-
-        $TableInfoArray[10]["name"] = "negative_ttl";
-        $TableInfoArray[10]["type"] = "int";
-        $TableInfoArray[10]["key"] = "";
-        $TableInfoArray[10]["default"] = "";
-
-        $TableInfoArray[11]["name"] = "status";
-        $TableInfoArray[11]["type"] = "tinytext";
-        $TableInfoArray[11]["key"] = "";
-        $TableInfoArray[11]["default"] = "";
-
-        $TableInfoArray[12]["name"] = "deleted";
-        $TableInfoArray[12]["type"] = "int";
-        $TableInfoArray[12]["key"] = "";
-        $TableInfoArray[12]["default"] = "0";
-
-        $oDatabase->CreateTableFromArray($TableName, $TableInfoArray);
-}
-
-if($oDatabase->TableExists("rrs") == false)
-{
-        $TableName = "rrs";
-
-        $TableInfoArray[0]["name"] = "id";
-        $TableInfoArray[0]["type"] = "int";
-        $TableInfoArray[0]["key"] = "primary key auto_increment";
-        $TableInfoArray[0]["default"] = "";
-
-        $TableInfoArray[1]["name"] = "soa_id";
-        $TableInfoArray[1]["type"] = "int";
-        $TableInfoArray[1]["key"] = "";
-        $TableInfoArray[1]["default"] = "";
-
-        $TableInfoArray[2]["name"] = "domain";
-        $TableInfoArray[2]["type"] = "tinytext";
-        $TableInfoArray[2]["key"] = "";
-        $TableInfoArray[2]["default"] = "";
-        $TableInfoArray[3]["name"] = "ttl";
-        $TableInfoArray[3]["type"] = "int";
-        $TableInfoArray[3]["key"] = "";
-        $TableInfoArray[3]["default"] = "";
-
-        $TableInfoArray[4]["name"] = "class";
-        $TableInfoArray[4]["type"] = "tinytext";
-        $TableInfoArray[4]["key"] = "";
-        $TableInfoArray[4]["default"] = "";
-
-        $TableInfoArray[5]["name"] = "type";
-        $TableInfoArray[5]["type"] = "tinytext";
-        $TableInfoArray[5]["key"] = "";
-        $TableInfoArray[5]["default"] = "";
-
-        $TableInfoArray[6]["name"] = "value1";
-        $TableInfoArray[6]["type"] = "tinytext";
-        $TableInfoArray[6]["key"] = "";
-        $TableInfoArray[6]["default"] = "";
-
-        $TableInfoArray[7]["name"] = "value2";
-        $TableInfoArray[7]["type"] = "tinytext";
-        $TableInfoArray[7]["key"] = "";
-        $TableInfoArray[7]["default"] = "";
-
-        $TableInfoArray[8]["name"] = "value3";
-        $TableInfoArray[8]["type"] = "tinytext";
-        $TableInfoArray[8]["key"] = "";
-        $TableInfoArray[8]["default"] = "";
-
-        $TableInfoArray[9]["name"] = "value4";
-        $TableInfoArray[9]["type"] = "tinytext";
-        $TableInfoArray[9]["key"] = "";
-        $TableInfoArray[9]["default"] = "";
-
-        $TableInfoArray[10]["name"] = "value5";
-        $TableInfoArray[10]["type"] = "tinytext";
-        $TableInfoArray[10]["key"] = "";
-        $TableInfoArray[10]["default"] = "";
-
-        $TableInfoArray[11]["name"] = "value6";
-        $TableInfoArray[11]["type"] = "tinytext";
-        $TableInfoArray[11]["key"] = "";
-        $TableInfoArray[11]["default"] = "";
-        $TableInfoArray[12]["name"] = "value7";
-        $TableInfoArray[12]["type"] = "tinytext";
-        $TableInfoArray[12]["key"] = "";
-        $TableInfoArray[12]["default"] = "";
-
-        $TableInfoArray[13]["name"] = "value8";
-        $TableInfoArray[13]["type"] = "tinytext";
-        $TableInfoArray[13]["key"] = "";
-        $TableInfoArray[13]["default"] = "";
-
-        $TableInfoArray[14]["name"] = "value9";
-        $TableInfoArray[14]["type"] = "tinytext";
-        $TableInfoArray[14]["key"] = "";
-        $TableInfoArray[14]["default"] = "";
-
-        $TableInfoArray[15]["name"] = "value10";
-        $TableInfoArray[15]["type"] = "tinytext";
-        $TableInfoArray[15]["key"] = "";
-        $TableInfoArray[15]["default"] = "";
-
-        $TableInfoArray[16]["name"] = "deleted";
-        $TableInfoArray[16]["type"] = "int";
-        $TableInfoArray[16]["key"] = "";
-        $TableInfoArray[16]["default"] = "0";
-
-        $oDatabase->CreateTableFromArray($TableName, $TableInfoArray);
-}
-
-
-
-
-
+include dirname(__FILE__)."/dns_db.php";
 
 
 $TTL = 7200;
@@ -201,35 +36,29 @@ $Expire = 1209600;
 $EmailAddress = "";
 
 $ServerType = $oDNS->GetSetting("server_type");
-if( $ServerType == "master")
-{
+if( $ServerType == "master") {
 	$TTL = $oDNS->GetSetting("ttl");
-	if( (is_numeric($TTL) == false) || ($TTL < 0) )
-	{
+	if( (is_numeric($TTL) == false) || ($TTL < 0) ) {
 		$TTL = 7200;
 	}
 
 	$NegativeTTL = $oDNS->GetSetting("negative_ttl");
-	if( (is_numeric($NegativeTTL) == false) || ($NegativeTTL < 0) )
-	{
+	if( (is_numeric($NegativeTTL) == false) || ($NegativeTTL < 0) ) {
 		$NegativeTTL = 7200;
 	}
 
 	$Refresh = $oDNS->GetSetting("refresh");
-	if( (is_numeric($Refresh) == false) || ($Refresh < 0) )
-	{
+	if( (is_numeric($Refresh) == false) || ($Refresh < 0) ) {
 		$Refresh = 1800;
 	}
 
 	$Retry = $oDNS->GetSetting("retry");
-	if( (is_numeric($Retry) == false) || ($Retry < 0) )
-	{
+	if( (is_numeric($Retry) == false) || ($Retry < 0) ) {
 		$Retry = 7200;
 	}
 
 	$Expire = $oDNS->GetSetting("expire");
-	if( (is_numeric($Expire) == false) || ($Expire < 0) )
-	{
+	if( (is_numeric($Expire) == false) || ($Expire < 0) ) {
 		$Expire = 1209600;
 	}
 
@@ -237,22 +66,16 @@ if( $ServerType == "master")
 
 
 	$PrimaryNameServer = $oDNS->GetSetting("primary_name_server");
-        if($PrimaryNameServer == "")
-        {
-        	$PrimaryNameServer = $_SERVER["SERVER_NAME"];
-        }
+	if($PrimaryNameServer == "") {
+		$PrimaryNameServer = $_SERVER["SERVER_NAME"];
+	}
 
-
-}
-else if($ServerType == "slave")
-{
+} else if($ServerType == "slave") {
 	$MasterHostName = $oDNS->GetSetting("master_host_name");
 	$MasterIPAddress = $oDNS->GetSetting("master_ip_address");
 	$MasterPassword = $oDNS->GetSetting("master_password");
 	$MasterPublicKey = $oDNS->GetSetting("master_public_key");
-}
-else
-{
+} else {
 	$ServerType == "no_dns";
 }
 
