@@ -2,45 +2,45 @@
 session_start();
 
 include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
-$oDNS = new DNS();
-$oDatabase = new Database();
-$oUtils = new Utils();
+
 $oUser = new User();
-$oLog = new Log();
 $oSettings = new Settings();
-$oReseller = new Reseller();
+$oUtils = new Utils();
+$oDomain = new Domain();
 $oSimpleNonce = new SimpleNonce();
+$oReseller = new Reseller();
+$oSSH = new SSH();
 
 require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 
-$oDNS->GenerateKeyFiles();
-
 $ClientID = $oUser->getClientId();
-
-include dirname(__FILE__)."/dns_db.php";
-
-
 if($ClientID < 1) {
-	$oLog->WriteLog("DEBUG", "/dns/index.php -> client_id not set, redirecting to /index.php");
 	header("Location: /index.php");
 	exit();
 }
-	
-$oLog->WriteLog("DEBUG", "/dns/index.php -> client_id set, continuing");
 
-if($oUser->Role != "admin") {
-	header("location: /dns/index.php?Notes=You don't have permission to be there&NoteType=Error");
-	exit();
+// can this client edit this domain?
+$domainId = intVal( $_REQUEST["domainId"] );
+$clientId = $ClientID;
+$clientRole = $oUser->Role;
+$domainOwnerId = $oDomain->GetDomainOwner($domainId);
+$resellerId = $oReseller->GetClientResellerID($domainOwnerId);
+
+if ( $clientId != $domainOwnerId ) {
+	if ( $resellerId != $clientId ) {
+		header("Location: index.php?Notes=You don't have permission to edit that domain&NoteType=error");
+		exit();
+	}
 }
 
-$ServerType = $oDNS->GetSetting("server_type");
+$nonceArray = [
+	$oUser->Role,
+	$clientId,
+	$domainId
+];
 
-if( $ServerType == "") {
-	header("Location: settings.php?Notes=The DNS settings for this server are not set&NoteType=Error");
-	exit();
-}
-
-
+$nonce = $oSimpleNonce->GenerateNonce("getDomainNameFromDomainID", $nonceArray);
+$domainName = $oDomain->GetDomainNameFromDomainID( $domainId, $nonce);
 
 ?>
 
@@ -52,7 +52,7 @@ if( $ServerType == "") {
 	<!--<![endif]-->
 	<!-- start: HEAD -->
 	<head>
-		<title>DNS Management | <?php print $oSettings->GetWebCPTitle(); ?></title>
+		<title>Add Public Key | <?php print $oSettings->GetWebCPTitle(); ?></title>
 		<!-- start: META -->
 		<meta charset="utf-8" />
 		<!--[if IE]><meta http-equiv='X-UA-Compatible' content="IE=edge,IE=9,IE=8,chrome=1" /><![endif]-->
@@ -79,25 +79,20 @@ if( $ServerType == "") {
 		<!-- start: CSS REQUIRED FOR THIS PAGE ONLY -->
 		<link rel="stylesheet" type="text/css" href="/assets/plugins/select2/select2.css" />
 		<link rel="stylesheet" href="/assets/plugins/DataTables/media/css/DT_bootstrap.css" />
+		<link rel="stylesheet" href="assets/plugins/ladda-bootstrap/dist/ladda-themeless.min.css">
+
+		<link rel="stylesheet" href="/assets/plugins/bootstrap-switch/static/stylesheets/bootstrap-switch.css">
+
+		<link rel="stylesheet" href="/assets/plugins/bootstrap-social-buttons/social-buttons-3.css">
+
+		<link href="/assets/plugins/bootstrap-modal/css/bootstrap-modal-bs3patch.css" rel="stylesheet" type="text/css"/>
+
+		<link href="/assets/plugins/bootstrap-modal/css/bootstrap-modal.css" rel="stylesheet" type="text/css"/>
+
 		<!-- end: CSS REQUIRED FOR THIS PAGE ONLY -->
 		<link rel="shortcut icon" href="/favicon.ico" />
 		
 		
-		<script language="javascript">
-		function ConfirmDelete(DNSName)
-		{
-			if(confirm("Are you sure you want to delete " + DNSName + "?\r\nWARNING: This will stop the website / emails working if this is the authoritive name server for the domain"))
-			{
-				return true;
-			}
-			return false;
-		}
-		
-		</script>
-		
-		
-
-
 	</head>
 	<!-- end: HEAD -->
 	<!-- start: BODY -->
@@ -162,23 +157,30 @@ if( $ServerType == "") {
 							<!-- start: PAGE TITLE & BREADCRUMB -->
 							<ol class="breadcrumb">
 								<li>
-									<i class="active"></i>
-									<a href="/dns/">
-										DNS
+									<a href="/ssh/">
+										SSH
 									</a>
 								</li>
+								<li>
+									<i class="active"></i>
+									
+										Add Key
+									
+								</li>
+					
 					
 							</ol>
 							<div class="page-header">
-								<h1>DNS <small>Add / edit DNS</small></h1>
+								<h1>Add Public Key for <?php print $domainName; ?></h1>
 							</div>
 							<!-- end: PAGE TITLE & BREADCRUMB -->
 						</div>
 					</div>
 					<!-- end: PAGE HEADER -->
 					<!-- start: PAGE CONTENT -->
-
 					<div class="row">
+					
+			
 					<?php
 					if(isset($_REQUEST["Notes"]))
 					{
@@ -189,7 +191,7 @@ if( $ServerType == "") {
 							$NoteType = $_REQUEST["NoteType"];
 						}
 						
-						if(strtolower($NoteType) == "error")
+						if($NoteType == "Error")
 						{
 							print "<div class=\"alert alert-danger\">";
 								print "<button data-dismiss=\"alert\" class=\"close\">";
@@ -211,126 +213,97 @@ if( $ServerType == "") {
 						print "</div>";
 					
 					}
-					?>
+					
+					$nonceArray = [
+						$oUser->Role,
+						$clientId,
+						$domainName,
+						$domainId
+					];
+
+					$nonce = $oSimpleNonce->GenerateNonce("doAddKey.php", $nonceArray);
+					?>					
+
+
+					<form name="PublicKey" action="doAddKey.php" method="post">
+					<input type="hidden" name="domainName" value="<?php print $domainName; ?>">
+					<input type="hidden" name="domainId" value="<?php print $domainId; ?>">
+					<input type="hidden" name="nonce" value="<?php print $nonce["Nonce"]; ?>">
+					<input type="hidden" name="timeStamp" value="<?php print $nonce["TimeStamp"]; ?>">
+
+					<div class="col-md-12">
+
+						<div class="panel panel-default">
+
+							<div class="panel-body">
+	
+							<h1>Add Public Key</h1>
+
+							<p>
+	
+							<div class="form-group" style="padding-bottom: 50px;">
+								<label class="col-sm-2 control-label">
+								<b>Label</b>:<br>
+								<i>eg, John's Laptop</i>
+								</label>
+								<div class="col-sm-8">
+									<span class="input-icon">
+									<input type="text" class="form-control" name="keyName">
+									</span>
+								</div>
+							</div>
+							
+							<div class="form-group" style="padding-bottom: 50px;">
+								<label class="col-sm-2 control-label">
+								<b>Public Key</b>:<br>
+								<i>Paste your public key here</i> <a href="https://docs.webcp.io/docs/ssh/generate-public-key/" target="_new"><img src="/img/help.png" width="20px"></a>
+								</label>
+								<div class="col-sm-8">
+									<span class="input-icon">
+									<textarea class="form-control" name="publicKey" style="height: 250px;"></textarea>
+									</span>
+								</div>
+							</div>
+							
+							</div>
+
+						</div>
+					</div>
 					
 
 
-						<div class="col-md-12">
-							<!-- start: DYNAMIC TABLE PANEL -->
-							<div class="panel panel-default">
-									
-								<div class="panel-body">
+					<div class="col-md-12">
 
-									<?php
-									if($ServerType == "slave")
-									{
-										print "<b>This server is a DNS slave. You can add / edit zones on the master server</b><p>";
-									}
-									?>
-									<table class="table table-bordered table-full-width" id="sample_1">
-										<thead>
-											<tr>
-												<th>DNS</th>
-												<th>&nbsp;</th>
-											</tr>
-										</thead>
-										
-										
-										<tbody>
-
-										<?php
-										$Array = array();
-										$ArrayCount = 0;
-										$oDNS->GetSOAList($Array, $ArrayCount);
-
-										for($x = 0; $x < $ArrayCount; $x++)
-										{
-											print "<tr>";
-												$Domain = $oDNS->RemoveLastPeriod($Array[$x]["Domain"]);
-												print "<td><a href=\"http://".$Domain."\" target=\"_BLANK\">".$Domain."</a></td>\r\n";
-												if(($oUser->Role == "admin") || ($oUser->Role == "reseller"))
-												{
-
-													print "<td class=\"center\">";
-													
-													if($ServerType == "master")
-													{
-													print "<div class=\"visible-md visible-lg hidden-sm hidden-xs\">";
-														
-														print "<a href=\"EditZone.php?ID=".$Array[$x]["ID"]."\" class=\"btn btn-green tooltips\" data-placement=\"top\" data-original-title=\"Edit Zone\"><i class=\"fa fa-edit fa fa-white\" style=\"color:white;\"></i></a>\n";
-														print "<a href=\"DeleteZone.php?ZoneName=".$Domain."\" onclick=\"return ConfirmDelete('".$Domain."'); return false;\" class=\"btn btn-bricky tooltips\" data-placement=\"top\" data-original-title=\"Delete Zone\"><i class=\"fa fa-times fa fa-white\" style=\"color:white;\"></i></a>\n";
-													print "</div>";
-													print "<div class=\"visible-xs visible-sm hidden-md hidden-lg\">";
-														print "<div class=\"btn-group\">";
-															print "<a class=\"btn btn-primary dropdown-toggle btn-sm\" data-toggle=\"dropdown\" href=\"#\">";
-																print "<i class=\"fa fa-cog\"></i> <span class=\"caret\"></span>";
-															print "</a>";
-															print "<ul role=\"menu\" class=\"dropdown-menu pull-right\">";
-															
-																print "<li role=\"presentation\">";
-																	print "<a role=\"menuitem\" tabindex=\"-1\" href=\"EditZone.php?ID=".$Array[$x]["ID"]."\">";
-																	print "<i class=\"fa fa-ban\"></i> Edit Zone";
-																	print "</a>";
-																print "</li>";
-																
-																print "<li role=\"presentation\">";
-																	print "<a role=\"menuitem\" tabindex=\"-1\" href=\"DeleteZone.php?ZoneName=".$Domain."\" onclick=\"return ConfirmDelete('".$Domain."'); return false;\">";
-																		print "<i class=\"fa fa-times\"></i> Delete Zone";
-																	print "</a>";
-																print "</li>";																
-															print "</ul>";
-														print "</div>";
-													print "</div>";
-
-													}
-												
-													print "</td>";				
-												}
-											
-										
-												print "</tr>";
-										}
-										?>
 	
-									</tbody>
-									
-									</table>
-						
-									<?php
-									if($ServerType == "master")
-									{	
-									?>
-										<a class="btn btn-primary" href="AddZone.php"><i class="fa fa-plus"></i>
-										Add new Zone</a>
-									<?php
-									}
-									?>
-								</div>
+							<div class="form-group" style="padding-bottom: 50px;">
+
+								<button type="submit" data-style="zoom-in" class="btn btn-info ladda-button" onclick="return ValidateForm(); return false;">
+								Add Key
+								<span class="ladda-spinner"></span>
+								<span class="ladda-progress" style="width: 0px;"></span>
+								</button>
 							</div>
+					</div>
 
-							<?php
-							if ( $ServerType == "master" ) {
-							?>
-							[ <a href="RecreateAllZones.php">Recreate all zones</a> ]
-							<p>
-							<?php
-							}
-							?>
+					</form>
 
-							<?php
-							if($oUser->Role == "admin")
-							{
-							?>
-							<b>
-							<a href="https://api.webcp.io/com.php" target="_new">Click here to order .com, .net. .org, etc domain names</a>
-							<br>
-							<a href="https://api.webcp.io/coza.php" target="_new">Click here to order co.za domain names</a>
-							</b>
-							<?php
-							}
-							?>
 
-							<!-- end: DYNAMIC TABLE PANEL -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 						</div>
 					</div>
 					<!-- end: PAGE CONTENT-->
@@ -349,6 +322,8 @@ if( $ServerType == "") {
 			</div>
 		</div>
 		<!-- end: FOOTER -->
+
+
 		<!-- start: MAIN JAVASCRIPTS -->
 		<!--[if lt IE 9]>
 		<script src="/assets/plugins/respond.min.js"></script>
@@ -371,20 +346,26 @@ if( $ServerType == "") {
 		<script type="text/javascript" src="/assets/plugins/DataTables/media/js/jquery.dataTables.min.js"></script>
 		<script type="text/javascript" src="/assets/plugins/DataTables/media/js/DT_bootstrap.js"></script>
 		<script src="/assets/js/table-data.js"></script>
-
-		<script src="/assets/plugins/flot/jquery.flot.js"></script>
-		<script src="/assets/plugins/jquery.sparkline/jquery.sparkline.js"></script>
-		<script src="/assets/plugins/jquery-easy-pie-chart/jquery.easy-pie-chart.js"></script>
-		<script src="/assets/js/index.js"></script>
-
-
-
 		<!-- end: JAVASCRIPTS REQUIRED FOR THIS PAGE ONLY -->
+		<script src="/assets/plugins/bootstrap-modal/js/bootstrap-modal.js"></script>
+
+		<script src="/assets/plugins/bootstrap-modal/js/bootstrap-modalmanager.js"></script>
+
+		<script src="/assets/js/ui-modals.js"></script>
+
+		<script src="/assets/plugins/ladda-bootstrap/dist/spin.min.js"></script>
+
+		<script src="/assets/plugins/ladda-bootstrap/dist/ladda.min.js"></script>
+
+		<script src="/assets/plugins/bootstrap-switch/static/js/bootstrap-switch.min.js"></script>
+
+		<script src="/assets/js/ui-buttons.js"></script>
+
+
 		<script>
 			jQuery(document).ready(function() {
 				Main.init();
-				TableData.init();
-				Index.init();
+				UIButtons.init();
 			});
 		</script>
 	</body>

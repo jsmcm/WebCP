@@ -15,18 +15,25 @@ $oSimpleNonce = new SimpleNonce();
 
 require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 
-if($oDatabase->FieldExists("packages", "user_id", array("int")) == false)
-{
+$ClientID = $oUser->getClientId();
 
-	if($oDatabase->FieldExists("packages", "username", array("int")) == true)
-	{
+if($oDatabase->FieldExists("packages", "user_id", array("int")) == false) {
+	if($oDatabase->FieldExists("packages", "username", array("int")) == true) {
 		$oDatabase->DoSQL("ALTER TABLE packages ADD user_id int AFTER username;");
 		$oDatabase->DoSQL("ALTER TABLE packages DROP username;");
 	}
 }
 
 
-if($oDatabase->TableExists("server_stats") == false) {
+$nonceArray = [
+	$oUser->Role,
+	$ClientID,
+	"server_stats"
+];
+
+$nonce = $oSimpleNonce->GenerateNonce("tableExists", $nonceArray);
+
+if($oDatabase->TableExists("server_stats", $nonce) == false) {
 	$TableName = "server_stats";
 
 	$TableInfoArray[0]["name"] = "id";
@@ -64,10 +71,28 @@ if($oDatabase->TableExists("server_stats") == false) {
 	$TableInfoArray[6]["key"] = "";
 	$TableInfoArray[6]["default"] = "0";
 
-	$oDatabase->CreateTableFromArray($TableName, $TableInfoArray);
+	$nonceArray = [
+		$oUser->Role,
+		$ClientID,
+		$TableName
+	];
+	
+	$nonce = $oSimpleNonce->GenerateNonce("createTableFromArray", $nonceArray);
+	
+	$oDatabase->CreateTableFromArray($TableName, $TableInfoArray, $nonce);
 }
 
-if($oDatabase->TableExists("reseller_relationships") == false) {
+
+
+$nonceArray = [
+	$oUser->Role,
+	$ClientID,
+	"reseller_relationships"
+];
+
+$nonce = $oSimpleNonce->GenerateNonce("tableExists", $nonceArray);
+
+if($oDatabase->TableExists("reseller_relationships", $nonce) == false) {
 	$TableName = "reseller_relationships";
 
 	$TableInfoArray[0]["name"] = "id";
@@ -90,11 +115,27 @@ if($oDatabase->TableExists("reseller_relationships") == false) {
 	$TableInfoArray[3]["key"] = "";
 	$TableInfoArray[3]["default"] = "0";
 
-	$oDatabase->CreateTableFromArray($TableName, $TableInfoArray);
+
+	$nonceArray = [
+		$oUser->Role,
+		$ClientID,
+		$TableName
+	];
+	
+	$nonce = $oSimpleNonce->GenerateNonce("createTableFromArray", $nonceArray);
+	
+	$oDatabase->CreateTableFromArray($TableName, $TableInfoArray, $nonce);
 }
 
-if($oDatabase->TableExists("reseller_settings") == false)
-{
+$nonceArray = [
+	$oUser->Role,
+	$ClientID,
+	"reseller_settings"
+];
+
+$nonce = $oSimpleNonce->GenerateNonce("tableExists", $nonceArray);
+
+if($oDatabase->TableExists("reseller_settings", $nonce) == false) {
 	$TableName = "reseller_settings";
 
 	$TableInfoArray[0]["name"] = "id";
@@ -132,14 +173,21 @@ if($oDatabase->TableExists("reseller_settings") == false)
 	$TableInfoArray[6]["key"] = "";
 	$TableInfoArray[6]["default"] = "0";
 
-	$oDatabase->CreateTableFromArray($TableName, $TableInfoArray);
+
+	$nonceArray = [
+		$oUser->Role,
+		$ClientID,
+		$TableName
+	];
+	
+	$nonce = $oSimpleNonce->GenerateNonce("createTableFromArray", $nonceArray);
+	
+	$oDatabase->CreateTableFromArray($TableName, $TableInfoArray, $nonce);
 }
 
 $oLog->WriteLog("DEBUG", "/domains/index.php...");
 
-$ClientID = $oUser->getClientId();
-if($ClientID < 1)
-{
+if($ClientID < 1) {
 	$oLog->WriteLog("DEBUG", "/domains/index.php -> client_id not set, redirecting to /index.php");
 	header("Location: /index.php");
 	exit();
@@ -152,17 +200,14 @@ $serverAccountsAllowed = $validationArray["allowed"];
 $serverLicenseType = $validationArray["type"];
 
 $Accounts = 0;
-if($oUser->Role == "admin")
-{
+if($oUser->Role == "admin") {
 	$TotalDiskSpace = $oPackage->GetTotalDiskSpace();
 	$Usage = $oDomain->GetPackageDiskSpaceUsage();
 
 	$Traffic = $oSettings->GetServerTrafficAllowance();
 	$TrafficUsage = $oDomain->GetPackageTrafficUsage();
 	
-}
-else
-{
+} else {
 	$TotalDiskSpace = $oReseller->GetDiskSpaceAllocation($oUser->ClientID);
 	$Usage = $oDomain->GetPackageDiskSpaceUsage($oUser->ClientID);
 	$Accounts = $oReseller->GetAccountsLimit($oUser->ClientID);
@@ -175,8 +220,7 @@ else
 }
 
 $AccountsPercent = 0;
-if(($Accounts > 0) && ($AccountsCreated > 0) )
-{
+if(($Accounts > 0) && ($AccountsCreated > 0) ) {
 	$AccountsPercent = $AccountsCreated / $Accounts * 100;
 }
 
@@ -184,8 +228,7 @@ $DiskSpaceUsageBuffer = $Usage;
 $DiskSpaceBuffer = $TotalDiskSpace;
 
 $DiskSpacePercent = 0;
-if($TotalDiskSpace > 0)
-{
+if($TotalDiskSpace > 0) {
 	$DiskSpacePercent = $Usage / $TotalDiskSpace * 100;
 }
 $Scale = "b";								
@@ -197,8 +240,7 @@ $TrafficUsageBuffer = $TrafficUsage;
 $TrafficBuffer = $Traffic;
 
 $TrafficPercent = 0;
-if($Traffic > 0)
-{
+if($Traffic > 0) {
 	$TrafficPercent = $TrafficUsage / $Traffic * 100;
 }
 $Scale = "b";								

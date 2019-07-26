@@ -1,11 +1,16 @@
 <?php
+
 session_start();
 
 include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
+
 $oUser = new User();
-$oPackage = new Package();
 $oSettings = new Settings();
+$oUtils = new Utils();
+$oDomain = new Domain();
 $oSimpleNonce = new SimpleNonce();
+$oReseller = new Reseller();
+$oSSH = new SSH();
 
 require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 
@@ -14,59 +19,40 @@ if($ClientID < 1) {
 	header("Location: /index.php");
 	exit();
 }
-	
-$DomainID = 0;
-if(isset($_REQUEST["DomainID"])) {
-	$DomainID = $_REQUEST["DomainID"];
+
+// can this client edit this domain?
+$domainId = intVal( $_REQUEST["domainId"] );
+$clientId = $ClientID;
+$clientRole = $oUser->Role;
+$domainOwnerId = $oDomain->GetDomainOwner($domainId);
+$resellerId = $oReseller->GetClientResellerID($domainOwnerId);
+
+if ( $clientId != $domainOwnerId ) {
+	if ( $resellerId != $clientId ) {
+		header("Location: index.php?Notes=You don't have permission to edit that domain&NoteType=error");
+		exit();
+	}
 }
 
-if( (! is_numeric($DomainID)) || ($DomainID < 1) ) {
-	header("Location: /index.php");
-	exit();
-}
+$nonceArray = [
+	$clientRole,
+	$clientId,
+	$domainId
+];
+
+$nonce = $oSimpleNonce->GenerateNonce("getDomainPublicKeyList", $nonceArray);
+
+$publicKeyList = $oSSH->getDomainPublicKeyList($domainId, $nonce);
 
 
-	$oDomain = new Domain();
-	$ClientID = $oUser->ClientID;
-	$DomainOwnerClientID = $oDomain->GetDomainOwner($DomainID);
+$nonceArray = [
+	$clientRole,
+	$clientId,
+	$domainId
+];
 
-	$nonceArray = [
-		$oUser->Role,
-		$oUser->getClientId(),
-		$DomainID
-	];
-	
-	$nonce = $oSimpleNonce->GenerateNonce("getDomainNameFromDomainID", $nonceArray);
-	$PrimaryDomainName = $oDomain->GetDomainNameFromDomainID($DomainID, $nonce);
-
-	//print "ClientID: ".$ClientID."<p>";
-	//print "DomainOwnerClientID: ".$DomainOwnerClientID."<p>";
-	//print "Role: ".$oUser->Role."<p>";
-
-	if( ($DomainOwnerClientID != $ClientID) && ($oUser->Role == 'client') ) {
-		die("You do not have permission to be here...");
-	}
-
-
-	$DomainUserName = "";
-	$SubDomainAllowance = -1;
-	$SubDomainUsage = -1;
-
-	if($DomainID > -1) {
-		$DomainInfoArray = array();
-		$oDomain->GetDomainInfo($DomainID, $DomainInfoArray);
-
-		$DomainUserName = $DomainInfoArray["UserName"];
-		$SubDomainAllowance = $oPackage->GetPackageAllowance("SubDomains", $DomainInfoArray["PackageID"]);
-		$SubDomainUsage = $oPackage->GetSubDomainUsage($DomainUserName);
-
-		//print "SubDomainAllowance: ".$SubDomainAllowance."<br>";
-		//print "SubDomainUsage: ".$SubDomainUsage."<br>";
-		//print "DomainID: ".$DomainID."<br>";
-		//print "DomainUserName: ".$DomainUserName."<br>";
-	}
-
-
+$nonce = $oSimpleNonce->GenerateNonce("getDomainNameFromDomainID", $nonceArray);
+$domainName = $oDomain->GetDomainNameFromDomainID( $domainId, $nonce);
 
 ?>
 
@@ -78,7 +64,7 @@ if( (! is_numeric($DomainID)) || ($DomainID < 1) ) {
 	<!--<![endif]-->
 	<!-- start: HEAD -->
 	<head>
-		<title>Subdomain Management | <?php print $oSettings->GetWebCPTitle(); ?></title>
+		<title>Manage SSH | <?php print $oSettings->GetWebCPTitle(); ?></title>
 		<!-- start: META -->
 		<meta charset="utf-8" />
 		<!--[if IE]><meta http-equiv='X-UA-Compatible' content="IE=edge,IE=9,IE=8,chrome=1" /><![endif]-->
@@ -105,22 +91,33 @@ if( (! is_numeric($DomainID)) || ($DomainID < 1) ) {
 		<!-- start: CSS REQUIRED FOR THIS PAGE ONLY -->
 		<link rel="stylesheet" type="text/css" href="/assets/plugins/select2/select2.css" />
 		<link rel="stylesheet" href="/assets/plugins/DataTables/media/css/DT_bootstrap.css" />
+		<link rel="stylesheet" href="assets/plugins/ladda-bootstrap/dist/ladda-themeless.min.css">
+
+		<link rel="stylesheet" href="/assets/plugins/bootstrap-switch/static/stylesheets/bootstrap-switch.css">
+
+		<link rel="stylesheet" href="/assets/plugins/bootstrap-social-buttons/social-buttons-3.css">
+
+		<link href="/assets/plugins/bootstrap-modal/css/bootstrap-modal-bs3patch.css" rel="stylesheet" type="text/css"/>
+
+		<link href="/assets/plugins/bootstrap-modal/css/bootstrap-modal.css" rel="stylesheet" type="text/css"/>
+
+
+                <link rel="stylesheet" href="/assets/plugins/x-editable/css/bootstrap-editable.css">
+
+
+
+
 		<!-- end: CSS REQUIRED FOR THIS PAGE ONLY -->
 		<link rel="shortcut icon" href="/favicon.ico" />
 		
-		
 		<script language="javascript">
-		function ConfirmDelete(DomainName)
+		function ConfirmDelete(keyName)
 		{
-
-			if(confirm("Are you sure you want to delete the sub domain " + DomainName + "?\r\nWARNING: This will delete all files, emails, FTP and database accounts and cannot be reversed"))
-			{
+			if(confirm("Are you sure you want to delete " + keyName + "?")) {
 				return true;
 			}
 			return false;
 		}
-		
-
 		</script>
 		
 	</head>
@@ -187,55 +184,44 @@ if( (! is_numeric($DomainID)) || ($DomainID < 1) ) {
 							<!-- start: PAGE TITLE & BREADCRUMB -->
 							<ol class="breadcrumb">
 								<li>
-									<a href="/domains/">
-										Domains
+									<a href="/ssh/">
+										SSH
 									</a>
 								</li>
 								<li>
 									<i class="active"></i>
-									<a href="/domains/ListSubDomains.php?DomainID=<?php print $_REQUEST["DomainID"]; ?>">
-										Sub Domains
-									</a>
+									
+										Keys
+							
 								</li>
 					
 							</ol>
 							<div class="page-header">
-								<h1>Sub domains for <?php print $PrimaryDomainName; ?><small>Add / remove</small></h1>
+								<h1>Keys for <?php print $domainName; ?></h1>
 							</div>
 							<!-- end: PAGE TITLE & BREADCRUMB -->
 						</div>
 					</div>
 					<!-- end: PAGE HEADER -->
 					<!-- start: PAGE CONTENT -->
+
 					<div class="row">
-					
-			
 					<?php
-					if(isset($_REQUEST["Notes"]))
-					{
+					if(isset($_REQUEST["Notes"])) {
 						$NoteType = "Message";
 						
-						if(isset($_REQUEST["NoteType"]))
-						{
+						if(isset($_REQUEST["NoteType"])) {
 							$NoteType = $_REQUEST["NoteType"];
 						}
-									
-						if(strstr($_REQUEST["Notes"], "DNS could not be registered"))
-						{
-							$NoteType = "Error";
-						}
-	
-						if($NoteType == "Error")
-						{
+						
+						if($NoteType == "Error") {
 							print "<div class=\"alert alert-danger\">";
 								print "<button data-dismiss=\"alert\" class=\"close\">";
 									print "&times;";
 								print "</button>";
 								print "<i class=\"fa fa-times-circle\"></i>";
 						
-						}
-						else
-						{
+						} else {
 							print "<div class=\"alert alert-success\">";
 								print "<button data-dismiss=\"alert\" class=\"close\">";
 									print "&times;";
@@ -247,132 +233,124 @@ if( (! is_numeric($DomainID)) || ($DomainID < 1) ) {
 						print "</div>";
 					
 					}
-
 					?>
-
 					
 
 
 						<div class="col-md-12">
 
-									<?php
-									if($DomainID != -1)
-									{
-										if( ($SubDomainUsage < $SubDomainAllowance) || ($SubDomainAllowance == -1) )
-										{
-										?>
-											<div class="alert alert-block alert-success fade in">
-											<button data-dismiss="alert" class="close" type="button">
-											&times;
-											</button>
-											<h4 class="alert-heading"><i class="fa fa-check-circle"></i>Sub Domains Available!</h4>
-											<p>
-												You have used <?php print $SubDomainUsage." of ".(($SubDomainAllowance == -1)? "unlimited":$SubDomainAllowance); ?> Sub Domains
-											</p>
-											</div>
-										<?php
-										}
-										else
-										{
-										?>
-											<div class="alert alert-block alert-danger fade in">
-											<button data-dismiss="alert" class="close" type="button">
-											&times;
-											</button>
-											<h4 class="alert-heading"><i class="fa fa-times-circle"></i> No Sub Domains Available!</h4>
-											<p>
-												You have used <?php print $SubDomainUsage." of ".$SubDomainAllowance; ?> Sub Domains
-											</p>
-											</div>
-										<?php
-										}
-									}
-									?>
-
-
 							<!-- start: DYNAMIC TABLE PANEL -->
 							<div class="panel panel-default">
 									
 								<div class="panel-body">
-									<table class="table table-bordered table-full-width table-striped table-hover" id="sample_1">
+
+									<p>Manage <?php print $domainName; ?>'s SSH keys here<br>
+									<a href="https://docs.webcp.io/docs/ssh/" target="_new">View Documentation</a>
+									</p>
+
+									<table class="table table-bordered table-full-width table-hover table-striped" id="sample_1">
 										<thead>
 											<tr>
-												<th>Sub Domain</th>
+												<th>Key Name</th>
+												<th>Created</th>
+												<th>Authorised <a href="https://docs.webcp.io/docs/ssh/authorising-ssh-keys/" target="_new"><img src="/img/help.png" width="20px"></a></th>
 												<th>&nbsp;</th>
 											</tr>
 										</thead>
 										
+										
 										<tbody>
 
 										<?php
-										$oDomain = new Domain();
+										$oEmail = new Email();
 
-										$oDomain->GetSubDomainList($Array, $ArrayCount, $DomainID, $DomainOwnerClientID, $oUser->Role);
+										$ClientID = $oUser->ClientID;
 
-										for($x = 0; $x < $ArrayCount; $x++)
-										{
+										if(isset($_REQUEST["ClientID"])) {
+											if($oUser->Role == "admin") {
+												//yes, permission..
+												$ClientID = $_REQUEST["ClientID"];
+											}
+										}
+										
+										for($x = 0; $x < count($publicKeyList); $x++) {
 											print "<tr>";
-											print "<td><a href=\"http://".$Array[$x]["SubDomain"]."\" target=\"new\">".$Array[$x]["SubDomain"]."</a></td>\r\n";
+											print "<td>".$publicKeyList[$x]["publicKeyName"]."</td>\r\n";
+										
+											print "<td>".date("F jS, Y", strtotime($publicKeyList[$x]["date"]))."</td>\r\n";
+
+											$nonceArray = [	
+												$oUser->Role,
+												$oUser->ClientID,
+												$publicKeyList[$x]["id"],
+												$domainId
+											];
+											$nonce = $oSimpleNonce->GenerateNonce("pubKeyAuthorisation", $nonceArray);
+											
+
+											print "<td><a href=\"#\" data-nonce-timestamp=\"".$nonce["TimeStamp"]."\" data-domain-id=\"".$domainId."\" data-nonce-value=\"".$nonce["Nonce"]."\" id=\"ssh_key_authorise_".$publicKeyList[$x]["id"]."\" data-type=\"select\" data-pk=\"".$publicKeyList[$x]["id"]."\" data-value=\"".$publicKeyList[$x]["authorised"]."\" data-original-title=\"Select Authorisation\"></a></td>\r\n";	
+
 
 											print "<td class=\"center\">";
-											print "<div class=\"visible-md visible-lg hidden-sm hidden-xs\">";
-											print "<a href=\"DeleteSubDomain.php?SubDomainID=".$Array[$x]["ID"]."\" onclick=\"return ConfirmDelete('".$Array[$x]["SubDomain"]."'); return false;\" class=\"btn btn-bricky tooltips\" data-placement=\"top\" data-original-title=\"Delete Sub Domain\"><i class=\"fa fa-times fa fa-white\" style=\"color:white;\"></i></a>\n";
-											print "</div>";
-											print "<div class=\"visible-xs visible-sm hidden-md hidden-lg\">";
-											print "<div class=\"btn-group\">";
-											print "<a class=\"btn btn-primary dropdown-toggle btn-sm\" data-toggle=\"dropdown\" href=\"#\">";
-											print "<i class=\"fa fa-cog\"></i> <span class=\"caret\"></span>";
-											print "</a>";
-											print "<ul role=\"menu\" class=\"dropdown-menu pull-right\">";
-															
-											print "<li role=\"presentation\">";
-											print "<a role=\"menuitem\" tabindex=\"-1\" href=\"DeleteSubDomain.php?SubDomainID=".$Array[$x]["ID"]."\" onclick=\"return ConfirmDelete('".$Array[$x]["SubDomain"]."'); return false;\">";
-											print "<i class=\"fa fa-times\"></i> Delete Sub Domain";
-											print "</a>";
-											print "</li>";																
-											print "</ul>";
-											print "</div>";
-											print "</div></td>";				
+												print "<div class=\"visible-md visible-lg hidden-sm hidden-xs\">";
+
+													$nonceArray = [	
+														$oUser->Role,
+														$oUser->ClientID,
+														$publicKeyList[$x]["id"],
+														$domainId
+													];
+													$nonce = $oSimpleNonce->GenerateNonce("deleteSSHKey", $nonceArray);
+													
+
+												
+													print "<a href=\"deleteKey.php?nonce=".$nonce["Nonce"]."&timeStamp=".$nonce["TimeStamp"]."&domainId=".$domainId."&keyId=".$publicKeyList[$x]["id"]."\" onclick=\"return ConfirmDelete('".$publicKeyList[$x]["publicKeyName"]."'); return false;\" class=\"btn btn-bricky tooltips\" data-placement=\"top\" data-original-title=\"Delete Public Key\"><i class=\"fa fa-times fa fa-white\" style=\"color:white;\"></i></a>\n";
+
+												
+													print "</div>";
+													
+													print "<div class=\"visible-xs visible-sm hidden-md hidden-lg\">";
+													
+													print "<div class=\"btn-group\">";
+													print "<a class=\"btn btn-primary dropdown-toggle btn-sm\" data-toggle=\"dropdown\" href=\"#\">";
+														print "<i class=\"fa fa-cog\"></i> <span class=\"caret\"></span>";
+													print "</a>";
+
+													print "<ul role=\"menu\" class=\"dropdown-menu pull-right\">";
+
+
+														print "<li role=\"presentation\">";
+															print "<a role=\"menuitem\" tabindex=\"-1\" href=\"deleteKey.php?nonce=".$nonce["Nonce"]."&timeStamp=".$nonce["TimeStamp"]."&domainId=".$domainId."&keyId=".$publicKeyList[$x]["id"]."\" onclick=\"return ConfirmDelete('".$publicKeyList[$x]["publicKeyName"]."'); return false;\">";
+																print "<i class=\"fa fa-times\"></i> Delete Public Key";
+															print "</a>";
+														print "</li>";															
+
+													print "</ul>";
+												print "</div>";
+												print "</div>";
+											print "</td>";	
+
+
 											print "</tr>";
 										}
-											
 										?>
-	
+
 									</tbody>
 									
 									</table>
-
-
-                                                                        <?php
-                                                                        if( (($SubDomainUsage >= $SubDomainAllowance) && ($SubDomainAllowance != -1)) && ($oUser->Role != 'admin') )
-                                                                        {       
-                                                                                print "<span class=\"label label-danger\">You have used all of your sub domains!</span>";
-                                                                        }
-                                                                        else    
-                                                                        {
-                                                                        ?>
-										<div class="form-group">										
-										<div class="col-sm-4">
-                                                                                <form action="AddSubDomain.php" method="post">
-                                                                                <input type="hidden" value="<?php print $DomainID; ?>" name="DomainID">
-										<input type="submit" value="Add new Sub Domain" data-style="zoom-in" class="btn btn-info ladda-button" onclick="return ValidateForm(); return false;">
-										<span class="ladda-spinner"></span>
-										<span class="ladda-progress" style="width: 0px;"></span>
-										</input>
-                                                                                </form>
-										</div>
-										</div>
-
-                                                                        <?php   
-                                                                        }
-                                                                        ?>
 							
-										
-								</div>
+
+									<a class="btn btn-primary" href="addKey.php?domainId=<?php print $domainId; ?>"><i class="fa fa-plus"></i>
+										Add New Public Key
+									</a>
+
+
 							</div>
 							<!-- end: DYNAMIC TABLE PANEL -->
 						</div>
 					</div>
+
+
 					<!-- end: PAGE CONTENT-->
 				</div>
 			</div>
@@ -389,6 +367,8 @@ if( (! is_numeric($DomainID)) || ($DomainID < 1) ) {
 			</div>
 		</div>
 		<!-- end: FOOTER -->
+
+
 		<!-- start: MAIN JAVASCRIPTS -->
 		<!--[if lt IE 9]>
 		<script src="/assets/plugins/respond.min.js"></script>
@@ -412,10 +392,30 @@ if( (! is_numeric($DomainID)) || ($DomainID < 1) ) {
 		<script type="text/javascript" src="/assets/plugins/DataTables/media/js/DT_bootstrap.js"></script>
 		<script src="/assets/js/table-data.js"></script>
 		<!-- end: JAVASCRIPTS REQUIRED FOR THIS PAGE ONLY -->
+
+
+
+
+		<script src="/assets/plugins/bootstrap-modal/js/bootstrap-modal.js"></script>
+
+		<script src="/assets/plugins/bootstrap-modal/js/bootstrap-modalmanager.js"></script>
+
+		<script src="/assets/js/ui-modals.js"></script>
+
+		<script src="/assets/plugins/jquery-mockjax/jquery.mockjax.js"></script>
+
+		<script src="/assets/plugins/x-editable/js/bootstrap-editable.min.js"></script>
+
+		<script src="/assets/plugins/x-editable/ssh-key-authorise.js"></script>
+
+		<script src="/assets/plugins/x-editable/demo.js"></script>
+
+
 		<script>
 			jQuery(document).ready(function() {
 				Main.init();
 				TableData.init();
+				//UIModals();
 			});
 		</script>
 	</body>
