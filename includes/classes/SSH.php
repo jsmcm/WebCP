@@ -147,6 +147,7 @@ class SSH
 			$query->execute();
 			
 			touch( $_SERVER["DOCUMENT_ROOT"]."/nm/".$keyId.".delete_pub_key", 0755);
+			
 
 		} catch(PDOException $e) {
 			$oLog = new Log();
@@ -170,12 +171,170 @@ class SSH
 
 
 
+	function checkForDuplicateDomainPublicKey($domainId, $keyName, $publicKey, $domainUserName, $nonceArray)
+	{		
+
+		if ( intVal($domainId) < 1 ) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.SSH.php -> checkForDuplicateDomainPublicKey(); domainId cannot be blank in SSH::checkForDuplicateDomainPublicKey");
+			throw new Exception("<p><b>domainId cannot be blank in SSH::checkForDuplicateDomainPublicKey</b><p>");
+		}
+
+		if ( $keyName == "" ) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.SSH.php -> checkForDuplicateDomainPublicKey(); keyName cannot be blank in SSH::checkForDuplicateDomainPublicKey");
+			throw new Exception("<p><b>keyName cannot be blank in SSH::checkForDuplicateDomainPublicKey</b><p>");
+		}
+
+		if ( $publicKey == "" ) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.SSH.php -> checkForDuplicateDomainPublicKey(); publicKey cannot be blank in SSH::checkForDuplicateDomainPublicKey");
+			throw new Exception("<p><b>publicKey cannot be blank in SSH::checkForDuplicateDomainPublicKey</b><p>");
+		}
+
+		if ( $domainUserName == "" ) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.SSH.php -> checkForDuplicateDomainPublicKey(); domainUserName cannot be blank in SSH::checkForDuplicateDomainPublicKey");
+			throw new Exception("<p><b>domainUserName cannot be blank in SSH::checkForDuplicateDomainPublicKey</b><p>");
+		}
+
+		if ( ! (is_array($nonceArray) && !empty($nonceArray) ) ) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.SSH.php -> checkForDuplicateDomainPublicKey(); Nonce not set");
+			throw new Exception("<p><b>Nonce not set in SSH::checkForDuplicateDomainPublicKey</b><p>");
+		}
+		
+		$oUser = new User();
+		$ClientID = $oUser->getClientId();
+
+		$nonceMeta = [
+			$oUser->Role,
+			$ClientID,
+			$domainId,
+			$keyName,
+			$domainUserName
+		];
+
+		$oSimpleNonce = new SimpleNonce();
+		$nonceResult = $oSimpleNonce->VerifyNonce($nonceArray["Nonce"], "checkForDuplicateDomainPublicKey", $nonceArray["TimeStamp"], $nonceMeta);
+
+		if ( ! $nonceResult ) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.SSH.php -> checkForDuplicateDomainPublicKey(); Nonce failed");
+			throw new Exception("<p><b>Nonce failed in SSH::checkForDuplicateDomainPublicKey</b></p>");
+		}
+
+		$oUtils = new Utils();
+		$fileName = $oUtils->slugify( $keyName );
+
+
+		$dirBase = "/home/".$domainUserName."/.ssh_hashes/";
+
+		if ($handle = opendir($dirBase))  {	
+			/* This is the correct way to loop over the directory. */
+			while (false !== ($file = readdir($handle))) {
+	
+				if(is_file($dirBase.$file)) {
+					if( ($file != ".") && ($file != "..") ) {
+						$filesHash = file_get_contents($dirBase.$file);
+						$thisKeysHash = md5( $publicKey );
+
+						if ( $filesHash == $thisKeysHash ) {
+							// This key already exists, return the key name
+							return $keyName;
+						}
+					}
+				}
+	
+			}
+	
+			closedir($handle);	
+		}
+	
+		return "";
+	}
+	
 
 
 
 
 
-	function addDomainPublicKey($domainId, $keyName, $publicKey, $nonceArray)
+
+	function checkForDuplicateFileName($domainId, $keyName, $nonceArray)
+	{		
+
+		if ( intVal($domainId) < 1 ) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.SSH.php -> checkForDuplicateFileName(); domainId cannot be blank in SSH::checkForDuplicateFileName");
+			throw new Exception("<p><b>domainId cannot be blank in SSH::checkForDuplicateFileName</b><p>");
+		}
+
+		if ( $keyName == "" ) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.SSH.php -> checkForDuplicateFileName(); keyName cannot be blank in SSH::checkForDuplicateFileName");
+			throw new Exception("<p><b>keyName cannot be blank in SSH::checkForDuplicateFileName</b><p>");
+		}
+
+		if ( ! (is_array($nonceArray) && !empty($nonceArray) ) ) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.SSH.php -> checkForDuplicateFileName(); Nonce not set");
+			throw new Exception("<p><b>Nonce not set in SSH::checkForDuplicateFileName</b><p>");
+		}
+		
+		$oUser = new User();
+		$ClientID = $oUser->getClientId();
+
+		$nonceMeta = [
+			$oUser->Role,
+			$ClientID,
+			$domainId,
+			$keyName
+		];
+
+		$oSimpleNonce = new SimpleNonce();
+		$nonceResult = $oSimpleNonce->VerifyNonce($nonceArray["Nonce"], "checkForDuplicateFileName", $nonceArray["TimeStamp"], $nonceMeta);
+
+		if ( ! $nonceResult ) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.SSH.php -> checkForDuplicateFileName(); Nonce failed");
+			throw new Exception("<p><b>Nonce failed in SSH::checkForDuplicateFileName</b></p>");
+		}
+
+		
+		
+		try {
+
+			$oUtils = new Utils();
+			$fileName = $oUtils->slugify( $keyName );
+
+			$query = $this->DatabaseConnection->prepare("SELECT id FROM ssh WHERE deleted = 0 AND domain_id = :domain_id AND (public_key_name = :key_name OR file_name = :file_name)");
+
+			$query->bindParam(":domain_id", $domainId);
+			$query->bindParam(":key_name", $keyName);
+			$query->bindParam(":file_name", $fileName);
+
+			$query->execute();
+
+			if($result = $query->fetch(PDO::FETCH_ASSOC)) {
+				return true;
+			}
+
+		} catch(PDOException $e) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.SSH.php -> checkForDuplicateFileName(); Error = ".$e);
+			return false;
+		}
+
+		return false;
+
+	}
+	
+
+
+
+
+
+	function addDomainPublicKey($domainId, $keyName, $publicKey, $domainUserName, $nonceArray)
 	{		
 
 		if ( intVal($domainId) < 1 ) {
@@ -197,6 +356,13 @@ class SSH
 			throw new Exception("<p><b>publicKey cannot be blank in SSH::addDomainPublicKey</b><p>");
 		}
 
+
+		if ( $domainUserName == "" ) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.SSH.php -> addDomainPublicKey(); domainUserName cannot be blank in SSH::addDomainPublicKey");
+			throw new Exception("<p><b>domainUserName cannot be blank in SSH::addDomainPublicKey</b><p>");
+		}
+
 		if ( ! (is_array($nonceArray) && !empty($nonceArray) ) ) {
 			$oLog = new Log();
 			$oLog->WriteLog("error", "/class.SSH.php -> addDomainPublicKey(); Nonce not set");
@@ -210,7 +376,8 @@ class SSH
 			$oUser->Role,
 			$ClientID,
 			$domainId,
-			$keyName
+			$keyName,
+			$domainUserName
 		];
 
 		$oSimpleNonce = new SimpleNonce();
@@ -221,6 +388,7 @@ class SSH
 			$oLog->WriteLog("error", "/class.SSH.php -> addDomainPublicKey(); Nonce failed");
 			throw new Exception("<p><b>Nonce failed in SSH::addDomainPublicKey</b></p>");
 		}
+
 
 		try {
 
@@ -239,6 +407,11 @@ class SSH
 			file_put_contents( $_SERVER["DOCUMENT_ROOT"]."/nm/".$id.".add_pub_key", $publicKey );
 			chmod( $_SERVER["DOCUMENT_ROOT"]."/nm/".$id.".add_pub_key", 0000 );
 
+			file_put_contents( "/home/".$domainUserName."/.ssh_hashes/".$fileName, md5($publicKey) );
+			chmod( "/home/".$domainUserName."/.ssh_hashes/".$fileName, 0660 );
+
+			
+
 		} catch(PDOException $e) {
 			$oLog = new Log();
 			$oLog->WriteLog("error", "/class.SSH.php -> addDomainPublicKey(); Error = ".$e);
@@ -250,6 +423,65 @@ class SSH
 	}
 	
 
+
+
+
+
+	function getFileName($keyId, $nonceArray)
+	{		
+
+		if ( intVal($keyId) < 1 ) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.SSH.php -> getFileName(); keyId cannot be blank in SSH::getFileName");
+			throw new Exception("<p><b>keyId cannot be blank in SSH::getFileName</b><p>");
+		}
+
+		if ( ! (is_array($nonceArray) && !empty($nonceArray) ) ) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.SSH.php -> getFileName(); Nonce not set");
+			throw new Exception("<p><b>Nonce not set in SSH::getFileName</b><p>");
+		}
+		
+		$oUser = new User();
+		$ClientID = $oUser->getClientId();
+
+		$nonceMeta = [
+			$oUser->Role,
+			$ClientID,
+			$keyId
+		];
+
+		$oSimpleNonce = new SimpleNonce();
+		$nonceResult = $oSimpleNonce->VerifyNonce($nonceArray["Nonce"], "getFileName", $nonceArray["TimeStamp"], $nonceMeta);
+
+		if ( ! $nonceResult ) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.SSH.php -> getFileName(); Nonce failed");
+			throw new Exception("<p><b>Nonce failed in SSH::getFileName</b></p>");
+		}
+		$key = array();
+
+		try {
+			$query = $this->DatabaseConnection->prepare("SELECT file_name FROM ssh WHERE deleted = 0 AND id = :keyId");
+
+			$query->bindParam(":keyId", $keyId);
+
+			$query->execute();
+			
+			if($result = $query->fetch(PDO::FETCH_ASSOC)) {
+
+				return $result["file_name"];
+			
+			}
+		} catch(PDOException $e) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.SSH.php -> getFileName(); Error = ".$e);
+			return false;
+		}
+
+		return false;
+
+	}
 
 
 

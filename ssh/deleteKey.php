@@ -52,6 +52,31 @@ if ( ! $nonceResult ) {
     exit();
 }
 
+$oDomain = new Domain();
+
+$nonceArray = [	
+    $oUser->Role,
+    $oUser->ClientID,
+    $domainId
+];
+$nonce = $oSimpleNonce->GenerateNonce("getDomainUserName", $nonceArray);		
+$domainUserName = $oDomain->getDomainUserName( $domainId, $nonce);
+
+if ( $domainUserName == "" ) {
+    $oLog = new Log();
+    $oLog->WriteLog("error", "/deleteKey.php -> domainUserName not found");
+    throw new Exception("<p><b>deleteKey.php -> domainUserName not found</b></p>");
+}
+
+
+$nonceArray = [	
+    $oUser->Role,
+    $oUser->ClientID,
+    $keyId
+];
+$nonce = $oSimpleNonce->GenerateNonce("getFileName", $nonceArray);
+$fileName = $oSSH->getFileName($keyId, $nonce);
+
 $nonceArray = [	
     $oUser->Role,
     $oUser->ClientID,
@@ -70,11 +95,12 @@ if ($oSSH->deleteDomainPublicKey($domainId, $keyId, $nonce) == true ) {
         unlink($_SERVER["DOCUMENT_ROOT"]."/nm/".$keyId.".add_pub_key");
     }
 
+    if ( file_exists("/home/".$domainUserName."/.ssh_hashes/".$fileName) ) {
+        unlink("/home/".$domainUserName."/.ssh_hashes/".$fileName);
+    }
+
     header("location: keys.php?domainId=".$domainId."&Notes=Success, key deleted&NoteType=success");
     exit();
 }
 
 header("location: keys.php?domainId=".$domainId."&Notes=Error, key could not be deleted&NoteType=error");
-
-
-
