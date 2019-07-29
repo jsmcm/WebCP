@@ -5,7 +5,8 @@
  - Added SSH Management
  - Introducing nonce into function calls for security
  - Fixed bug which allowed clients to delete their own domains
- 
+ - Fixed bug whereby email addresses login credentials were still active after deletion
+  
 * 2.1.2 *
 = release: 2019-07-23 =
  - DNS connections now try ssl first and fall back to non ssl
