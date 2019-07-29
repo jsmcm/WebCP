@@ -1853,52 +1853,103 @@ class Domain
 	}
 	
 
-	function GetDomainOwnerFromDomainName($DomainName)
+	function GetDomainOwnerFromDomainName($DomainName, $nonceArray)
 	{
 
-		try
-		{
+
+		if ( $DomainName == "" ) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Domain.php -> GetDomainOwnerFromDomainName(); DomainName cannot be blank in Domain::GetDomainOwnerFromDomainName");
+			throw new Exception("<p><b>DomainName cannot be blank in Domain::GetDomainOwnerFromDomainName</b><p>");
+		}
+
+		if ( ! (is_array($nonceArray) && !empty($nonceArray) ) ) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Domain.php -> GetDomainOwnerFromDomainName(); Nonce not set");
+			throw new Exception("<p><b>Nonce not set in Domain::GetDomainOwnerFromDomainName</b><p>");
+		}
+		
+		$oUser = new User();
+		$ClientID = $oUser->getClientId();
+
+		$nonceMeta = [
+			$oUser->Role,
+			$ClientID,
+			$DomainName
+		];
+
+		$oSimpleNonce = new SimpleNonce();
+		$nonceResult = $oSimpleNonce->VerifyNonce($nonceArray["Nonce"], "getDomainOwnerFromDomainName", $nonceArray["TimeStamp"], $nonceMeta);
+
+		if ( ! $nonceResult ) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Domain.php -> GetDomainOwnerFromDomainName(); Nonce failed");
+			throw new Exception("<p><b>Nonce failed in Domain::GetDomainOwnerFromDomainName</b></p>");
+		}
+
+		try {
 			$query = $this->DatabaseConnection->prepare("SELECT client_id FROM domains WHERE fqdn = :domain_name AND deleted = 0");
 			
 			$query->bindParam(":domain_name", $DomainName);
-			
 			$query->execute();
 	
-			if($result = $query->fetch(PDO::FETCH_ASSOC))
-			{
+			if($result = $query->fetch(PDO::FETCH_ASSOC)) {
 				return $result["client_id"];
 			}
 	
-		}
-		catch(PDOException $e)
-		{
+		} catch(PDOException $e) {
 			$oLog = new Log();
 			$oLog->WriteLog("error", "/class.Domain.php -> GetDomainOwnerFromDomainName(); Error = ".$e);
 		}
 
 		return 0;
-		
 	}
 	
-	function GetDomainOwner($domain_id)
+	function GetDomainOwner($domain_id, $nonceArray)
 	{
+
+
+		if ( intVal($domain_id) < 1 ) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Domain.php -> GetDomainOwner(); Domaindomain_id cannot be blank in Domain::GetDomainOwner");
+			throw new Exception("<p><b>domain_id cannot be blank in Domain::GetDomainOwner</b><p>");
+		}
+
+		if ( ! (is_array($nonceArray) && !empty($nonceArray) ) ) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Domain.php -> GetDomainOwner(); Nonce not set");
+			throw new Exception("<p><b>Nonce not set in Domain::GetDomainOwner</b><p>");
+		}
 		
-		try
-		{
+		$oUser = new User();
+		$ClientID = $oUser->getClientId();
+
+		$nonceMeta = [
+			$oUser->Role,
+			$ClientID,
+			$domain_id
+		];
+
+		$oSimpleNonce = new SimpleNonce();
+		$nonceResult = $oSimpleNonce->VerifyNonce($nonceArray["Nonce"], "getDomainOwner", $nonceArray["TimeStamp"], $nonceMeta);
+
+		if ( ! $nonceResult ) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Domain.php -> GetDomainOwner(); Nonce failed");
+			throw new Exception("<p><b>Nonce failed in Domain::GetDomainOwner</b></p>");
+		}
+
+		try {
 			$query = $this->DatabaseConnection->prepare("SELECT client_id FROM domains WHERE id = :domain_id");
 			
 			$query->bindParam(":domain_id", $domain_id);
-			
 			$query->execute();
 	
-			if($result = $query->fetch(PDO::FETCH_ASSOC))
-			{
+			if($result = $query->fetch(PDO::FETCH_ASSOC)) {
 				return $result["client_id"];
 			}
 	
-		}
-		catch(PDOException $e)
-		{
+		} catch(PDOException $e) {
 			$oLog = new Log();
 			$oLog->WriteLog("error", "/class.Domain.php -> GetDomainOwner(); Error = ".$e);
 		}
@@ -2727,7 +2778,7 @@ class Domain
 		$nonce = $oSimpleNonce->GenerateNonce("getDomainInfo", $nonceArray);
 		
 		$DomainInfoArray = array();
-		$this->GetDomainInfo($DomainID, $random, $DomainInfoArray);
+		$this->GetDomainInfo($DomainID, $random, $DomainInfoArray, $nonce);
 
 		$PrimaryDomainID = $DomainInfoArray["PrimaryDomainID"];
 		$DomainName = $DomainInfoArray["DomainName"];

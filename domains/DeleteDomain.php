@@ -5,6 +5,7 @@ include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 $oUser = new User();
 $oEmail = new Email();
 $oSimpleNonce = new SimpleNonce();
+$oDomain = new Domain();
 
 require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 
@@ -14,19 +15,31 @@ if($ClientID < 1) {
     exit();
 }
 
-$oDomain = new Domain();
-$DomainOwnerClientID = $oDomain->GetDomainOwner($_REQUEST["DomainID"]);
+$domainId = intVal($_REQUEST["DomainID"]);
+
+
+$nonceArray = [
+    $oUser->Role,
+    $ClientID,
+    $domainId
+];
+
+$nonce = $oSimpleNonce->GenerateNonce("getDomainOwner", $nonceArray);
+$DomainOwnerClientID = $oDomain->GetDomainOwner($domainId, $nonce);
 
 if( ($ClientID != $DomainOwnerClientID) && ($oUser->Role != 'admin') ) {	
-    header("location: index?Notes=No%20Permission!!!");
+    header("location: /domains/index.phpNotes=No%20Permission!!!&NoteType=Error");
     exit();
 }
 
+if ( $oUser->Role == "client" ) {
+    header("location: /domains/index.php?Notes=Sorry, you can't delete domains!!!&NoteType=Error");
+    exit(); 
+}
 //print "DomainOwnerClientID: ".$DomainOwnerClientID."<br>";
 //print "DomainID: ".$_REQUEST["DomainID"]."<br>";
 
 $domainName = filter_var($_REQUEST["domainName"], FILTER_SANITIZE_STRING);
-$domainId = intVal( $_REQUEST["DomainID"] );
 $clientId = $ClientID;
 $clientRole = $oUser->Role;
 
@@ -48,9 +61,25 @@ if ( $nonceResult === false ) {
 }
 
 
+$nonceArray = [
+    $oUser->Role,
+    $ClientID,
+    $DomainOwnerClientID,
+    $domainId
+];
 
-if($oDomain->DeleteDomain($DomainOwnerClientID, $domainId, $Error) == 1) {
-	$oEmail->makeSendgridEximSettings();
+$nonce = $oSimpleNonce->GenerateNonce("deleteDomain", $nonceArray);
+if($oDomain->DeleteDomain($DomainOwnerClientID, $domainId, $Error, $nonce) == 1) {
+
+    $random = random_int(1,100000);
+    $nonceArray = [
+        $oUser->Role,
+        $ClientID,
+        $random
+    ];
+    
+    $nonce = $oSimpleNonce->GenerateNonce("makeSendgridEximSettings", $nonceArray);
+	$oEmail->makeSendgridEximSettings($random, $nonce);
 	$Notes="Domain Deleted";
 } else {	
 	$Notes="Domain cannot be deleted";

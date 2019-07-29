@@ -607,25 +607,19 @@ if($Traffic == 0)
 
 										$ClientID = $oUser->ClientID;
 
-										if(isset($_REQUEST["ClientID"]))
-										{
-											if($oUser->Role == "admin")
-											{
+										if(isset($_REQUEST["ClientID"])) {
+											if($oUser->Role == "admin") {
 												//yes, permission..
 												$ClientID = $_REQUEST["ClientID"];
 											}
 										}
-									//print "ClientID: ".$ClientID."<p>";
-									//print "Role: ".$oUser->Role."<p>";
 
 										$oDomain->GetDomainList($Array, $ArrayCount, $ClientID, $oUser->Role);
 
 										$DomainCount = 0;
 
-										for($x = 0; $x < $ArrayCount; $x++)
-										{
-											if($Array[$x]["type"] == 'primary')
-											{
+										for($x = 0; $x < $ArrayCount; $x++) {
+											if($Array[$x]["type"] == 'primary') {
 											
 												$domainSettings = $oDomain->getDomainSettings($Array[$x]["id"]);
 	                                                                                        $domainRedirect = "none";
@@ -655,34 +649,31 @@ if($Traffic == 0)
 													print "<td class=\"hidden-xs\"><a href=\"./EditUser.php?DomainID=".$Array[$x]["id"]."\">[ ".$ClientInfoArray["FirstName"]." ".$ClientInfoArray["Surname"]." ]</a></td>\r\n";
 												}
 										
-												if(($oUser->Role == "admin") || ($oUser->Role == "reseller"))
-												{
+												if(($oUser->Role == "admin") || ($oUser->Role == "reseller")) {
 													print "<td><a href=\"./EditPackage.php?DomainID=".$Array[$x]["id"]."\">[ ".$oPackage->GetPackageName($Array[$x]["PackageID"])." ]</a></td>\r\n";
-												}
-												else
-												{
+												} else {
 													print "<td>".$oPackage->GetPackageName($Array[$x]["PackageID"])."</td>\r\n";
 												}	
 
-                print "<td><a href=\"#\" id=\"wwwredirect_".$Array[$x]["id"]."\" data-type=\"select\" data-pk=\"".$Array[$x]["id"]."\" data-value=\"".$domainRedirect."\" data-original-title=\"Select Redirect\"></a></td>\r\n";
+               	 								print "<td><a href=\"#\" id=\"wwwredirect_".$Array[$x]["id"]."\" data-type=\"select\" data-pk=\"".$Array[$x]["id"]."\" data-value=\"".$domainRedirect."\" data-original-title=\"Select Redirect\"></a></td>\r\n";
 
 												
-												{
 
 													print "<td class=\"center\">";
 													print "<div class=\"visible-md visible-lg hidden-sm hidden-xs\">";
 
-  $nonceArray = [	
-	  $Array[$x]["domain_name"],
-	  $Array[$x]["id"],
-	  $oUser->Role,
-	  $oUser->ClientID
-  ];
+													$nonceArray = [	
+														$Array[$x]["domain_name"],
+														$Array[$x]["id"],
+														$oUser->Role,
+														$oUser->ClientID
+													];
+													
 													$deleteDomainNonce = $oSimpleNonce->GenerateNonce("deleteDomain", $nonceArray);
 													$suspendDomainNonce = $oSimpleNonce->GenerateNonce("suspendDomain", $nonceArray);
 													$domainSettingsNonce = $oSimpleNonce->GenerateNonce("domainSettings", $nonceArray);
 
-if(($oUser->Role == "admin") || ($oUser->Role == "reseller"))
+													if(($oUser->Role == "admin") || ($oUser->Role == "reseller")) {
 														if($Array[$x]["Suspended"] == 1)
 														{
 															print "<a href=\"ManageSuspension.php?nonce=".$suspendDomainNonce["Nonce"]."&timeStamp=".$suspendDomainNonce["TimeStamp"]."&ChangeTo=0&DomainID=".$Array[$x]["id"]."&domainName=".$Array[$x]["domain_name"]."\" onclick=\"return ConfirmChange(0, '".$Array[$x]["domain_name"]."'); return false;\" class=\"btn btn-green tooltips\" data-placement=\"top\" data-original-title=\"Unsuspend Domain\"><i class=\"fa clip-spinner-4 fa fa-white\" style=\"color:white;\"></i></a>\n";
@@ -693,8 +684,8 @@ if(($oUser->Role == "admin") || ($oUser->Role == "reseller"))
 														}
 														
 														print "<a href=\"DeleteDomain.php?nonce=".$deleteDomainNonce["Nonce"]."&timeStamp=".$deleteDomainNonce["TimeStamp"]."&DomainID=".$Array[$x]["id"]."&domainName=".$Array[$x]["domain_name"]."\" onclick=\"return ConfirmDelete('".$Array[$x]["domain_name"]."'); return false;\" class=\"btn btn-bricky tooltips\" data-placement=\"top\" data-original-title=\"Delete Domain\"><i class=\"fa fa-times fa fa-white\" style=\"color:white;\"></i></a>\n";
+													}
 
-}
 														print "<a href=\"settings.php?nonce=".$domainSettingsNonce["Nonce"]."&timeStamp=".$domainSettingsNonce["TimeStamp"]."&DomainID=".$Array[$x]["id"]."&domainName=".$Array[$x]["domain_name"]."\" class=\"btn btn-teal tooltips\" data-placement=\"top\" data-original-title=\"Domain Settings\"><i class=\"fa fa-gear fa fa-white\" style=\"color:white;\"></i></a>\n";
 												print "</div>";
 													print "<div class=\"visible-xs visible-sm hidden-md hidden-lg\">";
@@ -728,7 +719,8 @@ if(($oUser->Role == "admin") || ($oUser->Role == "reseller"))
 																	print "<i class=\"fa fa-times\"></i> Delete Domain";
 																	print "</a>";
 																print "</li>";																
-		}
+															}
+															
 														print "<li role=\"presentation\">";
 															print "<a role=\"menuitem\" tabindex=\"-1\" href=\"settings.php?nonce=".$domainSettingsNonce["Nonce"]."&timeStamp=".$domainSettingsNonce["TimeStamp"]."&DomainID=".$Array[$x]["id"]."&domainName=".$Array[$x]["domain_name"]."\">";
 													$deleteDomainNonce = $oSimpleNonce->GenerateNonce("deleteDomain", $nonceArray);

@@ -148,8 +148,40 @@ class Email
 
 
 
-	function makeSendgridEximSettings()
+	function makeSendgridEximSettings($random, $nonceArray)
 	{
+
+		if ( $random == "" ) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Email.php -> makeSendgridEximSettings(); random cannot be blank in Email::makeSendgridEximSettings");
+			throw new Exception("<p><b>random cannot be blank in Email::makeSendgridEximSettings</b><p>");
+		}
+
+
+		if ( ! (is_array($nonceArray) && !empty($nonceArray) ) ) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Email.php -> makeSendgridEximSettings(); Nonce not set");
+			throw new Exception("<p><b>Nonce not set in Email::makeSendgridEximSettings</b><p>");
+		}
+		
+		$oUser = new User();
+		$ClientID = $oUser->getClientId();
+
+		$nonceMeta = [
+			$oUser->Role,
+			$ClientID,
+			$random
+		];
+
+		$oSimpleNonce = new SimpleNonce();
+		$nonceResult = $oSimpleNonce->VerifyNonce($nonceArray["Nonce"], "makeSendgridEximSettings", $nonceArray["TimeStamp"], $nonceMeta);
+
+		if ( ! $nonceResult ) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Email.php -> makeSendgridEximSettings(); Nonce failed");
+			throw new Exception("<p><b>Nonce failed in Email::makeSendgridEximSettings</b></p>");
+		}
+
 		if ( ! file_exists("/var/www/html/mail/sendgrid")) {
 			mkdir("/var/www/html/mail/sendgrid", 0755);
 		}
@@ -171,7 +203,17 @@ class Email
 			file_put_contents("/var/www/html/mail/sendgrid/username", $username);
 			file_put_contents("/var/www/html/mail/sendgrid/password", $password);
 
-			$domains = $this->getSendgridDomains();
+			$random = random_int(1, 1000000);
+			$oUser = new User();
+			$oSimpleNonce = new SimpleNonce();
+			$nonceArray = [	
+				$oUser->Role,
+				$oUser->ClientID,
+				$random
+			];
+			$nonce = $oSimpleNonce->GenerateNonce("getSendgridDomains", $nonceArray);
+			
+			$domains = $this->getSendgridDomains($random, $nonce);
 
 			file_put_contents("/var/www/html/mail/sendgrid/domains", "");
 			if (!empty($domains) ) {
@@ -181,8 +223,40 @@ class Email
 
 	}
 
-        function getSendgridDomains()
-        {
+	function getSendgridDomains($random, $nonceArray)
+	{
+
+
+		if ( $random == "" ) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Email.php -> getSendgridDomains(); random cannot be blank in Email::getSendgridDomains");
+			throw new Exception("<p><b>random cannot be blank in Email::getSendgridDomains</b><p>");
+		}
+
+
+		if ( ! (is_array($nonceArray) && !empty($nonceArray) ) ) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Email.php -> getSendgridDomains(); Nonce not set");
+			throw new Exception("<p><b>Nonce not set in Email::getSendgridDomains</b><p>");
+		}
+		
+		$oUser = new User();
+		$ClientID = $oUser->getClientId();
+
+		$nonceMeta = [
+			$oUser->Role,
+			$ClientID,
+			$random
+		];
+
+		$oSimpleNonce = new SimpleNonce();
+		$nonceResult = $oSimpleNonce->VerifyNonce($nonceArray["Nonce"], "getSendgridDomains", $nonceArray["TimeStamp"], $nonceMeta);
+
+		if ( ! $nonceResult ) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Email.php -> getSendgridDomains(); Nonce failed");
+			throw new Exception("<p><b>Nonce failed in Email::getSendgridDomains</b></p>");
+		}
 
 		$domains = array();
 
