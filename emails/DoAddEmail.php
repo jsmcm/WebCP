@@ -28,10 +28,21 @@ $Role = $oUser->Role;
 
 if($DomainID > -1)
 {
-        $DomainInfoArray = array();
-        $oDomain->GetDomainInfo($DomainID, $DomainInfoArray);
+		$DomainInfoArray = array();
 		
-	$DomainName = $DomainInfoArray["DomainName"];	
+		$random = random_int(1, 1000000);
+		$oUser = new User();
+		$oSimpleNonce = new SimpleNonce();
+		$nonceArray = [	
+			$oUser->Role,
+			$oUser->ClientID,
+			$DomainID,
+			$random
+		];
+		$nonce = $oSimpleNonce->GenerateNonce("getDomainInfo", $nonceArray);
+        $oDomain->GetDomainInfo($DomainID, $random, $DomainInfoArray, $nonce);
+		
+		$DomainName = $DomainInfoArray["DomainName"];	
         $DomainUserName = $DomainInfoArray["UserName"];
         $EmailAllowance = $oPackage->GetPackageAllowance("Emails", $DomainInfoArray["PackageID"]);
         $EmailUsage = $oPackage->GetEmailUsage($DomainID);
@@ -117,19 +128,17 @@ if($oEmail->EmailExists($LocalPart, $DomainID) > 0)
 
 $Reply = $oEmail->AddEmail($LocalPart, $DomainID, $Password, $ClientID);
 
-if($Reply < 1)
-{
+if($Reply < 1) {
 	$Message = "Cannot add email address";
 
-	if($Reply == -1)
-	{
+	if($Reply == -1) {
 		$Message = "No more emails left on this hosting plan";
 	}
 	header("location: index.php?Notes=".$Message);
 	exit();
 }
+
 header("location: index.php?Notes=Email added");
 
-?>
 
 

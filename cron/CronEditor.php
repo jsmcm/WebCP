@@ -12,48 +12,48 @@ require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 $oDomain = new Domain();
 
 $ClientID = $oUser->getClientId();
-if($ClientID < 1)
-{
-        header("Location: /domains/");
-        exit();
+if($ClientID < 1) {
+	header("Location: /domains/");
+	exit();
 }
 
 
 
 $URL = "";
-if(isset($_REQUEST["URL"]))
-{
+if(isset($_REQUEST["URL"])) {
 	$URL = $_REQUEST["URL"];
-}
-else
-{
+} else {
 	header("location: index.php?Notes=URL not set");
 	exit();
 }
-$DomainOwnerID = $oDomain->GetDomainOwnerFromDomainName($URL);
 
-if($oUser->Role == "client")
-{
-	if($DomainOwnerID != $ClientID)
-	{
+
+$nonceArray = [
+	$oUser->Role,
+	$oUser->ClientID,
+	$URL
+];
+
+$oSimpleNonce = new SimpleNonce();
+$nonce = $oSimpleNonce->GenerateNonce("getDomainOwnerFromDomainName", $nonceArray);
+$DomainOwnerID = $oDomain->GetDomainOwnerFromDomainName($URL, $nonce);  
+  
+if($oUser->Role == "client") {
+	if($DomainOwnerID != $ClientID) {
 		header("location: index.php?Notes=permission not set");
-	        exit();
+		exit();
 	}
-}
-else if($oUser->Role == "reseller")
-{
+} else if($oUser->Role == "reseller") {
 	$ResellerID = $oReseller->GetDomainResellerID($URL);
 
-	if( ($DomainOwnerID != $ClientID) && ($ResellerID != $ClientID) )
-	{
+	if( ($DomainOwnerID != $ClientID) && ($ResellerID != $ClientID) ) {
 		header("location: index.php?Notes=permission not set");
-	        exit();
+		exit();
 	}
 }
 
 $MaxJobs = 10;
-if(file_exists($_SERVER["DOCUMENT_ROOT"]."/cron/max_jobs.dat"))
-{
+if(file_exists($_SERVER["DOCUMENT_ROOT"]."/cron/max_jobs.dat")) {
 	$MaxJobs = (int)file_get_contents($_SERVER["DOCUMENT_ROOT"]."/cron/max_jobs.dat");
 }
 
@@ -81,9 +81,7 @@ curl_close($c);
 if(trim($ResultString) != "")
 {
 	$CronArray = explode("\n", $ResultString);
-}
-else
-{
+} else {
 	$CronArray = array();
 }
 

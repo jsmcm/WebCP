@@ -17,16 +17,28 @@ if($ClientID < 1) {
 
 $DomainID = $_REQUEST["DomainID"];
 $Role = $oUser->Role;
-$DomainOwner = $oDomain->GetDomainOwner($DomainID);
 
+$random = random_int(1, 100000);
+$nonceArray = [
+	$oUser->Role,
+	$oUser->ClientID,
+	$DomainID,
+	$random
+];
+
+$nonce = $oSimpleNonce->GenerateNonce("getDomainOwner", $nonceArray);
+$DomainOwner = $oDomain->GetDomainOwner($DomainID, $random, $nonce);
+
+$random = random_int(1,100000);
 $nonceArray = [
 	$oUser->Role,
 	$oUser->getClientId(),
-	$DomainID
+	$DomainID,
+	$random
 ];
 
 $nonce = $oSimpleNonce->GenerateNonce("getDomainNameFromDomainID", $nonceArray);
-$PrimaryDomain = $oDomain->GetDomainNameFromDomainID($DomainID, $nonce);
+$PrimaryDomain = $oDomain->GetDomainNameFromDomainID($DomainID, $random, $nonce);
 $AncestorDomainID = $oDomain->GetAncestorDomainID($DomainID);
 
 $DomainInfoArray = array();

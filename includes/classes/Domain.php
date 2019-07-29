@@ -41,8 +41,46 @@ class Domain
     }
 
 
-	function deleteDomainSetting($domainId, $setting)
+	function deleteDomainSetting($domainId, $setting, $nonceArray)
     {
+
+
+		if ( intVal($domainId) < 1 ) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Domain.php -> deleteDomainSetting(); domainId cannot be blank in Domain::deleteDomainSetting");
+			throw new Exception("<p><b>domainId cannot be blank in Domain::deleteDomainSetting</b><p>");
+		}
+
+		if ( $setting == "" ) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Domain.php -> deleteDomainSetting(); setting cannot be blank in Domain::deleteDomainSetting");
+			throw new Exception("<p><b>setting cannot be blank in Domain::deleteDomainSetting</b><p>");
+		}
+
+		if ( ! (is_array($nonceArray) && !empty($nonceArray) ) ) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Domain.php -> deleteDomainSetting(); Nonce not set");
+			throw new Exception("<p><b>Nonce not set in Domain::deleteDomainSetting</b><p>");
+		}
+		
+		$oUser = new User();
+		$ClientID = $oUser->getClientId();
+
+		$nonceMeta = [
+			$oUser->Role,
+			$ClientID,
+			$domainId,
+			$setting
+		];
+
+		$oSimpleNonce = new SimpleNonce();
+		$nonceResult = $oSimpleNonce->VerifyNonce($nonceArray["Nonce"], "deleteDomainSetting", $nonceArray["TimeStamp"], $nonceMeta);
+
+		if ( ! $nonceResult ) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Domain.php -> deleteDomainSetting(); Nonce failed");
+			throw new Exception("<p><b>Nonce failed in Domain::deleteDomainSetting</b></p>");
+		}
 
  		try {
 			$query = $this->DatabaseConnection->prepare("UPDATE domain_settings SET deleted = 1 WHERE setting_name = :setting AND domain_id = :domain_id");
@@ -59,10 +97,66 @@ class Domain
 
     }
 
-	function saveDomainSetting($domainId, $setting, $value, $extra1="", $extra2="")
+	function saveDomainSetting($domainId, $setting, $value, $extra1="", $extra2="", $nonceArray)
 	{
- 		$this->deleteDomainSetting($domainId, $setting);
+
+		if ( intVal($domainId) < 1 ) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Domain.php -> saveDomainSetting(); domainId cannot be blank in Domain::saveDomainSetting");
+			throw new Exception("<p><b>domainId cannot be blank in Domain::saveDomainSetting</b><p>");
+		}
+
+		if ( $setting == "" ) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Domain.php -> saveDomainSetting(); setting cannot be blank in Domain::saveDomainSetting");
+			throw new Exception("<p><b>setting cannot be blank in Domain::saveDomainSetting</b><p>");
+		}
+
+		if ( $value == "" ) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Domain.php -> saveDomainSetting(); value cannot be blank in Domain::saveDomainSetting");
+			throw new Exception("<p><b>value cannot be blank in Domain::saveDomainSetting</b><p>");
+		}
+
+
+		if ( ! (is_array($nonceArray) && !empty($nonceArray) ) ) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Domain.php -> saveDomainSetting(); Nonce not set");
+			throw new Exception("<p><b>Nonce not set in Domain::saveDomainSetting</b><p>");
+		}
 		
+		$oUser = new User();
+		$ClientID = $oUser->getClientId();
+
+		$nonceMeta = [
+			$oUser->Role,
+			$ClientID,
+			$domainId,
+			$setting,
+			$value
+		];
+
+		$oSimpleNonce = new SimpleNonce();
+		$nonceResult = $oSimpleNonce->VerifyNonce($nonceArray["Nonce"], "saveDomainSetting", $nonceArray["TimeStamp"], $nonceMeta);
+
+		if ( ! $nonceResult ) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Domain.php -> saveDomainSetting(); Nonce failed");
+			throw new Exception("<p><b>Nonce failed in Domain::saveDomainSetting</b></p>");
+		}
+
+
+		$nonceArray = [
+			$oUser->Role,
+			$ClientID,
+			$domainId,
+			$setting
+		];
+		
+		$nonce = $oSimpleNonce->GenerateNonce("deleteDomainSetting", $nonceArray);
+ 		$this->deleteDomainSetting($domainId, $setting, $nonce);
+		
+
 		try {
 			$query = $this->DatabaseConnection->prepare("INSERT INTO domain_settings VALUES (0, :domain_id, :setting, :value, :extra1, :extra2, 0)");
 
@@ -659,14 +753,16 @@ class Domain
 		$oUser = new User();
 		$oSimpleNonce = new SimpleNonce();
 
+		$random = random_int(1,100000);
 		$nonceArray = [
 			$oUser->Role,
 			$oUser->getClientId(),
-			$DomainID
+			$DomainID,
+			$random
 		];
 		
 		$nonce = $oSimpleNonce->GenerateNonce("getDomainNameFromDomainID", $nonceArray);
-		$DomainName = $this->GetDomainNameFromDomainID($DomainID, $nonce);
+		$DomainName = $this->GetDomainNameFromDomainID($DomainID, $random, $nonce);
 
 		try
 		{
@@ -743,14 +839,16 @@ class Domain
 			while($result = $query->fetch(PDO::FETCH_ASSOC)) {
 				$ParkedDomainArray[$ArrayCount]["ID"] = $result["id"];
 
+				$random = random_int(1,100000);
 				$nonceArray = [
 					$role,
 					$clientId,
-					$result["parent_domain_id"]
+					$result["parent_domain_id"],
+					$random
 				];
 				
 				$nonce = $oSimpleNonce->GenerateNonce("getDomainNameFromDomainID", $nonceArray);
-				$ParkedDomainArray[$ArrayCount]["ParkedOn"] = $this->GetDomainNameFromDomainID($result["parent_domain_id"], $nonce);
+				$ParkedDomainArray[$ArrayCount]["ParkedOn"] = $this->GetDomainNameFromDomainID($result["parent_domain_id"], $random, $nonce);
 	
 				// if this is parked on a subdomain which has been deleted but the files still remain, show path
 				if($ParkedDomainArray[$ArrayCount]["ParkedOn"] == "")
@@ -950,14 +1048,16 @@ class Domain
 		
 		if(file_exists($myfile)) {
 
+			$random = random_int(1,100000);
 			$nonceArray = [
 				$role,
 				$clientId,
-				$DomainID
+				$DomainID,
+				$random
 			];
 			
 			$nonce = $oSimpleNonce->GenerateNonce("getDomainNameFromDomainID", $nonceArray);
-			$DomainName = $this->GetDomainNameFromDomainID($DomainID, $nonce);	
+			$DomainName = $this->GetDomainNameFromDomainID($DomainID, $random, $nonce);	
 			if(file_exists("/var/www/html/webcp/nm/".$DomainName.".crtchain")) {
 				unlink("/var/www/html/webcp/nm/".$DomainName.".crtchain");
 			}
@@ -1010,9 +1110,20 @@ class Domain
 
 	function DeleteSubDomain($ClientID, $SubDomainID, &$Error)
 	{
+		$oUser = new User();
+
+		$random = random_int(1, 100000);
+		$nonceArray = [
+			$oUser->Role,
+			$oUser->ClientID,
+			$SubDomainID,
+			$random
+		];
 		
-		if($ClientID != $this->GetDomainOwner($SubDomainID))
-		{
+		$oSimpleNonce = new SimpleNonce();
+		
+		$nonce = $oSimpleNonce->GenerateNonce("getDomainOwner", $nonceArray);
+		if($ClientID != $this->GetDomainOwner($SubDomainID, $random, $nonce)) {
 			return 0;
 		}
 
@@ -1445,28 +1556,57 @@ class Domain
 		return "";
 	}
 	
-	function DeleteDomain($ClientID, $DomainID, &$Error)
+	function DeleteDomain($ClientID, $DomainID, &$Error, $nonceArray)
 	{
-		$oLog = new Log();
 
-		$oEmail = new Email();
+		if ( intVal($ClientID) < 1 ) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Domain.php -> DeleteDomain(); ClientID cannot be blank in Domain::DeleteDomain");
+			throw new Exception("<p><b>ClientID cannot be blank in Domain::DeleteDomain</b><p>");
+		}
+
+
+		if ( intVal($DomainID) < 1 ) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Domain.php -> DeleteDomain(); DomainID cannot be blank in Domain::DeleteDomain");
+			throw new Exception("<p><b>DomainID cannot be blank in Domain::DeleteDomain</b><p>");
+		}
+
+		if ( ! (is_array($nonceArray) && !empty($nonceArray) ) ) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Domain.php -> DeleteDomain(); Nonce not set");
+			throw new Exception("<p><b>Nonce not set in Domain::DeleteDomain</b><p>");
+		}
 		
+		$oUser = new User();
+		$nonceMeta = [
+			$oUser->Role,
+			$oUser->ClientID,
+			$ClientID,
+			$DomainID
+		];
+
+		$oSimpleNonce = new SimpleNonce();
+		$nonceResult = $oSimpleNonce->VerifyNonce($nonceArray["Nonce"], "deleteDomain", $nonceArray["TimeStamp"], $nonceMeta);
+
+		if ( ! $nonceResult ) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Domain.php -> DeleteDomain(); Nonce failed");
+			throw new Exception("<p><b>Nonce failed in Domain::DeleteDomain</b></p>");
+		}
+
+
+
+
+		$oLog = new Log();
+		$oEmail = new Email();
 		$oFTP = new FTP();
-
 		$oFirewall = new Firewall();
-
 		$oMySQL = new MySQL();
 
 		$oLog->WriteLog("Debug", "At top of class.Domains.php -> DeleteDomain; ClientID: ".$ClientID."; DomainID: ".$DomainID);
-		if($ClientID != $this->GetDomainOwner($DomainID))
-		{
-			$oLog->WriteLog("Debug", "Not same client id!");
-			return 0;
-		}
 
 		$random = random_int(1, 1000000);
-		$oUser = new User();
-		$oSimpleNonce = new SimpleNonce();
 		$nonceArray = [	
 			$oUser->Role,
 			$oUser->ClientID,
@@ -1477,6 +1617,11 @@ class Domain
 		
 		$InfoArray = array();
 		$this->GetDomainInfo($DomainID, $random, $InfoArray, $nonce);
+
+		if($ClientID != $InfoArray["ClientID"]) {
+			$oLog->WriteLog("Debug", "Not same client id (request from: ".$ClientId."; belongs to: ".$InfoArray["ClientID"]."!");
+			return 0;
+		}
 
 
 		$oEmail->DeleteDomainEmails($DomainID, $ClientID);
@@ -1629,25 +1774,29 @@ class Domain
 						$DomainArray[$ArrayCount]["Suspended"] = $result["suspended"];
 						$DomainArray[$ArrayCount]["ParentDomainID"] = $result["parent_domain_id"];
 
+						$random = random_int(1,100000);
 						$nonceArray = [
 							$role,
 							$clientId,
-							$result["parent_domain_id"]
+							$result["parent_domain_id"],
+							$random
 						];
 						
 						$nonce = $oSimpleNonce->GenerateNonce("getDomainNameFromDomainID", $nonceArray);
-						$DomainArray[$ArrayCount]["ParentDomain"] = $this->GetDomainNameFromDomainID($result["parent_domain_id"], $nonce);
+						$DomainArray[$ArrayCount]["ParentDomain"] = $this->GetDomainNameFromDomainID($result["parent_domain_id"], $random, $nonce);
 
 						$DomainArray[$ArrayCount]["AncestorDomainID"] = $result["ancestor_domain_id"];
 
+						$random = random_int(1,100000);
 						$nonceArray = [
 							$role,
 							$clientId,
-							$result["ancestor_domain_id"]
+							$result["ancestor_domain_id"],
+							$random
 						];
 						
 						$nonce = $oSimpleNonce->GenerateNonce("getDomainNameFromDomainID", $nonceArray);
-						$DomainArray[$ArrayCount]["AncestorDomain"] = $this->GetDomainNameFromDomainID($result["ancestor_domain_id"], $nonce);
+						$DomainArray[$ArrayCount]["AncestorDomain"] = $this->GetDomainNameFromDomainID($result["ancestor_domain_id"], $random, $nonce);
 						$DomainArray[$ArrayCount++]["type"] = $result["domain_type"];
 					}
 					
@@ -1784,11 +1933,7 @@ class Domain
 		try
 		{
 			$query = $this->DatabaseConnection->prepare($Query);
-			
-			
 			$query->execute();
-	
-	
 		}
 		catch(PDOException $e)
 		{
@@ -1905,14 +2050,20 @@ class Domain
 		return 0;
 	}
 	
-	function GetDomainOwner($domain_id, $nonceArray)
+	function GetDomainOwner($domain_id, $random, $nonceArray)
 	{
 
 
 		if ( intVal($domain_id) < 1 ) {
 			$oLog = new Log();
-			$oLog->WriteLog("error", "/class.Domain.php -> GetDomainOwner(); Domaindomain_id cannot be blank in Domain::GetDomainOwner");
+			$oLog->WriteLog("error", "/class.Domain.php -> GetDomainOwner(); domain_id cannot be blank in Domain::GetDomainOwner");
 			throw new Exception("<p><b>domain_id cannot be blank in Domain::GetDomainOwner</b><p>");
+		}
+
+		if ( $random == "" ) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Domain.php -> GetDomainOwner(); random cannot be blank in Domain::GetDomainOwner");
+			throw new Exception("<p><b>random cannot be blank in Domain::GetDomainOwner</b><p>");
 		}
 
 		if ( ! (is_array($nonceArray) && !empty($nonceArray) ) ) {
@@ -1927,7 +2078,8 @@ class Domain
 		$nonceMeta = [
 			$oUser->Role,
 			$ClientID,
-			$domain_id
+			$domain_id,
+			$random
 		];
 
 		$oSimpleNonce = new SimpleNonce();
@@ -2039,20 +2191,16 @@ class Domain
 
 		$oLog = new Log();
 
-
 		$lastInsertId = 0;
 		
 		try
 		{
-			$query = $this->DatabaseConnection->prepare("INSERT INTO domains VALUES (0, ".$ClientID.", '".$DomainInfoArray["UserName"]."', ".$DomainInfoArray["GroupID"].", ".$DomainInfoArray["UserID"].", '".$SubDomain.".".$DomainInfoArray["DomainName"]."', '".$DomainInfoArray["Path"]."/".strtolower($SubDomain)."', '".$DomainInfoArray["DomainOwner"]."', 1, 0, '".date('Y-m-d H:i:s')."', '".date('Y-m-d H:i:s')."', 'local', 'subdomain',  ".$DomainID.", ".$AncestorID.", ".$DomainInfoArray["PackageID"].", 0)");
-						
+			$query = $this->DatabaseConnection->prepare("INSERT INTO domains VALUES (0, ".$ClientID.", '".$DomainInfoArray["UserName"]."', ".$DomainInfoArray["GroupID"].", ".$DomainInfoArray["UserID"].", '".$SubDomain.".".$DomainInfoArray["DomainName"]."', '".$DomainInfoArray["Path"]."/".strtolower($SubDomain)."', '".$DomainInfoArray["DomainOwner"]."', 1, 0, '".date('Y-m-d H:i:s')."', '".date('Y-m-d H:i:s')."', 'local', 'subdomain',  ".$DomainID.", ".$AncestorID.", ".$DomainInfoArray["PackageID"].", 0)");				
 			$query->execute();
 			
 			$lastInsertId = $this->DatabaseConnection->lastInsertId();
 	
-		}
-		catch(PDOException $e)
-		{
+		} catch(PDOException $e) {
 	
 			$oLog->WriteLog("error", "/class.Domain.php -> AddSubDomain(); Error = ".$e);
 		}
@@ -2062,30 +2210,33 @@ class Domain
 		$this->DeleteDomainFile($AncestorID);
 		$this->MakeDomainFile($AncestorID);
 	
-		$clientId = $oUser->getClientId();
+		$random = random_int(1,100000);
 		$nonceArray = [
 			$oUser->Role,
-			$clientId,
-			$DomainID
+			$oUser->ClientID,
+			$DomainID,
+			$random
 		];
 
 		$nonce = $oSimpleNonce->GenerateNonce("getDomainNameFromDomainID", $nonceArray);
-		$DomainName = $this->GetDomainNameFromDomainID($DomainID, $nonce);
+		$DomainName = $this->GetDomainNameFromDomainID($DomainID, $random, $nonce);
 		
+		$ParentDomainName = $DomainName;
 		$ParentID = $this->GetParentDomainIDRecursive($DomainID, true);
 
+		$random = random_int(1,100000);
 		$nonceArray = [
 			$oUser->Role,
-			$clientId,
-			$ParentID
+			$oUser->ClientID,
+			$ParentID,
+			$random
 		];
 
 		$nonce = $oSimpleNonce->GenerateNonce("getDomainNameFromDomainID", $nonceArray);
-		$ParentDomainName = $this->GetDomainNameFromDomainID($ParentID, $nonce);
-		
+		$ParentDomainName = $this->GetDomainNameFromDomainID($ParentID, $random, $nonce);
 
-		$FQDN = $SubDomain.".".$DomainName;
-			
+
+		$FQDN = $SubDomain.".".$DomainName;			
 		$SubDomain = substr($FQDN, 0, strlen($FQDN) - (strlen($ParentDomainName) + 1));
 		
 		try	
@@ -2436,7 +2587,20 @@ class Domain
 
 		$this->DeleteDomainFile($AddDomainID);
 		$this->MakeDomainFile($AddDomainID);
-		$this->saveDomainSetting($AddDomainID, "ssl_redirect", "enforce", "", "");
+
+		$oUser = new User();
+		$oSimpleNonce = new SimpleNonce();
+
+		$nonceArray = [
+			$oUser->Role,
+			$oUser->ClientID,
+			$AddDomainID,
+			"ssl_redirect",
+			"enforce"
+		];
+
+		$nonce = $oSimpleNonce->GenerateNonce("saveDomainSetting", $nonceArray);
+		$this->saveDomainSetting($AddDomainID, "ssl_redirect", "enforce", "", "", $nonce);
 
 		$oEmail = new Email();
 		$transactionalEmailSettings = $oEmail->getSendgridSettings();
@@ -2672,12 +2836,19 @@ class Domain
 
 	}
 	
-	function GetDomainNameFromDomainID($DomainID, $nonceArray)
+	function GetDomainNameFromDomainID($DomainID, $random, $nonceArray)
 	{
 		if ( intVal($DomainID) < 1 ) {
 			$oLog = new Log();
 			$oLog->WriteLog("error", "/class.Domain.php -> GetDomainNameFromDomainID(); DomainID cannot be blank in Domain::GetDomainNameFromDomainID");
 			throw new Exception("<p><b>domainId cannot be blank in Domain::GetDomainNameFromDomainID</b><p>");
+		}
+
+
+		if ( $random == "" ) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Domain.php -> GetDomainNameFromDomainID(); random cannot be blank in Domain::GetDomainNameFromDomainID");
+			throw new Exception("<p><b>random cannot be blank in Domain::GetDomainNameFromDomainID</b><p>");
 		}
 
 
@@ -2692,8 +2863,9 @@ class Domain
 
 		$nonceMeta = [
 			$oUser->Role,
-			$ClientID,
-			$DomainID
+			$oUser->ClientID,
+			$DomainID,
+			$random
 		];
 
 		$oSimpleNonce = new SimpleNonce();
@@ -2964,14 +3136,16 @@ class Domain
 		$this->GetDomainInfo($SubDomainID, $random, $DomainInfoArray, $nonce);
 
 				
+		$random = random_int(1,100000);
 		$nonceArray = [
 			$oUser->Role,
 			$oUser->getClientId(),
-			$DomainInfoArray["PrimaryDomainID"]
+			$DomainInfoArray["PrimaryDomainID"],
+			$random
 		];
 
 		$nonce = $oSimpleNonce->GenerateNonce("getDomainNameFromDomainID", $nonceArray);
-		$ParentDomainName = $this->GetDomainNameFromDomainID($DomainInfoArray["PrimaryDomainID"], $nonce);
+		$ParentDomainName = $this->GetDomainNameFromDomainID($DomainInfoArray["PrimaryDomainID"], $random, $nonce);
 		$FQDN = $DomainInfoArray["DomainName"];
 		$SubDomain = substr($FQDN, 0, strlen($FQDN) - (strlen($ParentDomainName) + 1));
 

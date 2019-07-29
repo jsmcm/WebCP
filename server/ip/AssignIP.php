@@ -20,14 +20,16 @@ if ( $oUser->Role != "admin" ) {
 $clientId = $oUser->getClientId();
 
 $domainId = intVal($_POST["DomainID"]);
+$random = random_int(1,100000);
 $nonceArray = [
 	$oUser->Role,
 	$clientId,
-	$domainId
+	$domainId,
+	$random
 ];
 
 $nonce = $oSimpleNonce->GenerateNonce("getDomainNameFromDomainID", $nonceArray);
-$DomainName = $oDomain->GetDomainNameFromDomainID($domainId, $nonce);
+$DomainName = $oDomain->GetDomainNameFromDomainID($domainId, $random, $nonce);
 
 $ip = filter_var($_POST["IPAddress"], FILTER_SANITIZE_IP);
 

@@ -45,7 +45,18 @@ $DomainOwnerClientID = -1;
 if($DomainID > -1)
 {
 	$DomainInfoArray = array();
-	$oDomain->GetDomainInfo($DomainID, $DomainInfoArray);
+
+	$random = random_int(1, 1000000);
+	$oUser = new User();
+	$oSimpleNonce = new SimpleNonce();
+	$nonceArray = [	
+		$oUser->Role,
+		$oUser->ClientID,
+		$DomainID,
+		$random
+	];
+	$nonce = $oSimpleNonce->GenerateNonce("getDomainInfo", $nonceArray);
+	$oDomain->GetDomainInfo($DomainID, $random, $DomainInfoArray, $nonce);
 
 	$DomainUserName = $DomainInfoArray["UserName"];
 	$SubDomainAllowance = $oPackage->GetPackageAllowance("SubDomains", $DomainInfoArray["PackageID"]);

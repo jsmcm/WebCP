@@ -28,22 +28,28 @@ if( (! is_numeric($DomainID)) || ($DomainID < 1) ) {
 
 	$oDomain = new Domain();
 	$ClientID = $oUser->ClientID;
-	$DomainOwnerClientID = $oDomain->GetDomainOwner($DomainID);
 
+	$random = random_int(1, 100000);
 	$nonceArray = [
-		$oUser->Role,$nonceArray = [
-			$oUser->Role,
-			$oUser->getClientId(),
-			$DomainID
-		];
-		
-		$nonce = $oSimpleNonce->GenerateNonce("getDomainNameFromDomainID", $nonceArray);
+		$oUser->Role,
+		$oUser->ClientID,
+		$DomainID,
+		$random
+	];
+	
+	$nonce = $oSimpleNonce->GenerateNonce("getDomainOwner", $nonceArray);
+	$DomainOwnerClientID = $oDomain->GetDomainOwner($DomainID, $random, $nonce);
+
+	$random = random_int(1,100000);
+	$nonceArray = [
+		$oUser->Role,
 		$oUser->getClientId(),
-		$DomainID
+		$DomainID,
+		$random
 	];
 	
 	$nonce = $oSimpleNonce->GenerateNonce("getDomainNameFromDomainID", $nonceArray);
-	$PrimaryDomainName = $oDomain->GetDomainNameFromDomainID($DomainID, $nonce);
+	$PrimaryDomainName = $oDomain->GetDomainNameFromDomainID($DomainID, $random, $nonce);
 
 	//print "ClientID: ".$ClientID."<p>";
 	//print "DomainOwnerClientID: ".$DomainOwnerClientID."<p>";

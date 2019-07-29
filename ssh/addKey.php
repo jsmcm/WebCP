@@ -23,8 +23,26 @@ if($ClientID < 1) {
 $domainId = intVal( $_REQUEST["domainId"] );
 $clientId = $ClientID;
 $clientRole = $oUser->Role;
+
+$nonceArray = [
+	$oUser->Role,
+	$oUser->ClientID,
+	$domainId
+];
+
+$nonce = $oSimpleNonce->GenerateNonce("getDomainOwner", $nonceArray);
 $domainOwnerId = $oDomain->GetDomainOwner($domainId);
-$resellerId = $oReseller->GetClientResellerID($domainOwnerId);
+
+
+$nonceArray = [
+    $oUser->Role,
+    $oUser->ClientID,
+    $domainOwnerId
+];
+
+$oReseller = new Reseller();
+$nonce = $oSimpleNonce->GenerateNonce("getClientResellerID", $nonceArray);
+$resellerId = $oReseller->GetClientResellerID($domainOwnerId, $nonce);
 
 if ( $clientId != $domainOwnerId ) {
 	if ( $resellerId != $clientId ) {
@@ -33,14 +51,16 @@ if ( $clientId != $domainOwnerId ) {
 	}
 }
 
+$random = random_int(1,100000);
 $nonceArray = [
 	$oUser->Role,
 	$clientId,
-	$domainId
+	$domainId,
+	$random
 ];
 
 $nonce = $oSimpleNonce->GenerateNonce("getDomainNameFromDomainID", $nonceArray);
-$domainName = $oDomain->GetDomainNameFromDomainID( $domainId, $nonce);
+$domainName = $oDomain->GetDomainNameFromDomainID( $domainId, $random, $nonce);
 
 ?>
 

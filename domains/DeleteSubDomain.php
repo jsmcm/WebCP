@@ -15,26 +15,47 @@ if($ClientID < 1)
         exit();
 }
 
+$subDomainId = intVal( $_REQUEST["SubDomainID"] );
+
 $oDomain = new Domain();
-$SubDomainOwnerClientID = $oDomain->GetDomainOwner($_REQUEST["SubDomainID"]);
-$DomainID = $oDomain->GetDomainIDFromSubDomainID($_REQUEST["SubDomainID"]);
+
+$random = random_int(1, 100000);
+$nonceArray = [
+	$oUser->Role,
+	$oUser->ClientID,
+    $subDomainId,
+    $random
+];
+
+$oSimpleNonce = new SimpleNonce();
+
+$nonce = $oSimpleNonce->GenerateNonce("getDomainOwner", $nonceArray);
+$SubDomainOwnerClientID = $oDomain->GetDomainOwner($subDomainId, $random, $nonce);
+
+$DomainID = $oDomain->GetDomainIDFromSubDomainID($subDomainId);
 
 
 $ResellerPermission = false;
-if($oUser->Role == "reseller")
-{
-        if($oReseller->GetClientResellerID($SubDomainOwnerClientID) == $ClientID)
-        {
-                $ResellerPermission = true;
+if($oUser->Role == "reseller") {
+
+        $nonceArray = [
+            $oUser->Role,
+            $oUser->ClientID,
+            $SubDomainOwnerClientID
+        ];
+        
+        $oReseller = new Reseller();
+        $nonce = $oSimpleNonce->GenerateNonce("getClientResellerID", $nonceArray);
+
+        if($oReseller->GetClientResellerID($SubDomainOwnerClientID, $nonce) == $ClientID) {
+            $ResellerPermission = true;
         }
 }
 
-if( ($ClientID != $SubDomainOwnerClientID) && ($Role != "admin"))
-{
-        if($ResellerPermission == false)
-        {
-                exit();
-        }
+if( ($ClientID != $SubDomainOwnerClientID) && ($Role != "admin")) {
+    if($ResellerPermission == false) {
+        exit();
+    }
 }
 
 

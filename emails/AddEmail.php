@@ -10,8 +10,7 @@ $oSettings = new Settings();
 require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 
 $ClientID = $oUser->getClientId();
-if($ClientID < 1)
-{
+if($ClientID < 1) {
 	header("Location: /index.php");
 	exit();
 }
@@ -20,42 +19,45 @@ $Role = $oUser->Role;
 
 
 $DomainID = -1;
-
-if(isset($_POST["DomainID"]))
-{
-	$DomainID = $_POST["DomainID"];
+if(isset($_POST["DomainID"])) {
+	$DomainID = intVal($_POST["DomainID"]);
 }
 
 
 
 $LocalPart = "";
-
-if(isset($_POST["LocalPart"]))
-{
-	$LocalPart = $_POST["LocalPart"];
+if(isset($_POST["LocalPart"])) {
+	$LocalPart = filter_var($_POST["LocalPart"], FILTER_SANITIZE_STRING);
 }
 
 
 $Password = "";
-
-if(isset($_POST["Password"]))
-{
-	$Password = $_POST["Password"];
+if(isset($_POST["Password"])) {
+	$Password = filter_var($_POST["Password"], FILTER_SANITIZE_STRING);
 }
 
 $PasswordAgain = "";
-
-if(isset($_POST["PasswordAgain"]))
-{
-	$PasswordAgain = $_POST["PasswordAgain"];
+if(isset($_POST["PasswordAgain"])) {
+	$PasswordAgain = filter_var($_POST["PasswordAgain"], FILTER_SANITIZE_STRING);
 }
 
 
 
-if($DomainID > -1)
-{
+if($DomainID > -1) {
 	$DomainInfoArray = array();
-	$oDomain->GetDomainInfo($DomainID, $DomainInfoArray);
+
+
+	$random = random_int(1, 1000000);
+	$oUser = new User();
+	$oSimpleNonce = new SimpleNonce();
+	$nonceArray = [	
+		$oUser->Role,
+		$oUser->ClientID,
+		$DomainID,
+		$random
+	];
+	$nonce = $oSimpleNonce->GenerateNonce("getDomainInfo", $nonceArray);
+	$oDomain->GetDomainInfo($DomainID, $random, $DomainInfoArray, $nonce);
 
 	$DomainUserName = $DomainInfoArray["UserName"];
 	$EmailAllowance = $oPackage->GetPackageAllowance("Emails", $DomainInfoArray["PackageID"]);
@@ -70,12 +72,9 @@ if($DomainID > -1)
 	//print "DomainID: ".$DomainID."<br>";
 	//print "AncestorDomainID: ".$AncestorDomainID."<br>";
 
-	if($DomainInfoArray["DomainType"] == "primary")
-	{
+	if($DomainInfoArray["DomainType"] == "primary") {
 		$EmailUsage = $oPackage->GetEmailUsage($DomainID);
-	}
-	else
-	{
+	} else {
 		$EmailUsage = $oPackage->GetEmailUsage($AncestorDomainID);
 	}
 

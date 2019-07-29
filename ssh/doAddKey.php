@@ -48,8 +48,27 @@ if ( base64_encode(base64_decode($keyTest, true)) !== $keyTest){
     exit();
 }
 
-$domainOwnerId = $oDomain->GetDomainOwner($domainId);
-$resellerId = $oReseller->GetClientResellerID($domainOwnerId);
+$random = random_int(1, 100000);
+$nonceArray = [
+	$oUser->Role,
+	$oUser->ClientID,
+    $domainId,
+    $random
+];
+
+$nonce = $oSimpleNonce->GenerateNonce("getDomainOwner", $nonceArray);
+$domainOwnerId = $oDomain->GetDomainOwner($domainId, $random, $nonce);
+
+
+$nonceArray = [
+    $oUser->Role,
+    $oUser->ClientID,
+    $domainOwnerId
+];
+
+$oReseller = new Reseller();
+$nonce = $oSimpleNonce->GenerateNonce("getClientResellerID", $nonceArray);
+$resellerId = $oReseller->GetClientResellerID($domainOwnerId, $nonce);
 
 if ( $ClientID != $domainOwnerId ) {
 	if ( $resellerId != $ClientID ) {

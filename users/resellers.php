@@ -298,6 +298,16 @@ $oReseller->deleteOldResellers();
 									
 									</table>
 							
+									<?php
+									
+									if(($oUser->Role == "admin") || ($oUser->Role == "reseller") ) {
+									?>
+										<a class="btn btn-primary" href="AddUser.php?r"><i class="fa fa-plus"></i>
+										Add new Reseller</a>
+									<?php
+									}
+									?>
+									
 								</div>
 							</div>
 							<!-- end: DYNAMIC TABLE PANEL -->

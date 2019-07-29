@@ -15,8 +15,16 @@ if($ClientID < 1)
 $URL = "nodecp.rsa.pw";
 $PostData = "Server=WebCP";
 
-$DomainOwnerID = $oDomain->GetDomainOwnerFromDomainName($URL);
+$nonceArray = [
+	$oUser->Role,
+	$oUser->ClientID,
+	$URL
+];
 
+$oSimpleNonce = new SimpleNonce();
+$nonce = $oSimpleNonce->GenerateNonce("getDomainOwnerFromDomainName", $nonceArray);
+$DomainOwnerID = $oDomain->GetDomainOwnerFromDomainName($URL, $nonce);  
+  
 print "URL: ".$URL."<br>";
 print "ClientID: ".$ClientID."<br>";
 print "DomainOwnerID: ".$DomainOwnerID."<br>";

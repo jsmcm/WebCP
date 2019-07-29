@@ -25,8 +25,17 @@ $publicKeyId = intVal( $_REQUEST["publicKeyId"] );
 $nonceValue = filter_var( $_REQUEST["nonceValue"], FILTER_SANITIZE_STRING );
 $nonceTimeStamp = filter_var( $_REQUEST["nonceTimeStamp"], FILTER_SANITIZE_STRING );
 
+$random = random_int(1, 100000);
+$nonceArray = [
+	$oUser->Role,
+	$oUser->ClientID,
+    $domainId,
+    $random
+];
 
-$domainOwnerId = $oDomain->GetDomainOwner($domainId);
+$nonce = $oSimpleNonce->GenerateNonce("getDomainOwner", $nonceArray);
+$domainOwnerId = $oDomain->GetDomainOwner($domainId, $random, $nonce);
+
 $resellerId = $oReseller->GetClientResellerID($domainOwnerId);
 
 if ( $ClientID != $domainOwnerId ) {

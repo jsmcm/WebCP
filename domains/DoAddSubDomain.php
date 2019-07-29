@@ -19,25 +19,25 @@ if($ClientID < 1) {
 }
 
 $DomainID = intVal($_POST["DomainID"]);
-$DomainName = "";
 $SubDomain = filter_var($_POST["SubDomain"], FILTER_SANITIZE_STRING);
-$DomainOwnerClientID = $oDomain->GetDomainOwner($DomainID);
+
+$random = random_int(1, 100000);
+$nonceArray = [
+	$oUser->Role,
+	$oUser->ClientID,
+	$DomainID,
+	$random
+];
+
+$nonce = $oSimpleNonce->GenerateNonce("getDomainOwner", $nonceArray);
+$DomainOwnerClientID = $oDomain->GetDomainOwner($DomainID, $random, $nonce);
 
 //print "Role: ".$Role."<br>";
 //print "DomainOwnerClientID: ".$DomainOwnerClientID."<br>";
 //print "client_id: ".$ClientID."<br>";
 
-$nonceArray = [
-	$oUser->Role,
-	$oUser->getClientId(),
-	$DomainID
-];
-
-$nonce = $oSimpleNonce->GenerateNonce("getDomainNameFromDomainID", $nonceArray);
-$DomainName = $oDomain->GetDomainNameFromDomainID($DomainID, $nonce);
 $AncestorDomainID = $oDomain->GetAncestorDomainID($DomainID);
 
-//print "Domain Name: ".$DomainName."<br>";
 //print "Domain ID: ".$DomainID."<br>";
 //print "Sub Domain: ".$SubDomain."<br>";
 

@@ -21,24 +21,43 @@ if($ClientID < 1) {
 $DomainID = $_REQUEST["DomainID"];
 $ParkedDomain = $_REQUEST["ParkedDomain"];
 $Role = $oUser->Role;
-$DomainOwner = $oDomain->GetDomainOwner($DomainID);
 
+$random = random_int(1, 100000);
+$nonceArray = [
+	$oUser->Role,
+	$oUser->ClientID,
+	$DomainID,
+	$random
+];
+
+$nonce = $oSimpleNonce->GenerateNonce("getDomainOwner", $nonceArray);
+$DomainOwner = $oDomain->GetDomainOwner($DomainID, $random, $nonce);
+
+$random = random_int(1,100000);
 $nonceArray = [
 	$oUser->Role,
 	$oUser->getClientId(),
-	$DomainID
+	$DomainID,
+	$random
 ];
 
 $nonce = $oSimpleNonce->GenerateNonce("getDomainNameFromDomainID", $nonceArray);
-$PrimaryDomain = $oDomain->GetDomainNameFromDomainID($DomainID, $nonce);
+$PrimaryDomain = $oDomain->GetDomainNameFromDomainID($DomainID, $random, $nonce);
 
 
 
 $ParkedDomainUsage = $oPackage->GetParkedDomainUsage($oUser->UserName);
 $DomainInfoArray = array();
 
-
-$oDomain->GetDomainInfo($DomainID, $DomainInfoArray);
+$random = random_int(1, 1000000);
+$nonceArray = [	
+	$oUser->Role,
+	$oUser->ClientID,
+	$DomainID,
+	$random
+];
+$nonce = $oSimpleNonce->GenerateNonce("getDomainInfo", $nonceArray);
+$oDomain->GetDomainInfo($DomainID, $random, $DomainInfoArray, $nonce);
 
 $DomainUserName = $DomainInfoArray["UserName"];
 $PackageID = $DomainInfoArray["PackageID"];

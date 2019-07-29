@@ -28,16 +28,28 @@ if( (! is_numeric($DomainID)) || ($DomainID < 1) ) {
 
 	$oDomain = new Domain();
 	$ClientID = $oUser->ClientID;
-	$DomainOwnerClientID = $oDomain->GetDomainOwner($DomainID);
 
+	$random = random_int(1, 100000);
+	$nonceArray = [
+		$oUser->Role,
+		$oUser->ClientID,
+		$DomainID,
+		$random
+	];
+	
+	$nonce = $oSimpleNonce->GenerateNonce("getDomainOwner", $nonceArray);
+	$DomainOwnerClientID = $oDomain->GetDomainOwner($DomainID, $random, $nonce);
+
+	$random = random_int(1,100000);
 	$nonceArray = [
 		$oUser->Role,
 		$oUser->getClientId(),
-		$DomainID
+		$DomainID,
+		$random
 	];
 	
 	$nonce = $oSimpleNonce->GenerateNonce("getDomainNameFromDomainID", $nonceArray);
-	$PrimaryDomainName = $oDomain->GetDomainNameFromDomainID($DomainID, $nonce);
+	$PrimaryDomainName = $oDomain->GetDomainNameFromDomainID($DomainID, $random, $nonce);
 
 	//print "ClientID: ".$ClientID."<p>";
 	//print "DomainOwnerClientID: ".$DomainOwnerClientID."<p>";
@@ -54,7 +66,18 @@ if( (! is_numeric($DomainID)) || ($DomainID < 1) ) {
 
 	if($DomainID > -1) {
 		$DomainInfoArray = array();
-		$oDomain->GetDomainInfo($DomainID, $DomainInfoArray);
+
+		$random = random_int(1, 1000000);
+		$oUser = new User();
+		$oSimpleNonce = new SimpleNonce();
+		$nonceArray = [	
+			$oUser->Role,
+			$oUser->ClientID,
+			$DomainID,
+			$random
+		];
+		$nonce = $oSimpleNonce->GenerateNonce("getDomainInfo", $nonceArray);
+		$oDomain->GetDomainInfo($DomainID, $random, $DomainInfoArray, $nonce);
 
 		$DomainUserName = $DomainInfoArray["UserName"];
 		$SubDomainAllowance = $oPackage->GetPackageAllowance("SubDomains", $DomainInfoArray["PackageID"]);

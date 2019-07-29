@@ -9,6 +9,11 @@ $oDomain = new Domain();
 
 require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 
+if ( $oUser->Role == "client" ) {
+    header("location: /domains/index.php?Notes=Sorry, you can't delete domains!!!&NoteType=Error");
+    exit(); 
+}
+
 $ClientID = $oUser->getClientId();
 if($ClientID < 1) {
     header("Location: /index.php");
@@ -17,25 +22,37 @@ if($ClientID < 1) {
 
 $domainId = intVal($_REQUEST["DomainID"]);
 
-
+$random = random_int(1, 100000);
 $nonceArray = [
     $oUser->Role,
-    $ClientID,
-    $domainId
+    $oUser->ClientID,
+    $domainId,
+    $random
 ];
 
 $nonce = $oSimpleNonce->GenerateNonce("getDomainOwner", $nonceArray);
-$DomainOwnerClientID = $oDomain->GetDomainOwner($domainId, $nonce);
+$DomainOwnerClientID = $oDomain->GetDomainOwner($domainId, $random, $nonce);
 
-if( ($ClientID != $DomainOwnerClientID) && ($oUser->Role != 'admin') ) {	
-    header("location: /domains/index.phpNotes=No%20Permission!!!&NoteType=Error");
-    exit();
+
+$nonceArray = [
+    $oUser->Role,
+    $oUser->ClientID,
+    $DomainOwnerClientID
+];
+
+$oReseller = new Reseller();
+$nonce = $oSimpleNonce->GenerateNonce("getClientResellerID", $nonceArray);
+$resellerId = $oReseller->GetClientResellerID($DomainOwnerClientID, $nonce);
+
+if ( $oUser->Role != "admin") {
+    if ( $ClientID != $DomainOwnerClientID ) {
+        if ( $resellerId != $ClientID ) {
+            header("Location: index.php?Notes=You don't have permission to edit that domain&NoteType=error");
+            exit();
+        }
+    }
 }
 
-if ( $oUser->Role == "client" ) {
-    header("location: /domains/index.php?Notes=Sorry, you can't delete domains!!!&NoteType=Error");
-    exit(); 
-}
 //print "DomainOwnerClientID: ".$DomainOwnerClientID."<br>";
 //print "DomainID: ".$_REQUEST["DomainID"]."<br>";
 
@@ -63,10 +80,12 @@ if ( $nonceResult === false ) {
 
 $nonceArray = [
     $oUser->Role,
-    $ClientID,
+    $oUser->ClientID,
     $DomainOwnerClientID,
     $domainId
 ];
+
+$noteType = "success";
 
 $nonce = $oSimpleNonce->GenerateNonce("deleteDomain", $nonceArray);
 if($oDomain->DeleteDomain($DomainOwnerClientID, $domainId, $Error, $nonce) == 1) {
@@ -74,7 +93,7 @@ if($oDomain->DeleteDomain($DomainOwnerClientID, $domainId, $Error, $nonce) == 1)
     $random = random_int(1,100000);
     $nonceArray = [
         $oUser->Role,
-        $ClientID,
+        $oUser->ClientID,
         $random
     ];
     
@@ -82,8 +101,9 @@ if($oDomain->DeleteDomain($DomainOwnerClientID, $domainId, $Error, $nonce) == 1)
 	$oEmail->makeSendgridEximSettings($random, $nonce);
 	$Notes="Domain Deleted";
 } else {	
-	$Notes="Domain cannot be deleted";
+    $Notes="Domain cannot be deleted";
+    $noteType = "Error";
 }
 
 
-header("location: index.php?Notes=".$Notes.$Error);	
+header("location: index.php?Notes=".$Notes.$Error."&NoteType=".$noteType);	

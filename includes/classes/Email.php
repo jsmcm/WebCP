@@ -1461,10 +1461,10 @@ class Email
 
         function RecreateUserForwardFile($ClientID)
         {
-		$oLog = new Log();
+			$oLog = new Log();
 
-		$oLog->WriteLog("debug", "In RecreateUserForwardFile, calling GenerateUserForwardFile(".$ClientID.")");
-		$this->GenerateUserForwardFile($ClientID);		
+			$oLog->WriteLog("debug", "In RecreateUserForwardFile, calling GenerateUserForwardFile(".$ClientID.")");
+			$this->GenerateUserForwardFile($ClientID);		
         }
 
 	function GenerateUserForwardFile($ClientID)
@@ -1607,62 +1607,66 @@ class Email
         function AddEmail($LocalPart, $DomainID, $Password, $ClientID)
         {
 
-		$UserName = "";
+			$UserName = "";
+
+			$oUser = new User();
+			$oPackage = new Package();
+			$oDomain = new Domain();
+
+			$DomainInfoArray = array();
+
+			$random = random_int(1, 1000000);
+			$oUser = new User();
+			$oSimpleNonce = new SimpleNonce();
+			$nonceArray = [	
+				$oUser->Role,
+				$oUser->ClientID,
+				$DomainID,
+				$random
+			];
+			$nonce = $oSimpleNonce->GenerateNonce("getDomainInfo", $nonceArray);
+			$oDomain->GetDomainInfo($DomainID, $random, $DomainInfoArray, $nonce);
+
+			$DomainUserName = $DomainInfoArray["UserName"];
+			$EmailAllowance = $oPackage->GetPackageAllowance("Emails", $DomainInfoArray["PackageID"]);
+			$EmailUsage = $oPackage->GetEmailUsage($DomainID);
+
+			if( (($EmailAllowance - $EmailUsage) < 1) && ($oAccount->Role != "admin") ) {
+				// No More Mails Left
+				return -1;
+			}
 
 
-                $oUser = new User();
-                $oPackage = new Package();
-                $oDomain = new Domain();
-
-                $DomainInfoArray = array();
-                $oDomain->GetDomainInfo($DomainID, $DomainInfoArray);
-
-                $DomainUserName = $DomainInfoArray["UserName"];
-                $EmailAllowance = $oPackage->GetPackageAllowance("Emails", $DomainInfoArray["PackageID"]);
-                $EmailUsage = $oPackage->GetEmailUsage($DomainID);
-
-                if( (($EmailAllowance - $EmailUsage) < 1) && ($oAccount->Role != "admin") )
-                {
-                        // No More Mails Left
-                        return -1;
-                }
-
-
-		$lastInsertId = 0;
-		
-		try
-		{
-			$query = $this->DatabaseConnection->prepare("INSERT INTO mailboxes VALUES (0, :domain_id, :domain_user_name, :local_part, :password, '', 1, :create_date, :modify_date)");
+			$lastInsertId = 0;
 			
-			$Password = md5($Password);
-			$Date = date('Y-m-d H:i:s');
-			
-			$query->bindParam(":domain_id", $DomainID);
-			$query->bindParam(":domain_user_name", $DomainUserName);
-			$query->bindParam(":local_part", $LocalPart);
-			$query->bindParam(":password", $Password);
-			
-			$query->bindParam(":create_date", $Date);
-			$query->bindParam(":modify_date", $Date);
-			
-			$query->execute();
-			$lastInsertId = $this->DatabaseConnection->lastInsertId();
-	
-		}
-		catch(PDOException $e)
-		{
-			$oLog = new Log();
-			$oLog->WriteLog("error", "/class.Email.php -> AddEmail(); Error = ".$e);
-		}			
+			try {
+				$query = $this->DatabaseConnection->prepare("INSERT INTO mailboxes VALUES (0, :domain_id, :domain_user_name, :local_part, :password, '', 1, :create_date, :modify_date)");
+				
+				$Password = md5($Password);
+				$Date = date('Y-m-d H:i:s');
+				
+				$query->bindParam(":domain_id", $DomainID);
+				$query->bindParam(":domain_user_name", $DomainUserName);
+				$query->bindParam(":local_part", $LocalPart);
+				$query->bindParam(":password", $Password);
+				
+				$query->bindParam(":create_date", $Date);
+				$query->bindParam(":modify_date", $Date);
+				
+				$query->execute();
+				$lastInsertId = $this->DatabaseConnection->lastInsertId();
+
+			} catch(PDOException $e) {
+				$oLog = new Log();
+				$oLog->WriteLog("error", "/class.Email.php -> AddEmail(); Error = ".$e);
+			}			
 
 
+			$this->GetDomainInfo($DomainID, $UserName, $DomainName);
 
-
-                $this->GetDomainInfo($DomainID, $UserName, $DomainName);
-
-                $this->MakeNEAFile($LocalPart, $DomainName, $UserName);
-                $this->RecreateUserForwardFile($ClientID);
-                return $lastInsertId;
+			$this->MakeNEAFile($LocalPart, $DomainName, $UserName);
+			$this->RecreateUserForwardFile($ClientID);
+			return $lastInsertId;
 
         }
 
@@ -1677,8 +1681,19 @@ class Email
                 $oPackage = new Package();
                 $oDomain = new Domain();
 
-                $DomainInfoArray = array();
-                $oDomain->GetDomainInfo($DomainID, $DomainInfoArray);
+				$DomainInfoArray = array();
+				
+				$random = random_int(1, 1000000);
+				$oUser = new User();
+				$oSimpleNonce = new SimpleNonce();
+				$nonceArray = [	
+					$oUser->Role,
+					$oUser->ClientID,
+					$DomainID,
+					$random
+				];
+				$nonce = $oSimpleNonce->GenerateNonce("getDomainInfo", $nonceArray);
+                $oDomain->GetDomainInfo($DomainID, $random, $DomainInfoArray, $nonce);
 
                 $DomainUserName = $DomainInfoArray["UserName"];
                 $EmailAllowance = $oPackage->GetPackageAllowance("Emails", $DomainInfoArray["PackageID"]);
@@ -3054,8 +3069,7 @@ class Email
 		
 		$x = 1;
 		$FileName = $_SERVER["DOCUMENT_ROOT"]."/nm/".$UserName."_".$x.".nma";
-		while(file_exists($FileName))
-		{
+		while(file_exists($FileName)) {
 			$x++;
 			$FileName = $_SERVER["DOCUMENT_ROOT"]."/nm/".$UserName."_".$x.".nma";
 		}
@@ -3130,19 +3144,27 @@ class Email
 	function AddSingleForward($LocalPart, $DomainID, $ForwardTo, $ClientID)
 	{
 	
-		
 		$oUser = new User();
 		$oDomain = new Domain();
        
-
 		$DomainInfoArray = array();
-	        $oDomain->GetDomainInfo($DomainID, $DomainInfoArray);
 
-        	$DomainUserName = $DomainInfoArray["UserName"];
+		$random = random_int(1, 1000000);
+		$oUser = new User();
+		$oSimpleNonce = new SimpleNonce();
+		$nonceArray = [	
+			$oUser->Role,
+			$oUser->ClientID,
+			$DomainID,
+			$random
+		];
+		$nonce = $oSimpleNonce->GenerateNonce("getDomainInfo", $nonceArray);
+		$oDomain->GetDomainInfo($DomainID, $random, $DomainInfoArray, $nonce);
+		
+		$DomainUserName = $DomainInfoArray["UserName"];
 
 		$lastInsertId = 0;
-		try
-		{
+		try {
 			$query = $this->DatabaseConnection->prepare("INSERT INTO email_forwarding VALUES (0, :client_id, :domain_id, :local_part, :forward_to, 0)");
 
 			$query->bindParam(":client_id", $ClientID);	
@@ -3154,13 +3176,10 @@ class Email
 	
 			$lastInsertId = $this->DatabaseConnection->lastInsertId();
 			
-		}
-		catch(PDOException $e)
-		{
+		} catch(PDOException $e) {
 			$oLog = new Log();
 			$oLog->WriteLog("error", "/class.Email.php -> AddSingleForward(); Error = ".$e);
 		}
-
 
 		$this->RecreateUserForwardFile($ClientID);
 		return $lastInsertId;
@@ -3170,12 +3189,22 @@ class Email
 	function DeleteDomainEmailForwarders($DomainID, $ClientID)
 	{
 		
+		$oUser = new User();
 		$oDomain = new Domain();
+		$oSimpleNonce = new SimpleNonce();
 
-                if($ClientID != $oDomain->GetDomainOwner($DomainID))
-                {
-                        return 0;
-                }
+		$random = random_int(1, 100000);
+		$nonceArray = [
+			$oUser->Role,
+			$oUser->ClientID,
+			$DomainID,
+			$random
+		];
+		
+		$nonce = $oSimpleNonce->GenerateNonce("getDomainOwner", $nonceArray);
+		if($ClientID != $oDomain->GetDomainOwner($DomainID, $random, $nonce)) {
+			return 0;
+		}
 
 		
 
@@ -3759,12 +3788,22 @@ class Email
 	function DeleteDomainEmails($DomainID, $ClientID)
 	{
 		
+		$oUser = new User();
+		$oSimpleNonce = new SimpleNonce();
 		$oDomain = new Domain();
 
-                if($ClientID != $oDomain->GetDomainOwner($DomainID))
-                {
-                        return 0;
-                }
+		$random = random_int(1, 100000);
+		$nonceArray = [
+			$oUser->Role,
+			$oUser->ClientID,
+			$DomainID,
+			$random
+		];
+		
+		$nonce = $oSimpleNonce->GenerateNonce("getDomainOwner", $nonceArray);
+		if($ClientID != $oDomain->GetDomainOwner($DomainID, $random, $nonce)) {
+			return 0;
+		}
 
 		$EmailArray = array();
 		$ArrayCount = 0;
