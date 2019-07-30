@@ -66,8 +66,19 @@ if( (! is_numeric($DomainID)) || ($DomainID < 1) ) {
 
         if($DomainID > -1)
         {
-                $DomainInfoArray = array();
-                $oDomain->GetDomainInfo($DomainID, $DomainInfoArray);
+				$DomainInfoArray = array();
+				
+
+				$random = random_int(1, 1000000);
+				$oSimpleNonce = new SimpleNonce();
+				$nonceArray = [	
+					$oUser->Role,
+					$oUser->ClientID,
+					$DomainID,
+					$random
+				];
+				$nonce = $oSimpleNonce->GenerateNonce("getDomainInfo", $nonceArray);		
+                $oDomain->GetDomainInfo($DomainID, $random, $DomainInfoArray, $nonce);
 
                 $DomainUserName = $DomainInfoArray["UserName"];
                 $ParkedDomainAllowance = $oPackage->GetPackageAllowance("ParkedDomains", $DomainInfoArray["PackageID"]);

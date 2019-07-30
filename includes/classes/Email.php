@@ -3588,44 +3588,39 @@ class Email
 	}
 
 
-        function GetHigh550Count($HighCount, $StartDate, $EndDate, &$FireWallBlockList, &$EmailsToSuspend)
-        {
+	function GetHigh550Count($HighCount, $StartDate, $EndDate, &$FireWallBlockList, &$EmailsToSuspend)
+	{
 
-                $FireWallBlockList = array();
-                $EmailsToSuspend = array();
+		$FireWallBlockList = array();
+		$EmailsToSuspend = array();
 
 
-		try
-		{
-			$query = $this->DatabaseConnection->prepare("SELECT COUNT(confirmation) AS confirmation_count, auth_type, sender_host FROM email_trace WHERE auth_type != '' AND sender_host != '' AND SUBSTR(confirmation, 1,3) = '550'  AND start_date >= :start_date AND start_date <= :end_date GROUP BY subject ORDER BY confirmation_count;");
+		try {
+			$query = $this->DatabaseConnection->prepare("SELECT COUNT(confirmation) AS confirmation_count, auth_type, sender_host FROM email_trace WHERE auth_type != '' AND sender_host != '' AND SUBSTR(confirmation, 1,3) = '550'  AND start_date >= :start_date AND start_date <= :end_date GROUP BY subject, auth_type, sender_host ORDER BY confirmation_count;");
 
 			$query->bindParam(":start_date", $StartDate);
 			$query->bindParam(":end_date", $EndDate);
 			
 			$query->execute();
 	
-			while($result = $query->fetch(PDO::FETCH_ASSOC))
-			{
-				if( intVal($line["confirmation_count"]) >= $HighCount)
-				{ 
+			while($result = $query->fetch(PDO::FETCH_ASSOC)) {
+				if( intVal($line["confirmation_count"]) >= $HighCount) { 
 					array_push($FireWallBlockList, $result["sender_host"]);
 					array_push($EmailsToSuspend, $result["auth_type"]);
 				}
 			}
 	
-		}
-		catch(PDOException $e)
-		{
+		} catch(PDOException $e) { 
 			$oLog = new Log();
 			$oLog->WriteLog("error", "/class.Email.php -> GetHigh550Count(); Error = ".$e);
 		}			
 
-		
-                $FireWallBlockList = array_unique($FireWallBlockList);
-                $EmailsToSuspend = array_unique($EmailsToSuspend);		
-
-        }
 	
+		$FireWallBlockList = array_unique($FireWallBlockList);
+		$EmailsToSuspend = array_unique($EmailsToSuspend);		
+
+	}
+
 
 
 	function RemoveAlreadySuspendedFromArray($EmailArray)
