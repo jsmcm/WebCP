@@ -2074,7 +2074,7 @@ class DNS
 				// retry without SSL
 
 				$port = 8880;
-				$result = $this->deleteSlaveZone( $DomainName, $SlaveArray[$x]["IPAddress"], $SlaveArray[$x]["ID"],, $SlaveArray[$x]["HostName"], $port, $SlaveArray[$x]["Password"], $SlaveArray[$x]["PublicKey"]);
+				$result = $this->deleteSlaveZone( $DomainName, $SlaveArray[$x]["IPAddress"], $SlaveArray[$x]["ID"], $SlaveArray[$x]["HostName"], $port, $SlaveArray[$x]["Password"], $SlaveArray[$x]["PublicKey"]);
 			}
 		}
 	}
