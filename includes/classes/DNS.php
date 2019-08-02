@@ -246,19 +246,15 @@ class DNS
 
         function SetSlaveStatus($ID, $Status)
         {
-                try
-                {
-                        $query = $this->DatabaseConnection->prepare("UPDATE dns_slaves SET status = :status, status_date = '".date("Y-m-d H:i:s")."' WHERE id = :id;");
-                        $query->bindParam(":status", $Status);
-                        $query->bindParam(":id", $ID);
-                        $query->execute();
-
-                }
-                catch(PDOException $e)
-                {
-                        $oLog = new Log();
-                        $oLog->WriteLog("error", "/class.DNS.php -> SetSlaveStatus() Error = ".$e);
-                }
+			try {
+				$query = $this->DatabaseConnection->prepare("UPDATE dns_slaves SET status = :status, status_date = '".date("Y-m-d H:i:s")."' WHERE id = :id;");
+				$query->bindParam(":status", $Status);
+				$query->bindParam(":id", $ID);
+				$query->execute();
+			} catch(PDOException $e) {
+				$oLog = new Log();
+				$oLog->WriteLog("error", "/class.DNS.php -> SetSlaveStatus() Error = ".$e);
+			}
         }
 	
 	function GetSlaveData($ID, &$HostName, &$IPAddress, &$Password, &$PublicKey)
@@ -1457,17 +1453,17 @@ class DNS
 		for($x = 0; $x < $SlaveArrayCount; $x++) {
 			
 			$port = 8443;
-			$result = $this->createSlaveZone( $DomainName, $SlaveArray[$x]["IPAddress"], $SlaveArray[$x]["HostName"], $port, $SlaveArray[$x]["Password"], $SlaveArray[$x]["PublicKey"]);
+			$result = $this->createSlaveZone( $DomainName, $SlaveArray[$x]["IPAddress"], $SlaveArray[$x]["ID"], $SlaveArray[$x]["HostName"], $port, $SlaveArray[$x]["Password"], $SlaveArray[$x]["PublicKey"]);
 			
 			if ( $result == false && $port == 8443 ) {
 				//try without SSL
 				$port = 8880;
-				$result = $this->createSlaveZone( $DomainName, $SlaveArray[$x]["IPAddress"], $SlaveArray[$x]["HostName"], $port, $SlaveArray[$x]["Password"], $SlaveArray[$x]["PublicKey"]);
+				$result = $this->createSlaveZone( $DomainName, $SlaveArray[$x]["IPAddress"], $SlaveArray[$x]["ID"], $SlaveArray[$x]["HostName"], $port, $SlaveArray[$x]["Password"], $SlaveArray[$x]["PublicKey"]);
 			}
 		}
 	}
 
-	private function createSlaveZone($domainName, $ipAddress, $hostName, $port, $password, $publicKey)
+	private function createSlaveZone($domainName, $ipAddress, $slaveId, $hostName, $port, $password, $publicKey)
 	{
 		$options = array(
 		'uri' => $ipAddress,
@@ -1491,7 +1487,7 @@ class DNS
 				$SlaveStatus = "success";
 			}
 
-			$this->SetSlaveStatus($SlaveArray[$x]["ID"], $SlaveStatus);
+			$this->SetSlaveStatus($slaveId, $SlaveStatus);
 		} catch (Exception $e) {
 			return false;
 		}
@@ -2072,18 +2068,18 @@ class DNS
 		for($x = 0; $x < $SlaveArrayCount; $x++) {
 
 			$port = 8443;
-			$result = $this->deleteSlaveZone( $DomainName, $SlaveArray[$x]["IPAddress"], $SlaveArray[$x]["HostName"], $port, $SlaveArray[$x]["Password"], $SlaveArray[$x]["PublicKey"]);
+			$result = $this->deleteSlaveZone( $DomainName, $SlaveArray[$x]["IPAddress"], $SlaveArray[$x]["ID"], $SlaveArray[$x]["HostName"], $port, $SlaveArray[$x]["Password"], $SlaveArray[$x]["PublicKey"]);
 
 			if ( $result == false && $port == 8443 ) {
 				// retry without SSL
 
 				$port = 8880;
-				$result = $this->deleteSlaveZone( $DomainName, $SlaveArray[$x]["IPAddress"], $SlaveArray[$x]["HostName"], $port, $SlaveArray[$x]["Password"], $SlaveArray[$x]["PublicKey"]);
+				$result = $this->deleteSlaveZone( $DomainName, $SlaveArray[$x]["IPAddress"], $SlaveArray[$x]["ID"],, $SlaveArray[$x]["HostName"], $port, $SlaveArray[$x]["Password"], $SlaveArray[$x]["PublicKey"]);
 			}
 		}
 	}
 	
-	private function deleteSlaveZone( $domainName, $ipAddress, $hostName, $port, $password, $publicKey)
+	private function deleteSlaveZone( $domainName, $ipAddress, $slaveId, $hostName, $port, $password, $publicKey)
 	{
 		$options = array(
 			'uri' => $ipAddress,
@@ -2106,7 +2102,7 @@ class DNS
 			if($Result > 0) {
 				$SlaveStatus = "success";
 			}
-			$this->SetSlaveStatus($SlaveArray[$x]["ID"], $SlaveStatus);
+			$this->SetSlaveStatus($slaveId, $SlaveStatus);
 		} catch (Exception $e) {
 			//print_r($e);
 

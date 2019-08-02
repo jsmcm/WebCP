@@ -41,8 +41,18 @@ $nonce = $oSimpleNonce->GenerateNonce("getDomainNameFromDomainID", $nonceArray);
 $PrimaryDomain = $oDomain->GetDomainNameFromDomainID($DomainID, $random, $nonce);
 $AncestorDomainID = $oDomain->GetAncestorDomainID($DomainID);
 
+
+$random = random_int(1, 1000000);
+$nonceArray = [	
+	$oUser->Role,
+	$oUser->ClientID,
+	$DomainID,
+	$random
+];
+$nonce = $oSimpleNonce->GenerateNonce("getDomainInfo", $nonceArray);
+
 $DomainInfoArray = array();
-$oDomain->GetDomainInfo($DomainID, $DomainInfoArray);
+$oDomain->GetDomainInfo($DomainID, $random, $DomainInfoArray, $nonce);
 
 $DomainUserName = $DomainInfoArray["UserName"];
 $PackageID = $DomainInfoArray["PackageID"];

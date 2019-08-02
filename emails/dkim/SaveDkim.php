@@ -23,7 +23,17 @@ if(isset($_REQUEST["domain_id"])) {
 	$DomainID = $_REQUEST["domain_id"];
 
 	$InfoArray = array();
-	$oDomain->GetDomainInfo($DomainID, $InfoArray);
+
+	$random = random_int(1, 1000000);
+	$nonceArray = [	
+			$oUser->Role,
+			$oUser->ClientID,
+			$DomainID,
+			$random
+	];
+	$oSimpleNonce = new SimpleNonce();
+	$nonce = $oSimpleNonce->GenerateNonce("getDomainInfo", $nonceArray);
+	$oDomain->GetDomainInfo($DomainID, $random, $InfoArray, $nonce);
 
 	$DomainName = $InfoArray["DomainName"];
 	$DomainOwnerID = $InfoArray["ClientID"];

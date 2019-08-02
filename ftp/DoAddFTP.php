@@ -8,10 +8,9 @@ $oPackage = new Package();
 $oDomain = new Domain();
 
 $ClientID = $oUser->getClientId();
-if($ClientID < 1)
-{
-        header("Location: /index.php");
-        exit();
+if($ClientID < 1) {
+	header("Location: /index.php");
+	exit();
 }
 
 $UserName = filter_var($_POST["UserName"], FILTER_SANITIZE_STRING);
@@ -26,18 +25,12 @@ $Role = $oUser->Role;
 //print "Client ID: ".$ClientID."<br>";
 //print "DomainID: ".$DomainID."<br>";
 
-for($x = 0; $x < strlen($UserName); $x++)
-{
-				
-		
-	if(!ctype_alnum($UserName[$x]))
-	{
-		if($UserName[$x] != '_' && $UserName[$x] != '-' && $UserName[$x] != '.')
-		{
+for($x = 0; $x < strlen($UserName); $x++) {		
+	if(!ctype_alnum($UserName[$x])) {
+		if($UserName[$x] != '_' && $UserName[$x] != '-' && $UserName[$x] != '.') {
 			header("location: index.php?NoteType=Error&Notes=Incorrectly formatted FTP user name");
 			exit();
 		}
-		
 	}
 }
 
@@ -49,8 +42,18 @@ if($oFTP->FTPExists($DomainUserName."_".$UserName) > 0)
 	exit();
 }
 
+$random = random_int(1, 1000000);
+$nonceArray = [	
+	$oUser->Role,
+	$oUser->ClientID,
+	$DomainID,
+	$random
+];
+$oSimpleNonce = new SimpleNonce();
+$nonce = $oSimpleNonce->GenerateNonce("getDomainInfo", $nonceArray);
+
 $DomainInfoArray = array();
-$oDomain->GetDomainInfo($DomainID, $DomainInfoArray);
+$oDomain->GetDomainInfo($DomainID, $random, $DomainInfoArray, $nonce);
 
 $PackageID = $DomainInfoArray["PackageID"];
 $Mb = $oPackage->GetPackageAllowance("DiskSpace", $PackageID);

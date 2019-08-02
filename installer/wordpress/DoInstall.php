@@ -48,7 +48,17 @@ $DomainID = -1;
 $DomainID = $_POST["DomainID"];
 
 $DomainInfoArray = array();
-$oDomain->GetDomainInfo($DomainID, $DomainInfoArray);
+$random = random_int(1, 1000000);
+$nonceArray = [	
+		$oUser->Role,
+		$oUser->ClientID,
+		$DomainID,
+		$random
+];
+
+$oSimpleNonce = new SimpleNonce();
+$nonce = $oSimpleNonce->GenerateNonce("getDomainInfo", $nonceArray);
+$oDomain->GetDomainInfo($DomainID, $random, $DomainInfoArray, $nonce);
 
 
 $WP_DomainUserName = $DomainInfoArray["UserName"];

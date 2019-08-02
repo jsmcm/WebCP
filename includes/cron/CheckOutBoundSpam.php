@@ -144,7 +144,19 @@ if($SpamAction == "block")
 
 		if ( $domainId > -1 ) {
 
-			$oDomain->GetDomainInfo($domainId, $infoArray);
+	
+			$random = random_int(1, 1000000);
+			$nonceArray = [	
+					$oUser->Role,
+					$oUser->ClientID,
+					$DomainID,
+					$random
+			];
+			$oSimpleNonce = new SimpleNonce();
+			$nonce = $oSimpleNonce->GenerateNonce("getDomainInfo", $nonceArray);
+			$oDomain->GetDomainInfo($DomainID, $random, $infoArray, $nonce);
+
+			
 			touch ( dirname(__FILE__)."/../../nm/".$infoArray["UserName"].".mailpassword", 0755 );
 		}
 	}
