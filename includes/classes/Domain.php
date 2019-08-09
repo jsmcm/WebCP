@@ -1774,29 +1774,41 @@ class Domain
 						$DomainArray[$ArrayCount]["Suspended"] = $result["suspended"];
 						$DomainArray[$ArrayCount]["ParentDomainID"] = $result["parent_domain_id"];
 
-						$random = random_int(1,100000);
-						$nonceArray = [
-							$role,
-							$clientId,
-							$result["parent_domain_id"],
-							$random
-						];
-						
-						$nonce = $oSimpleNonce->GenerateNonce("getDomainNameFromDomainID", $nonceArray);
-						$DomainArray[$ArrayCount]["ParentDomain"] = $this->GetDomainNameFromDomainID($result["parent_domain_id"], $random, $nonce);
+						$DomainArray[$ArrayCount]["ParentDomain"] = "";
 
+						if ( intVal($result["parent_domain_id"]) > 0 ) {
+							$random = random_int(1,100000);
+							$nonceArray = [
+								$role,
+								$clientId,
+								$result["parent_domain_id"],
+								$random
+							];
+						
+							$nonce = $oSimpleNonce->GenerateNonce("getDomainNameFromDomainID", $nonceArray);
+							$DomainArray[$ArrayCount]["ParentDomain"] = $this->GetDomainNameFromDomainID($result["parent_domain_id"], $random, $nonce);
+						}
+
+					
+						
+					
 						$DomainArray[$ArrayCount]["AncestorDomainID"] = $result["ancestor_domain_id"];
-
-						$random = random_int(1,100000);
-						$nonceArray = [
-							$role,
-							$clientId,
-							$result["ancestor_domain_id"],
-							$random
-						];
 						
-						$nonce = $oSimpleNonce->GenerateNonce("getDomainNameFromDomainID", $nonceArray);
-						$DomainArray[$ArrayCount]["AncestorDomain"] = $this->GetDomainNameFromDomainID($result["ancestor_domain_id"], $random, $nonce);
+						$DomainArray[$ArrayCount]["AncestorDomain"] = "";
+
+						if ( intVal($result["ancestor_domain_id"]) > 0 ) {
+							$random = random_int(1,100000);
+							$nonceArray = [
+								$role,
+								$clientId,
+								$result["ancestor_domain_id"],
+								$random
+							];
+						
+							$nonce = $oSimpleNonce->GenerateNonce("getDomainNameFromDomainID", $nonceArray);
+							$DomainArray[$ArrayCount]["AncestorDomain"] = $this->GetDomainNameFromDomainID($result["ancestor_domain_id"], $random, $nonce);
+						}
+
 						$DomainArray[$ArrayCount++]["type"] = $result["domain_type"];
 					}
 					
