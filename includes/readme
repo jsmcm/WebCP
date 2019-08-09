@@ -1,5 +1,6 @@
 * 2.2.1 *
 = release: =
+ - Changed logging of failed logins to file_put_contents to prevent non-existing file errors
 
 * 2.2.0 *
 = release: 2019-08-09 =
