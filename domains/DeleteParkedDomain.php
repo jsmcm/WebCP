@@ -14,11 +14,21 @@ if($ClientID < 1)
         exit();
 }
 
+$parkedDomainId = intVal($_REQUEST["ParkedDomainID"]);
 $oDomain = new Domain();
-$ParkedDomainOwnerClientID = $oDomain->GetDomainOwner($_REQUEST["ParkedDomainID"]);
 
-if( ($ClientID != $ParkedDomainOwnerClientID) && ($oUser->Role != 'admin') )
-{	
+$random = random_int(1, 100000);
+$nonceArray = [
+	$oUser->Role,
+	$oUser->ClientID,
+	$parkedDomainId,
+	$random
+];
+
+$nonce = $oSimpleNonce->GenerateNonce("getDomainOwner", $nonceArray);
+$ParkedDomainOwnerClientID = $oDomain->GetDomainOwner($parkedDomainId, $random, $nonce);
+
+if( ($ClientID != $ParkedDomainOwnerClientID) && ($oUser->Role != 'admin') ) {	
 	header("location: index?Notes=No%20Permission!!!");
 	exit();
 }
@@ -27,8 +37,7 @@ if( ($ClientID != $ParkedDomainOwnerClientID) && ($oUser->Role != 'admin') )
 //print "ParkedDomainID: ".$_REQUEST["ParkedDomainID"]."<br>";
 $parentDomainId = intVal($_REQUEST["parentDomainId"]);
 
-if($oDomain->DeleteParkedDomain($ParkedDomainOwnerClientID, $_REQUEST["ParkedDomainID"], $Error) == 1)
-{
+if($oDomain->DeleteParkedDomain($ParkedDomainOwnerClientID, $_REQUEST["ParkedDomainID"], $Error) == 1) {
 	$Notes="Parked Domain Deleted";
 }
 else

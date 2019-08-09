@@ -8,8 +8,7 @@ $oDomain = new Domain();
 
 $Title = $_POST["Title"];
 
-if($Title == "")
-{
+if($Title == "") {
 	// htaccess causes 500 error if this is blank
 	$Title = " ";
 }
@@ -27,14 +26,20 @@ $Status = "off";
 //print "DomainOwnerFromDomainName: ".$oDomain->GetDomainOwnerFromDomainName($URL)."<br>";
 //exit();
 
-if( ($oDomain->GetDomainOwnerFromDomainName($URL) != $oUser->ClientID) && ($oUser->Role != "admin") )
-{
-        header("location: index.php?Notes=You do not have permission to access this sites detail");
-        exit();
+$nonceArray = [
+	$oUser->Role,
+	$oUser->ClientID,
+	$URL
+];
+
+$oSimpleNonce = new SimpleNonce();
+$nonce = $oSimpleNonce->GenerateNonce("getDomainOwnerFromDomainName", $nonceArray);
+if( ($oDomain->GetDomainOwnerFromDomainName($URL, $nonce)) != $oUser->ClientID) && ($oUser->Role != "admin") ) {
+	header("location: index.php?Notes=You do not have permission to access this sites detail");
+	exit();
 }
 
-if(isset($_POST["Status"]))
-{
+if(isset($_POST["Status"])) {
 	$Status = $_POST["Status"];
 }
 
@@ -51,8 +56,7 @@ $AuthOutput = $AuthOutput."AuthName \"".$Title."\"\n";
 $AuthOutput = $AuthOutput."AuthUserFile \"".$PasswordPath."\"\n";
 $AuthOutput = $AuthOutput."require valid-user\n";
 
-if(file_exists($HTAccessPath))
-{
+if(file_exists($HTAccessPath)) {
 
 	//print "FILE DOES EXISTS<p>";
 

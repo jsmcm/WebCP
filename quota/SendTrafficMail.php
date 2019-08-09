@@ -12,16 +12,27 @@ $oUser = new User();
 
 $SendSystemEmails = $oSettings->GetSendSystemEmails();
 
-if($SendSystemEmails == "off")
-{
-	exit();
+if($SendSystemEmails == "off") {
+  exit();
 }
 
 $AdminEmail = $oSettings->GetForwardSystemEmailsTo();
  
 $DomainName = $oDomain->GetDomainName($DomainUserName);
 $DomainID = $oDomain->GetDomainIDFromDomainName($DomainName);
-$UserID = $oDomain->GetDomainOwner($DomainID);
+
+$oSimpleNonce = new SimpleNonce();
+
+$random = random_int(1, 100000);
+$nonceArray = [
+	$oUser->Role,
+	$oUser->ClientID,
+  $DomainID,
+  $random
+];
+
+$nonce = $oSimpleNonce->GenerateNonce("getDomainOwner", $nonceArray);
+$UserID = $oDomain->GetDomainOwner($DomainID, $random, $nonce);
 
 $Username = "";
 $EmailAddress = "";

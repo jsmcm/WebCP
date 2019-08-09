@@ -7,10 +7,9 @@ $oUser = new User();
 $oDomain = new Domain();
 
 $ClientID = $oUser->getClientId();
-if($ClientID < 1)
-{
-        header("Location: /index.php");
-        exit();
+if($ClientID < 1) {
+	header("Location: /index.php");
+	exit();
 }
 
 $Role = $oUser->Role;
@@ -19,38 +18,40 @@ $DomainOwnerID = -1;
 $DomainID = -1;
 $Dkim = "";
 
-if(isset($_REQUEST["domain_id"]))
-{
+if(isset($_REQUEST["domain_id"])) {
 	$Dkim = $_REQUEST["dkim"];
-        $DomainID = $_REQUEST["domain_id"];
+	$DomainID = $_REQUEST["domain_id"];
 
-        $InfoArray = array();
-        $oDomain->GetDomainInfo($DomainID, $InfoArray);
+	$InfoArray = array();
 
-        $DomainName = $InfoArray["DomainName"];
-        $DomainOwnerID = $InfoArray["ClientID"];
-}
-else
-{
-        print "Please select correct domain&NoteType=Error";
+	$random = random_int(1, 1000000);
+	$nonceArray = [	
+			$oUser->Role,
+			$oUser->ClientID,
+			$DomainID,
+			$random
+	];
+	$oSimpleNonce = new SimpleNonce();
+	$nonce = $oSimpleNonce->GenerateNonce("getDomainInfo", $nonceArray);
+	$oDomain->GetDomainInfo($DomainID, $random, $InfoArray, $nonce);
+
+	$DomainName = $InfoArray["DomainName"];
+	$DomainOwnerID = $InfoArray["ClientID"];
+} else {
+    print "Please select correct domain&NoteType=Error";
 	exit();
 }
 
-if($DomainOwnerID  != $DomainID)
-{
-	if($Role != 'admin')
-	{
+if($DomainOwnerID  != $DomainID) {
+	if($Role != 'admin') {
 		print "You do not have permission to edit this domain!";
 		exit();
 	}
 }
 
-if( $Dkim == "enabled" )
-{
+if( $Dkim == "enabled" ) {
 	touch("/etc/exim4/dkim/".$DomainName);
-}
-else
-{
+} else {
 	unlink("/etc/exim4/dkim/".$DomainName);
 }
 

@@ -96,8 +96,17 @@ class Provisioning
 
 		
 		$InfoArray = array();
-		$oDomain->GetDomainInfo($DomainID, $InfoArray);
 
+		$random = random_int(1, 1000000);
+		$nonceArray = [	
+				$oUser->Role,
+				$oUser->ClientID,
+				$DomainID,
+				$random
+		];
+		$nonce = $oSimpleNonce->GenerateNonce("getDomainInfo", $nonceArray);
+		$oDomain->GetDomainInfo($DomainID, $random, $InfoArray, $nonce);
+	
 		if($DomainUserName != $InfoArray["UserName"])
 		{
 			$ReturnArray["Status"] = "false";
@@ -206,8 +215,16 @@ class Provisioning
 
 		
 		$InfoArray = array();
-		$oDomain->GetDomainInfo($DomainID, $InfoArray);
-
+		$random = random_int(1, 1000000);
+		$nonceArray = [	
+				$oUser->Role,
+				$oUser->ClientID,
+				$DomainID,
+				$random
+		];
+		$nonce = $oSimpleNonce->GenerateNonce("getDomainInfo", $nonceArray);
+		$oDomain->GetDomainInfo($DomainID, $random, $InfoArray, $nonce);
+	
 		if($DomainUserName != $InfoArray["UserName"])
 		{
 			$ReturnArray["Status"] = "false";
@@ -295,8 +312,16 @@ class Provisioning
 
 		
 		$InfoArray = array();
-		$oDomain->GetDomainInfo($DomainID, $InfoArray);
-
+		$random = random_int(1, 1000000);
+		$nonceArray = [	
+				$oUser->Role,
+				$oUser->ClientID,
+				$DomainID,
+				$random
+		];
+		$nonce = $oSimpleNonce->GenerateNonce("getDomainInfo", $nonceArray);
+		$oDomain->GetDomainInfo($DomainID, $random, $InfoArray, $nonce);
+	
 		if($DomainUserName != $InfoArray["UserName"])
 		{
 			$ReturnArray["Status"] = "false";
@@ -390,8 +415,16 @@ class Provisioning
 
 		
 		$InfoArray = array();
-		$oDomain->GetDomainInfo($DomainID, $InfoArray);
-
+		$random = random_int(1, 1000000);
+		$nonceArray = [	
+				$oUser->Role,
+				$oUser->ClientID,
+				$DomainID,
+				$random
+		];
+		$nonce = $oSimpleNonce->GenerateNonce("getDomainInfo", $nonceArray);
+		$oDomain->GetDomainInfo($DomainID, $random, $InfoArray, $nonce);
+	
 		if($DomainUserName != $InfoArray["UserName"])
 		{
 			$ReturnArray["Status"] = "false";
@@ -579,9 +612,19 @@ class Provisioning
 			return $ReturnArray;
 		}
 
-		$InfoArray = array();
-		$oDomain->GetDomainInfo($DomainID, $InfoArray);
+		$oSimpleNonce = new SimpleNonce();
 
+		$InfoArray = array();
+		$random = random_int(1, 1000000);
+		$nonceArray = [	
+				$oUser->Role,
+				$oUser->ClientID,
+				$DomainID,
+				$random
+		];
+		$nonce = $oSimpleNonce->GenerateNonce("getDomainInfo", $nonceArray);
+		$oDomain->GetDomainInfo($DomainID, $random, $InfoArray, $nonce);
+	
 		$ReturnArray["DomainUserName"] = $InfoArray["UserName"];
 
 		/*****************************************************************************

@@ -339,7 +339,18 @@ for($DomainCount = 0; $DomainCount < $DomainBackupListCount; $DomainCount++)
 	$XMLContent = new SimpleXMLElement('<?xml version="1.0" ?><BackupScript />');
 
 	$DomainArray = array();
-	$oDomain->GetDomainInfo($DomainID, $DomainArray);
+       
+	$random = random_int(1, 1000000);
+	$oUser = new User();
+	$oSimpleNonce = new SimpleNonce();
+	$nonceArray = [	
+		$oUser->Role,
+		$oUser->ClientID,
+		$DomainID,
+		$random
+	];
+	$nonce = $oSimpleNonce->GenerateNonce("getDomainInfo", $nonceArray);
+	$oDomain->GetDomainInfo($DomainID, $random, $DomainArray, $nonce);
 
 	$oPackage = new Package();
 

@@ -14,57 +14,52 @@ $email_ClientID = $oEmail->getLoggedInEmailId();
 
 $Role = $oUser->Role;
 
-if($ClientID < 1)
-{
-        if( $email_ClientID < 1 )
-        {
-                header("Location: /index.php");
-                exit();
-        }
-        $loggedInId = $email_ClientID;
+if($ClientID < 1) {
+	if( $email_ClientID < 1 ) {
+		header("Location: /index.php");
+		exit();
+	}
+	$loggedInId = $email_ClientID;
 
-        $Role = "email";
+	$Role = "email";
 }
 
 
 
 $EmailAddress = "";
-if(isset($_POST["EmailAddress"]))
-{
-	$EmailAddress = $_POST["EmailAddress"];
-}
-else
-{
+if(isset($_POST["EmailAddress"])) {
+	$EmailAddress = filter_var($_POST["EmailAddress"], FILTER_SANITIZE_EMAIL);
+} else {
 	header("Location: index.php?Notes=No client email address selected&NoteType=Error");
 	exit();
 }
 
 $WhiteListAddress = "";
-if(isset($_POST["WhiteListAddress"]))
-{
+if(isset($_POST["WhiteListAddress"])) {
 	$WhiteListAddress = $_POST["WhiteListAddress"];
-}
-else
-{
+} else {
 	header("Location: index.php?Notes=No black list email address selected&NoteType=Error");
 	exit();
 }
 
 $EmailAddressOwner = $ClientID;
-if($Role == "admin")
-{
+if($Role == "admin") {
 
-	if(strstr($EmailAddress, "@"))
-	{
+	if(strstr($EmailAddress, "@")) {
 		$EmailAddressOwner = $oEmail->GetEmailOwnerFromEmailAddress($EmailAddress);
+	} else {
+
+		$nonceArray = [
+			$oUser->Role,
+			$oUser->ClientID,
+			$EmailAddress
+		];
+		
+		$oSimpleNonce = new SimpleNonce();
+		$nonce = $oSimpleNonce->GenerateNonce("getDomainOwnerFromDomainName", $nonceArray);
+		$EmailAddressOwner = $oDomain->GetDomainOwnerFromDomainName($EmailAddress, $nonce);
 	}
-	else
-	{
-		$EmailAddressOwner = $oDomain->GetDomainOwnerFromDomainName($EmailAddress);
-	}
-}
-else if( $Role == "email" )
-{
+} else if( $Role == "email" ) {
 	$EmailAddressOwner = $oEmail->GetEmailOwner($loggedInId);
 }
 
@@ -72,15 +67,9 @@ else if( $Role == "email" )
 //print "EmailAddressOwner: ".$EmailAddressOwner."<br>";
 //exit();
 
-if($oEmail->AddBlackWhiteList($EmailAddressOwner, $EmailAddress, $WhiteListAddress, "white") == 1)
-{
+if($oEmail->AddBlackWhiteList($EmailAddressOwner, $EmailAddress, $WhiteListAddress, "white") == 1) {
 	header("Location: index.php?Notes=White List Added&NoteType=Success&EmailAddress=".$EmailAddress);
-}
-else
-{
+} else {
 	header("Location: index.php?Notes=White List Failed&NoteType=Error");
 }
-
-
-?>
 

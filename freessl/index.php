@@ -255,8 +255,19 @@ if($ClientID < 1)
 												continue;
 											}
 	
-											$InfoArray = array();								
-											$oDomain->GetDomainInfo($DomainID, $InfoArray);	
+											$InfoArray = array();
+											
+											$random = random_int(1, 1000000);
+											$oUser = new User();
+											$oSimpleNonce = new SimpleNonce();
+											$nonceArray = [	
+												$oUser->Role,
+												$oUser->ClientID,
+												$DomainID,
+												$random
+											];
+											$nonce = $oSimpleNonce->GenerateNonce("getDomainInfo", $nonceArray);			
+											$oDomain->GetDomainInfo($DomainID, $random, $InfoArray, $nonce);	
 											$PrimaryDomainID = $InfoArray["AncestorDomainID"];		
 
 											if($PrimaryDomainID < 1)

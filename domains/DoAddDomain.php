@@ -94,7 +94,19 @@ if ($domainId < 1 ) {
 }
 
 $infoArray = array();
-$oDomain->GetDomainInfo($domainId, $infoArray);
+
+
+$random = random_int(1, 1000000);
+$oUser = new User();
+$oSimpleNonce = new SimpleNonce();
+$nonceArray = [	
+	$oUser->Role,
+	$oUser->ClientID,
+	$domainId,
+	$random
+];
+$nonce = $oSimpleNonce->GenerateNonce("getDomainInfo", $nonceArray);
+$oDomain->GetDomainInfo($domainId, $random, $infoArray, $nonce);
 
 file_put_contents(dirname(__DIR__)."/nm/".$DomainName.".freessl_tmp", "PrimaryDomainID=".$domainId."\nType=".$_POST["DomainType"]."\nPath=".$infoArray["Path"]."\nDomainID=".$domainId."\nDomainName=".$DomainName."\nDomainUserName=".$infoArray["UserName"]."\nEmailAddress=".$oUser->EmailAddress."\n");
 

@@ -24,13 +24,35 @@ $domainName = filter_var($_REQUEST["domainName"], FILTER_SANITIZE_STRING);
 $domainId = intVal( $_REQUEST["DomainID"] );
 $clientId = $ClientID;
 $clientRole = $oUser->Role;
-$domainOwnerId = $oDomain->GetDomainOwner($domainId);
-$resellerId = $oReseller->GetClientResellerID($domainOwnerId);
 
-if ( $clientId != $domainOwnerId ) {
-	if ( $resellerId != $clientId ) {
-		header("Location: index.php?Notes=You don't have permission to edit that domain&NoteType=error");
-		exit();
+
+$random = random_int(1, 100000);
+$nonceArray = [
+    $oUser->Role,
+    $ClientID,
+	$domainId,
+	$random
+];
+
+$nonce = $oSimpleNonce->GenerateNonce("getDomainOwner", $nonceArray);
+$domainOwnerId = $oDomain->GetDomainOwner($domainId, $random, $nonce);
+
+
+$nonceArray = [
+    $oUser->Role,
+    $ClientID,
+    $domainOwnerId
+];
+
+$nonce = $oSimpleNonce->GenerateNonce("getClientResellerID", $nonceArray);
+$resellerId = $oReseller->GetClientResellerID($domainOwnerId, $nonce);
+
+if ( $oUser->Role != "admin") {
+	if ( $clientId != $domainOwnerId ) {
+		if ( $resellerId != $clientId ) {
+			header("Location: index.php?Notes=You don't have permission to edit that domain&NoteType=error");
+			exit();
+		}
 	}
 }
 

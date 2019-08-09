@@ -148,8 +148,40 @@ class Email
 
 
 
-	function makeSendgridEximSettings()
+	function makeSendgridEximSettings($random, $nonceArray)
 	{
+
+		if ( $random == "" ) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Email.php -> makeSendgridEximSettings(); random cannot be blank in Email::makeSendgridEximSettings");
+			throw new Exception("<p><b>random cannot be blank in Email::makeSendgridEximSettings</b><p>");
+		}
+
+
+		if ( ! (is_array($nonceArray) && !empty($nonceArray) ) ) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Email.php -> makeSendgridEximSettings(); Nonce not set");
+			throw new Exception("<p><b>Nonce not set in Email::makeSendgridEximSettings</b><p>");
+		}
+		
+		$oUser = new User();
+		$ClientID = $oUser->getClientId();
+
+		$nonceMeta = [
+			$oUser->Role,
+			$ClientID,
+			$random
+		];
+
+		$oSimpleNonce = new SimpleNonce();
+		$nonceResult = $oSimpleNonce->VerifyNonce($nonceArray["Nonce"], "makeSendgridEximSettings", $nonceArray["TimeStamp"], $nonceMeta);
+
+		if ( ! $nonceResult ) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Email.php -> makeSendgridEximSettings(); Nonce failed");
+			throw new Exception("<p><b>Nonce failed in Email::makeSendgridEximSettings</b></p>");
+		}
+
 		if ( ! file_exists("/var/www/html/mail/sendgrid")) {
 			mkdir("/var/www/html/mail/sendgrid", 0755);
 		}
@@ -171,7 +203,17 @@ class Email
 			file_put_contents("/var/www/html/mail/sendgrid/username", $username);
 			file_put_contents("/var/www/html/mail/sendgrid/password", $password);
 
-			$domains = $this->getSendgridDomains();
+			$random = random_int(1, 1000000);
+			$oUser = new User();
+			$oSimpleNonce = new SimpleNonce();
+			$nonceArray = [	
+				$oUser->Role,
+				$oUser->ClientID,
+				$random
+			];
+			$nonce = $oSimpleNonce->GenerateNonce("getSendgridDomains", $nonceArray);
+			
+			$domains = $this->getSendgridDomains($random, $nonce);
 
 			file_put_contents("/var/www/html/mail/sendgrid/domains", "");
 			if (!empty($domains) ) {
@@ -181,8 +223,40 @@ class Email
 
 	}
 
-        function getSendgridDomains()
-        {
+	function getSendgridDomains($random, $nonceArray)
+	{
+
+
+		if ( $random == "" ) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Email.php -> getSendgridDomains(); random cannot be blank in Email::getSendgridDomains");
+			throw new Exception("<p><b>random cannot be blank in Email::getSendgridDomains</b><p>");
+		}
+
+
+		if ( ! (is_array($nonceArray) && !empty($nonceArray) ) ) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Email.php -> getSendgridDomains(); Nonce not set");
+			throw new Exception("<p><b>Nonce not set in Email::getSendgridDomains</b><p>");
+		}
+		
+		$oUser = new User();
+		$ClientID = $oUser->getClientId();
+
+		$nonceMeta = [
+			$oUser->Role,
+			$ClientID,
+			$random
+		];
+
+		$oSimpleNonce = new SimpleNonce();
+		$nonceResult = $oSimpleNonce->VerifyNonce($nonceArray["Nonce"], "getSendgridDomains", $nonceArray["TimeStamp"], $nonceMeta);
+
+		if ( ! $nonceResult ) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Email.php -> getSendgridDomains(); Nonce failed");
+			throw new Exception("<p><b>Nonce failed in Email::getSendgridDomains</b></p>");
+		}
 
 		$domains = array();
 
@@ -1387,10 +1461,10 @@ class Email
 
         function RecreateUserForwardFile($ClientID)
         {
-		$oLog = new Log();
+			$oLog = new Log();
 
-		$oLog->WriteLog("debug", "In RecreateUserForwardFile, calling GenerateUserForwardFile(".$ClientID.")");
-		$this->GenerateUserForwardFile($ClientID);		
+			$oLog->WriteLog("debug", "In RecreateUserForwardFile, calling GenerateUserForwardFile(".$ClientID.")");
+			$this->GenerateUserForwardFile($ClientID);		
         }
 
 	function GenerateUserForwardFile($ClientID)
@@ -1533,62 +1607,66 @@ class Email
         function AddEmail($LocalPart, $DomainID, $Password, $ClientID)
         {
 
-		$UserName = "";
+			$UserName = "";
+
+			$oUser = new User();
+			$oPackage = new Package();
+			$oDomain = new Domain();
+
+			$DomainInfoArray = array();
+
+			$random = random_int(1, 1000000);
+			$oUser = new User();
+			$oSimpleNonce = new SimpleNonce();
+			$nonceArray = [	
+				$oUser->Role,
+				$oUser->ClientID,
+				$DomainID,
+				$random
+			];
+			$nonce = $oSimpleNonce->GenerateNonce("getDomainInfo", $nonceArray);
+			$oDomain->GetDomainInfo($DomainID, $random, $DomainInfoArray, $nonce);
+
+			$DomainUserName = $DomainInfoArray["UserName"];
+			$EmailAllowance = $oPackage->GetPackageAllowance("Emails", $DomainInfoArray["PackageID"]);
+			$EmailUsage = $oPackage->GetEmailUsage($DomainID);
+
+			if( (($EmailAllowance - $EmailUsage) < 1) && ($oAccount->Role != "admin") ) {
+				// No More Mails Left
+				return -1;
+			}
 
 
-                $oUser = new User();
-                $oPackage = new Package();
-                $oDomain = new Domain();
-
-                $DomainInfoArray = array();
-                $oDomain->GetDomainInfo($DomainID, $DomainInfoArray);
-
-                $DomainUserName = $DomainInfoArray["UserName"];
-                $EmailAllowance = $oPackage->GetPackageAllowance("Emails", $DomainInfoArray["PackageID"]);
-                $EmailUsage = $oPackage->GetEmailUsage($DomainID);
-
-                if( (($EmailAllowance - $EmailUsage) < 1) && ($oAccount->Role != "admin") )
-                {
-                        // No More Mails Left
-                        return -1;
-                }
-
-
-		$lastInsertId = 0;
-		
-		try
-		{
-			$query = $this->DatabaseConnection->prepare("INSERT INTO mailboxes VALUES (0, :domain_id, :domain_user_name, :local_part, :password, '', 1, :create_date, :modify_date)");
+			$lastInsertId = 0;
 			
-			$Password = md5($Password);
-			$Date = date('Y-m-d H:i:s');
-			
-			$query->bindParam(":domain_id", $DomainID);
-			$query->bindParam(":domain_user_name", $DomainUserName);
-			$query->bindParam(":local_part", $LocalPart);
-			$query->bindParam(":password", $Password);
-			
-			$query->bindParam(":create_date", $Date);
-			$query->bindParam(":modify_date", $Date);
-			
-			$query->execute();
-			$lastInsertId = $this->DatabaseConnection->lastInsertId();
-	
-		}
-		catch(PDOException $e)
-		{
-			$oLog = new Log();
-			$oLog->WriteLog("error", "/class.Email.php -> AddEmail(); Error = ".$e);
-		}			
+			try {
+				$query = $this->DatabaseConnection->prepare("INSERT INTO mailboxes VALUES (0, :domain_id, :domain_user_name, :local_part, :password, '', 1, :create_date, :modify_date)");
+				
+				$Password = md5($Password);
+				$Date = date('Y-m-d H:i:s');
+				
+				$query->bindParam(":domain_id", $DomainID);
+				$query->bindParam(":domain_user_name", $DomainUserName);
+				$query->bindParam(":local_part", $LocalPart);
+				$query->bindParam(":password", $Password);
+				
+				$query->bindParam(":create_date", $Date);
+				$query->bindParam(":modify_date", $Date);
+				
+				$query->execute();
+				$lastInsertId = $this->DatabaseConnection->lastInsertId();
+
+			} catch(PDOException $e) {
+				$oLog = new Log();
+				$oLog->WriteLog("error", "/class.Email.php -> AddEmail(); Error = ".$e);
+			}			
 
 
+			$this->GetDomainInfo($DomainID, $UserName, $DomainName);
 
-
-                $this->GetDomainInfo($DomainID, $UserName, $DomainName);
-
-                $this->MakeNEAFile($LocalPart, $DomainName, $UserName);
-                $this->RecreateUserForwardFile($ClientID);
-                return $lastInsertId;
+			$this->MakeNEAFile($LocalPart, $DomainName, $UserName);
+			$this->RecreateUserForwardFile($ClientID);
+			return $lastInsertId;
 
         }
 
@@ -1603,8 +1681,19 @@ class Email
                 $oPackage = new Package();
                 $oDomain = new Domain();
 
-                $DomainInfoArray = array();
-                $oDomain->GetDomainInfo($DomainID, $DomainInfoArray);
+				$DomainInfoArray = array();
+				
+				$random = random_int(1, 1000000);
+				$oUser = new User();
+				$oSimpleNonce = new SimpleNonce();
+				$nonceArray = [	
+					$oUser->Role,
+					$oUser->ClientID,
+					$DomainID,
+					$random
+				];
+				$nonce = $oSimpleNonce->GenerateNonce("getDomainInfo", $nonceArray);
+                $oDomain->GetDomainInfo($DomainID, $random, $DomainInfoArray, $nonce);
 
                 $DomainUserName = $DomainInfoArray["UserName"];
                 $EmailAllowance = $oPackage->GetPackageAllowance("Emails", $DomainInfoArray["PackageID"]);
@@ -2980,8 +3069,7 @@ class Email
 		
 		$x = 1;
 		$FileName = $_SERVER["DOCUMENT_ROOT"]."/nm/".$UserName."_".$x.".nma";
-		while(file_exists($FileName))
-		{
+		while(file_exists($FileName)) {
 			$x++;
 			$FileName = $_SERVER["DOCUMENT_ROOT"]."/nm/".$UserName."_".$x.".nma";
 		}
@@ -3056,19 +3144,27 @@ class Email
 	function AddSingleForward($LocalPart, $DomainID, $ForwardTo, $ClientID)
 	{
 	
-		
 		$oUser = new User();
 		$oDomain = new Domain();
        
-
 		$DomainInfoArray = array();
-	        $oDomain->GetDomainInfo($DomainID, $DomainInfoArray);
 
-        	$DomainUserName = $DomainInfoArray["UserName"];
+		$random = random_int(1, 1000000);
+		$oUser = new User();
+		$oSimpleNonce = new SimpleNonce();
+		$nonceArray = [	
+			$oUser->Role,
+			$oUser->ClientID,
+			$DomainID,
+			$random
+		];
+		$nonce = $oSimpleNonce->GenerateNonce("getDomainInfo", $nonceArray);
+		$oDomain->GetDomainInfo($DomainID, $random, $DomainInfoArray, $nonce);
+		
+		$DomainUserName = $DomainInfoArray["UserName"];
 
 		$lastInsertId = 0;
-		try
-		{
+		try {
 			$query = $this->DatabaseConnection->prepare("INSERT INTO email_forwarding VALUES (0, :client_id, :domain_id, :local_part, :forward_to, 0)");
 
 			$query->bindParam(":client_id", $ClientID);	
@@ -3080,13 +3176,10 @@ class Email
 	
 			$lastInsertId = $this->DatabaseConnection->lastInsertId();
 			
-		}
-		catch(PDOException $e)
-		{
+		} catch(PDOException $e) {
 			$oLog = new Log();
 			$oLog->WriteLog("error", "/class.Email.php -> AddSingleForward(); Error = ".$e);
 		}
-
 
 		$this->RecreateUserForwardFile($ClientID);
 		return $lastInsertId;
@@ -3096,12 +3189,22 @@ class Email
 	function DeleteDomainEmailForwarders($DomainID, $ClientID)
 	{
 		
+		$oUser = new User();
 		$oDomain = new Domain();
+		$oSimpleNonce = new SimpleNonce();
 
-                if($ClientID != $oDomain->GetDomainOwner($DomainID))
-                {
-                        return 0;
-                }
+		$random = random_int(1, 100000);
+		$nonceArray = [
+			$oUser->Role,
+			$oUser->ClientID,
+			$DomainID,
+			$random
+		];
+		
+		$nonce = $oSimpleNonce->GenerateNonce("getDomainOwner", $nonceArray);
+		if($ClientID != $oDomain->GetDomainOwner($DomainID, $random, $nonce)) {
+			return 0;
+		}
 
 		
 
@@ -3485,44 +3588,39 @@ class Email
 	}
 
 
-        function GetHigh550Count($HighCount, $StartDate, $EndDate, &$FireWallBlockList, &$EmailsToSuspend)
-        {
+	function GetHigh550Count($HighCount, $StartDate, $EndDate, &$FireWallBlockList, &$EmailsToSuspend)
+	{
 
-                $FireWallBlockList = array();
-                $EmailsToSuspend = array();
+		$FireWallBlockList = array();
+		$EmailsToSuspend = array();
 
 
-		try
-		{
-			$query = $this->DatabaseConnection->prepare("SELECT COUNT(confirmation) AS confirmation_count, auth_type, sender_host FROM email_trace WHERE auth_type != '' AND sender_host != '' AND SUBSTR(confirmation, 1,3) = '550'  AND start_date >= :start_date AND start_date <= :end_date GROUP BY subject ORDER BY confirmation_count;");
+		try {
+			$query = $this->DatabaseConnection->prepare("SELECT COUNT(confirmation) AS confirmation_count, auth_type, sender_host FROM email_trace WHERE auth_type != '' AND sender_host != '' AND SUBSTR(confirmation, 1,3) = '550'  AND start_date >= :start_date AND start_date <= :end_date GROUP BY subject, auth_type, sender_host ORDER BY confirmation_count;");
 
 			$query->bindParam(":start_date", $StartDate);
 			$query->bindParam(":end_date", $EndDate);
 			
 			$query->execute();
 	
-			while($result = $query->fetch(PDO::FETCH_ASSOC))
-			{
-				if( intVal($line["confirmation_count"]) >= $HighCount)
-				{ 
+			while($result = $query->fetch(PDO::FETCH_ASSOC)) {
+				if( intVal($line["confirmation_count"]) >= $HighCount) { 
 					array_push($FireWallBlockList, $result["sender_host"]);
 					array_push($EmailsToSuspend, $result["auth_type"]);
 				}
 			}
 	
-		}
-		catch(PDOException $e)
-		{
+		} catch(PDOException $e) { 
 			$oLog = new Log();
 			$oLog->WriteLog("error", "/class.Email.php -> GetHigh550Count(); Error = ".$e);
 		}			
 
-		
-                $FireWallBlockList = array_unique($FireWallBlockList);
-                $EmailsToSuspend = array_unique($EmailsToSuspend);		
-
-        }
 	
+		$FireWallBlockList = array_unique($FireWallBlockList);
+		$EmailsToSuspend = array_unique($EmailsToSuspend);		
+
+	}
+
 
 
 	function RemoveAlreadySuspendedFromArray($EmailArray)
@@ -3685,12 +3783,22 @@ class Email
 	function DeleteDomainEmails($DomainID, $ClientID)
 	{
 		
+		$oUser = new User();
+		$oSimpleNonce = new SimpleNonce();
 		$oDomain = new Domain();
 
-                if($ClientID != $oDomain->GetDomainOwner($DomainID))
-                {
-                        return 0;
-                }
+		$random = random_int(1, 100000);
+		$nonceArray = [
+			$oUser->Role,
+			$oUser->ClientID,
+			$DomainID,
+			$random
+		];
+		
+		$nonce = $oSimpleNonce->GenerateNonce("getDomainOwner", $nonceArray);
+		if($ClientID != $oDomain->GetDomainOwner($DomainID, $random, $nonce)) {
+			return 0;
+		}
 
 		$EmailArray = array();
 		$ArrayCount = 0;

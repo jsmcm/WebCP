@@ -5,25 +5,19 @@
 	include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 	$oReseller = new Reseller();
 	
-	if( ! isset($oDNS))
-	{
+	if( ! isset($oDNS)) {
 		$oDNS = new DNS();
 	}
 
-	if( ($oUser->Role == "admin") || ($oUser->Role == "reseller") )
-	{
+	if( ($oUser->Role == "admin") || ($oUser->Role == "reseller") ) {
 
-		if(strstr($_SERVER["SCRIPT_FILENAME"], "/users/"))
-		{
+		if(strstr($_SERVER["SCRIPT_FILENAME"], "/users/")) {
 			print "<li class=\"active open\">";
-		}
-		else
-		{
+		} else {
 			print "<li>";
 		}
 
-		if($oUser->Role == "admin")
-		{
+		if($oUser->Role == "admin") {
 		?>
 			<a href="javascript:void(0)"><i class="clip-user-2"></i>
 				<span class="title"> Users </span><i class="icon-arrow"></i>
@@ -1139,14 +1133,38 @@
 	</li>
 	<?php
 	}
-	?>
+	
 
 
 
 
+
+
+
+
+
+
+
+	if( $oUser->Role == "client" || $oUser->Role == "admin" || $oUser->Role == "reseller" ) {
+		if( (strstr($_SERVER["SCRIPT_FILENAME"], "/ssh/")) ) {
+			print "<li class=\"active\">";
+		} else {
+			print "<li>";
+		}
+		?>
+
+			<a href="/ssh"><i class="fa fa-terminal"></i>
+				<span class="title"> SSH </span><span class="selected"></span>
+			</a>
+
+		</li>
 	<?php
-	if($oUser->Role == "admin")
-	{
+	}
+
+
+
+
+	if($oUser->Role == "admin") {
 		if( strstr($_SERVER["SCRIPT_FILENAME"], "/modules/") )
 		{
 			print "<!--li class=\"active\">";

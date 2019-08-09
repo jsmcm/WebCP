@@ -12,42 +12,58 @@ $oSettings = new Settings();
 require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 
 $ClientID = $oUser->getClientId();
-if($ClientID < 1)
-{
+if($ClientID < 1) {
 	$oLog->WriteLog("DEBUG", "/domains/index.php -> client_id not set, redirecting to /index.php");
 	header("Location: /index.php");
 	exit();
 }
 	
-if($oUser->Role == "client")
-{
+if($oUser->Role == "client") {
 	header("Location: ./index.php?NoteType=Error&Notes=No Permissions");
 	exit();
 }
 
 
 
-if(!isset($_REQUEST["DomainID"]))
-{
+if(!isset($_REQUEST["DomainID"])) {
 	header("Location: index.php?Notes=Error changing package");
 	exit();
 }
 
-$DomainID = $_REQUEST["DomainID"];
-	
+$DomainID = intVal($_REQUEST["DomainID"]);
 
-$DomainOwnerID = $oDomain->GetDomainOwner($DomainID);
+$oSimpleNonce = new SimpleNonce();
 
-if( ($DomainOwnerID != $ClientID) && ($oUser->Role != "admin") )
-{
-        header("location: index.php?Notes=Error updating package");
-        exit();
+$random = random_int(1, 100000);
+$nonceArray = [
+	$oUser->Role,
+	$oUser->ClientID,
+	$DomainID,
+	$random
+];
 
+$nonce = $oSimpleNonce->GenerateNonce("getDomainOwner", $nonceArray);
+$DomainOwnerID = $oDomain->GetDomainOwner($DomainID, $random, $nonce);
+
+if( ($DomainOwnerID != $ClientID) && ($oUser->Role != "admin") ) {
+	header("location: index.php?Notes=Error updating package");
+	exit();
 }
 
 	
 $DomainArray = array();
-$oDomain->GetDomainInfo($DomainID, $DomainArray);	
+
+
+$random = random_int(1, 1000000);
+$nonceArray = [	
+	$oUser->Role,
+	$oUser->ClientID,
+	$DomainID,
+	$random
+];
+$nonce = $oSimpleNonce->GenerateNonce("getDomainInfo", $nonceArray);
+
+$oDomain->GetDomainInfo($DomainID, $random, $DomainArray, $nonce);	
 $PackageID = $DomainArray["PackageID"];
 
 

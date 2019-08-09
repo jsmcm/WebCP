@@ -9,29 +9,36 @@ $oSettings = new Settings();
 require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 
 $ClientID = $oUser->getClientId();
-if($ClientID < 1)
-{
+if($ClientID < 1) {
 	$oLog->WriteLog("DEBUG", "/domains/index.php -> client_id not set, redirecting to /index.php");
 	header("Location: /index.php");
 	exit();
 }
 	
-if($oUser->Role == "client")
-{
+if($oUser->Role == "client") {
 	header("Location: ./index.php?NoteType=Error&Notes=No Permissions");
 	exit();
 }
 
 
 
-if(!isset($_REQUEST["DomainID"]))
-{
+if(!isset($_REQUEST["DomainID"])) {
 	header("Location: index.php?NoteType=Error&Notes=Error changing package");
 	exit();
 }
 
-$DomainID = $_REQUEST["DomainID"];
-$DomainOwnerID = $oDomain->GetDomainOwner($DomainID);
+$DomainID = intVal($_REQUEST["DomainID"]);
+
+$random = random_int(1, 100000);
+$nonceArray = [
+	$oUser->Role,
+	$oUser->ClientID,
+	$DomainID,
+	$random
+];
+
+$nonce = $oSimpleNonce->GenerateNonce("getDomainOwner", $nonceArray);
+$DomainOwnerID = $oDomain->GetDomainOwner($DomainID, $random, $nonce);
 
 ?>
 

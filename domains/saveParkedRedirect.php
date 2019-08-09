@@ -30,8 +30,16 @@ if ( isset($_POST["redirect"])) {
     $redirect = filter_var($_POST["redirect"], FILTER_SANITIZE_STRING);
 }
 
+$random = random_int(1, 100000);
+$nonceArray = [
+	$oUser->Role,
+	$oUser->ClientID,
+    $domainId,
+    $random
+];
 
-if ($ClientID != $oDomain->GetDomainOwner($domainId) && ($Role == 'client')) {
+$nonce = $oSimpleNonce->GenerateNonce("getDomainOwner", $nonceArray);
+if ($ClientID != $oDomain->GetDomainOwner($domainId, $random, $nonce) && ($Role == 'client')) {
     print "error: Permission denied";
     exit();
 }

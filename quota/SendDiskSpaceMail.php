@@ -21,7 +21,17 @@ $AdminEmail = $oSettings->GetForwardSystemEmailsTo();
  
 $DomainName = $oDomain->GetDomainName($DomainUserName);
 $DomainID = $oDomain->GetDomainIDFromDomainName($DomainName);
-$UserID = $oDomain->GetDomainOwner($DomainID);
+
+$random = random_int(1, 100000);
+$nonceArray = [
+	$oUser->Role,
+	$oUser->ClientID,
+  $DomainID,
+  $random
+];
+
+$nonce = $oSimpleNonce->GenerateNonce("getDomainOwner", $nonceArray);
+$UserID = $oDomain->GetDomainOwner($DomainID, $random, $nonce);
 
 $Username = "";
 $EmailAddress = "";

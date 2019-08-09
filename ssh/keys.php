@@ -1,27 +1,79 @@
 <?php
+
 session_start();
 
 include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
-$oUser = new User();
-$oDomain = new Domain();
-$oReseller = new Reseller();
-$oSettings = new Settings();
-$oPackage = new Package();
-$oUtils = new Utils();
 
-$UserID = $oUser->getClientId();
-if($UserID < 1)
-{
+$oUser = new User();
+$oSettings = new Settings();
+$oUtils = new Utils();
+$oDomain = new Domain();
+$oSimpleNonce = new SimpleNonce();
+$oReseller = new Reseller();
+$oSSH = new SSH();
+
+require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
+
+$ClientID = $oUser->getClientId();
+if($ClientID < 1) {
 	header("Location: /index.php");
 	exit();
 }
-if($oUser->Role != "admin")
-{
-	header("./domains/index.php?Notes=You don't have permission to be there&NoteType=error");
-	exit();
+
+// can this client edit this domain?
+$domainId = intVal( $_REQUEST["domainId"] );
+$clientId = $ClientID;
+$clientRole = $oUser->Role;
+
+$random = random_int(1, 100000);
+$nonceArray = [
+    $oUser->Role,
+    $oUser->ClientID,
+	$domainId,
+	$random
+];
+
+$nonce = $oSimpleNonce->GenerateNonce("getDomainOwner", $nonceArray);
+$domainOwnerId = $oDomain->GetDomainOwner($domainId, $random, $nonce);
+
+$nonceArray = [
+    $oUser->Role,
+    $oUser->ClientID,
+    $domainOwnerId
+];
+
+$oReseller = new Reseller();
+$nonce = $oSimpleNonce->GenerateNonce("getClientResellerID", $nonceArray);
+$resellerId = $oReseller->GetClientResellerID($domainOwnerId, $nonce);
+
+if ( $clientId != $domainOwnerId ) {
+	if ( $resellerId != $clientId ) {
+		header("Location: index.php?Notes=You don't have permission to edit that domain&NoteType=error");
+		exit();
+	}
 }
 
-$oReseller->deleteOldResellers();
+$nonceArray = [
+	$clientRole,
+	$clientId,
+	$domainId
+];
+
+$nonce = $oSimpleNonce->GenerateNonce("getDomainPublicKeyList", $nonceArray);
+
+$publicKeyList = $oSSH->getDomainPublicKeyList($domainId, $nonce);
+
+
+$random = random_int(1,100000);
+$nonceArray = [
+	$clientRole,
+	$clientId,
+	$domainId,
+	$random
+];
+
+$nonce = $oSimpleNonce->GenerateNonce("getDomainNameFromDomainID", $nonceArray);
+$domainName = $oDomain->GetDomainNameFromDomainID( $domainId, $random, $nonce);
 
 ?>
 
@@ -33,7 +85,7 @@ $oReseller->deleteOldResellers();
 	<!--<![endif]-->
 	<!-- start: HEAD -->
 	<head>
-		<title>Reseller Management |  <?php print $oSettings->GetWebCPTitle(); ?></title>
+		<title>Manage SSH | <?php print $oSettings->GetWebCPTitle(); ?></title>
 		<!-- start: META -->
 		<meta charset="utf-8" />
 		<!--[if IE]><meta http-equiv='X-UA-Compatible' content="IE=edge,IE=9,IE=8,chrome=1" /><![endif]-->
@@ -60,10 +112,35 @@ $oReseller->deleteOldResellers();
 		<!-- start: CSS REQUIRED FOR THIS PAGE ONLY -->
 		<link rel="stylesheet" type="text/css" href="/assets/plugins/select2/select2.css" />
 		<link rel="stylesheet" href="/assets/plugins/DataTables/media/css/DT_bootstrap.css" />
+		<link rel="stylesheet" href="assets/plugins/ladda-bootstrap/dist/ladda-themeless.min.css">
+
+		<link rel="stylesheet" href="/assets/plugins/bootstrap-switch/static/stylesheets/bootstrap-switch.css">
+
+		<link rel="stylesheet" href="/assets/plugins/bootstrap-social-buttons/social-buttons-3.css">
+
+		<link href="/assets/plugins/bootstrap-modal/css/bootstrap-modal-bs3patch.css" rel="stylesheet" type="text/css"/>
+
+		<link href="/assets/plugins/bootstrap-modal/css/bootstrap-modal.css" rel="stylesheet" type="text/css"/>
+
+
+                <link rel="stylesheet" href="/assets/plugins/x-editable/css/bootstrap-editable.css">
+
+
+
+
 		<!-- end: CSS REQUIRED FOR THIS PAGE ONLY -->
 		<link rel="shortcut icon" href="/favicon.ico" />
-	
-
+		
+		<script language="javascript">
+		function ConfirmDelete(keyName)
+		{
+			if(confirm("Are you sure you want to delete " + keyName + "?")) {
+				return true;
+			}
+			return false;
+		}
+		</script>
+		
 	</head>
 	<!-- end: HEAD -->
 	<!-- start: BODY -->
@@ -128,51 +205,44 @@ $oReseller->deleteOldResellers();
 							<!-- start: PAGE TITLE & BREADCRUMB -->
 							<ol class="breadcrumb">
 								<li>
-									<i></i>
-									<a href="/users/">
-										Users
+									<a href="/ssh/">
+										SSH
 									</a>
 								</li>
 								<li>
 									<i class="active"></i>
-									<a href="/users/resellers.php">
-										Resellers
-									</a>
+									
+										Keys
+							
 								</li>
 					
 							</ol>
 							<div class="page-header">
-								<h1>Resellers <small> Edit settings</small></h1>
+								<h1>Keys for <?php print $domainName; ?></h1>
 							</div>
 							<!-- end: PAGE TITLE & BREADCRUMB -->
 						</div>
 					</div>
 					<!-- end: PAGE HEADER -->
 					<!-- start: PAGE CONTENT -->
+
 					<div class="row">
-					
-			
 					<?php
-					if(isset($_REQUEST["Notes"]))
-					{
+					if(isset($_REQUEST["Notes"])) {
 						$NoteType = "Message";
 						
-						if(isset($_REQUEST["NoteType"]))
-						{
+						if(isset($_REQUEST["NoteType"])) {
 							$NoteType = $_REQUEST["NoteType"];
 						}
 						
-						if(strtolower($NoteType) == "error")
-						{
+						if($NoteType == "Error") {
 							print "<div class=\"alert alert-danger\">";
 								print "<button data-dismiss=\"alert\" class=\"close\">";
 									print "&times;";
 								print "</button>";
 								print "<i class=\"fa fa-times-circle\"></i>";
 						
-						}
-						else
-						{
+						} else {
 							print "<div class=\"alert alert-success\">";
 								print "<button data-dismiss=\"alert\" class=\"close\">";
 									print "&times;";
@@ -189,37 +259,22 @@ $oReseller->deleteOldResellers();
 
 
 						<div class="col-md-12">
+
 							<!-- start: DYNAMIC TABLE PANEL -->
 							<div class="panel panel-default">
 									
 								<div class="panel-body">
 
-								<?php
-								$TotalDiskSpace = $oPackage->GetTotalDiskSpace();
-                                                                $NonResellerUsage = $oDomain->GetPackageDiskSpaceUsage(0); // non reseller usage
-                                                                $ResellerUsage = $oDomain->GetPackageDiskSpaceUsage(-1); // all reseller usage
+									<p>Manage <?php print $domainName; ?>'s SSH keys here<br>
+									<a href="https://docs.webcp.io/docs/ssh/" target="_new">View Documentation</a>
+									</p>
 
-								$ResellerAllocations = $oReseller->GetDiskSpaceAllocation(-1); // all reseller allocations
-
-								$LeftOver = $TotalDiskSpace - ($NonResellerUsage + $ResellerAllocations);
-								
-								$Scale = "b";
-								$Available = $oUtils->ConvertFromBytes($LeftOver, $Scale);
-								print "<b>Disk space available:</b> ".$Available."<p>";
-
-								
-?>
-
-								
-
-
-									<table class="table table-striped table-hover table-bordered table-full-width" id="sample_1">
+									<table class="table table-bordered table-full-width table-hover table-striped" id="sample_1">
 										<thead>
 											<tr>
-												<th>Name</th>
-												<th>Disk Space</th>
-												<th>Traffic</th>
-												<th>Limit Accounts</th>
+												<th>Key Name</th>
+												<th>Created</th>
+												<th>Authorised <a href="https://docs.webcp.io/docs/ssh/authorising-ssh-keys/" target="_new"><img src="/img/help.png" width="20px"></a></th>
 												<th>&nbsp;</th>
 											</tr>
 										</thead>
@@ -227,92 +282,96 @@ $oReseller->deleteOldResellers();
 										
 										<tbody>
 
-        <?php
-        $oReseller = new Reseller();
+										<?php
+										$oEmail = new Email();
 
-	$Array = array();
-	$ArrayCount = 0;
+										$ClientID = $oUser->ClientID;
 
-        $oReseller->GetResellerList($Array, $ArrayCount, $UserID, $oUser->Role);
+										if(isset($_REQUEST["ClientID"])) {
+											if($oUser->Role == "admin") {
+												//yes, permission..
+												$ClientID = $_REQUEST["ClientID"];
+											}
+										}
+										
+										for($x = 0; $x < count($publicKeyList); $x++) {
+											print "<tr>";
+											print "<td>".$publicKeyList[$x]["publicKeyName"]."</td>\r\n";
+										
+											print "<td>".date("F jS, Y", strtotime($publicKeyList[$x]["date"]))."</td>\r\n";
 
-        for($x = 0; $x < $ArrayCount; $x++)
-        {
-                print "<tr>";
-                print "<td>".$Array[$x]["FirstName"]." ".$Array[$x]["Surname"]."</td>\r\n";
-		
-		$DiskSpace = " not set ";
-		if(isset($Array[$x]["DiskSpace"]))
-		{
-			$Scale = "b";
-			$DiskSpace = $oUtils->ConvertFromBytes($Array[$x]["DiskSpace"], $Scale);
-		}
-                print "<td>".$DiskSpace."</td>\r\n";
+											$nonceArray = [	
+												$oUser->Role,
+												$oUser->ClientID,
+												$publicKeyList[$x]["id"],
+												$domainId
+											];
+											$nonce = $oSimpleNonce->GenerateNonce("pubKeyAuthorisation", $nonceArray);
+											
 
-		$Traffic = " not set ";
-		if(isset($Array[$x]["Traffic"]))
-		{
-			$Scale = "b";
-			$Traffic = $oUtils->ConvertFromBytes($Array[$x]["Traffic"], $Scale);
-		}
-                print "<td>".$Traffic."</td>\r\n";
-
-		$Accounts = " not set ";
-		if(isset($Array[$x]["Accounts"]))
-		{
-			$Accounts = $Array[$x]["Accounts"];
-		}
-                print "<td>".$Accounts."</td>\r\n";
+											print "<td><a href=\"#\" data-nonce-timestamp=\"".$nonce["TimeStamp"]."\" data-domain-id=\"".$domainId."\" data-nonce-value=\"".$nonce["Nonce"]."\" id=\"ssh_key_authorise_".$publicKeyList[$x]["id"]."\" data-type=\"select\" data-pk=\"".$publicKeyList[$x]["id"]."\" data-value=\"".$publicKeyList[$x]["authorised"]."\" data-original-title=\"Select Authorisation\"></a></td>\r\n";	
 
 
-                print "<td class=\"center\">";
-                print "<div class=\"visible-md visible-lg hidden-sm hidden-xs\">";
+											print "<td class=\"center\">";
+												print "<div class=\"visible-md visible-lg hidden-sm hidden-xs\">";
 
-                print "<a href=\"EditReseller.php?ResellerID=".$Array[$x]["UserID"]."\" class=\"btn btn-green tooltips\" data-placement=\"top\" data-original-title=\"Edit Reseller\"><i class=\"fa fa-edit fa fa-white\" style=\"color:white;\"></i></a>\n";
-                                  
+													$nonceArray = [	
+														$oUser->Role,
+														$oUser->ClientID,
+														$publicKeyList[$x]["id"],
+														$domainId
+													];
+													$nonce = $oSimpleNonce->GenerateNonce("deleteSSHKey", $nonceArray);
+													
 
-                        print "</div>";
+												
+													print "<a href=\"deleteKey.php?nonce=".$nonce["Nonce"]."&timeStamp=".$nonce["TimeStamp"]."&domainId=".$domainId."&keyId=".$publicKeyList[$x]["id"]."\" onclick=\"return ConfirmDelete('".$publicKeyList[$x]["publicKeyName"]."'); return false;\" class=\"btn btn-bricky tooltips\" data-placement=\"top\" data-original-title=\"Delete Public Key\"><i class=\"fa fa-times fa fa-white\" style=\"color:white;\"></i></a>\n";
 
-                        print "<div class=\"visible-xs visible-sm hidden-md hidden-lg\">";
-                        print "<div class=\"btn-group\">";
-                        print "<a class=\"btn btn-primary dropdown-toggle btn-sm\" data-toggle=\"dropdown\" href=\"#\">";
-                        print "<i class=\"fa fa-cog\"></i> <span class=\"caret\"></span>";
-                        print "</a>";
+												
+													print "</div>";
+													
+													print "<div class=\"visible-xs visible-sm hidden-md hidden-lg\">";
+													
+													print "<div class=\"btn-group\">";
+													print "<a class=\"btn btn-primary dropdown-toggle btn-sm\" data-toggle=\"dropdown\" href=\"#\">";
+														print "<i class=\"fa fa-cog\"></i> <span class=\"caret\"></span>";
+													print "</a>";
 
-                        print "<ul role=\"menu\" class=\"dropdown-menu pull-right\">";
-                        print "<li role=\"presentation\">";
-                        print "<a role=\"menuitem\" tabindex=\"-1\" href=\"EditReseller.php?ResellerID=".$Array[$x]["UserID"]."\">";
-                        print "<i class=\"fa fa-edit\"></i> Edit Reseller";
-                        print "</a>";
-                        print "</li>";
-                        print "</ul>";
-                        print "</div>";
-                        print "</div></td>";
-
-                print "</tr>";
-        }
-        ?>
+													print "<ul role=\"menu\" class=\"dropdown-menu pull-right\">";
 
 
-	
+														print "<li role=\"presentation\">";
+															print "<a role=\"menuitem\" tabindex=\"-1\" href=\"deleteKey.php?nonce=".$nonce["Nonce"]."&timeStamp=".$nonce["TimeStamp"]."&domainId=".$domainId."&keyId=".$publicKeyList[$x]["id"]."\" onclick=\"return ConfirmDelete('".$publicKeyList[$x]["publicKeyName"]."'); return false;\">";
+																print "<i class=\"fa fa-times\"></i> Delete Public Key";
+															print "</a>";
+														print "</li>";															
+
+													print "</ul>";
+												print "</div>";
+												print "</div>";
+											print "</td>";	
+
+
+											print "</tr>";
+										}
+										?>
+
 									</tbody>
 									
 									</table>
 							
-									<?php
-									
-									if(($oUser->Role == "admin") || ($oUser->Role == "reseller") ) {
-									?>
-										<a class="btn btn-primary" href="AddUser.php?r"><i class="fa fa-plus"></i>
-										Add new Reseller</a>
-									<?php
-									}
-									?>
-									
-								</div>
+
+									<a class="btn btn-primary" href="addKey.php?domainId=<?php print $domainId; ?>"><i class="fa fa-plus"></i>
+										Add New Public Key
+									</a>
+
+
 							</div>
 							<!-- end: DYNAMIC TABLE PANEL -->
 						</div>
 					</div>
+
+
 					<!-- end: PAGE CONTENT-->
 				</div>
 			</div>
@@ -329,6 +388,8 @@ $oReseller->deleteOldResellers();
 			</div>
 		</div>
 		<!-- end: FOOTER -->
+
+
 		<!-- start: MAIN JAVASCRIPTS -->
 		<!--[if lt IE 9]>
 		<script src="/assets/plugins/respond.min.js"></script>
@@ -352,10 +413,30 @@ $oReseller->deleteOldResellers();
 		<script type="text/javascript" src="/assets/plugins/DataTables/media/js/DT_bootstrap.js"></script>
 		<script src="/assets/js/table-data.js"></script>
 		<!-- end: JAVASCRIPTS REQUIRED FOR THIS PAGE ONLY -->
+
+
+
+
+		<script src="/assets/plugins/bootstrap-modal/js/bootstrap-modal.js"></script>
+
+		<script src="/assets/plugins/bootstrap-modal/js/bootstrap-modalmanager.js"></script>
+
+		<script src="/assets/js/ui-modals.js"></script>
+
+		<script src="/assets/plugins/jquery-mockjax/jquery.mockjax.js"></script>
+
+		<script src="/assets/plugins/x-editable/js/bootstrap-editable.min.js"></script>
+
+		<script src="/assets/plugins/x-editable/ssh-key-authorise.js"></script>
+
+		<script src="/assets/plugins/x-editable/demo.js"></script>
+
+
 		<script>
 			jQuery(document).ready(function() {
 				Main.init();
 				TableData.init();
+				//UIModals();
 			});
 		</script>
 	</body>
