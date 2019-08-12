@@ -9,10 +9,9 @@ $oMySQL = new MySQL();
 
 $ClientID = $oUser->getClientId();
 $Role = $oUser->Role;
-if($ClientID < 1)
-{
-        header("Location: /index.php");
-        exit();
+if($ClientID < 1) {
+	header("Location: /index.php");
+	exit();
 }
 
 
@@ -20,8 +19,7 @@ $MySQLID = $_POST["MySQLID"];
 $MySQLDatabaseName = $_POST["MySQLDatabaseName"];
 $MySQLUserName = trim($_POST["MySQLUserName"]);
 
-if(strlen($MySQLUserName) > 7)
-{
+if(strlen($MySQLUserName) > 7) {
 	header("location: AddMySQL.php?NoteType=Error&Notes=The user name cannot exceed 7 characters");
 	exit();
 }
@@ -70,30 +68,33 @@ print "PackageID:  ".$PackageID."<p>";
 */
 
 $ResellerPermission = false;
-if($oUser->Role == "reseller")
-{
-        if($oReseller->GetClientResellerID($DomainOwnerID) == $ClientID)
-        {
-                $ResellerPermission = true;
-        }
+if($oUser->Role == "reseller") {
+
+	$oSimpleNonce = new SimpleNonce();
+	$nonceArray = [	
+		$oUser->Role,
+		$oUser->ClientID,
+		$DomainOwnerClientID
+	];
+	$nonce = $oSimpleNonce->GenerateNonce("getClientResellerID", $nonceArray);
+
+	if($oReseller->GetClientResellerID($DomainOwnerClientID, $nonce) == $ClientID) {
+		$ResellerPermission = true;
+	}
 }
 
-if( ($ClientID != $DomainOwnerClientID) && ($Role != "admin"))
-{
-	if($ResellerPermission == false)
-	{
+if( ($ClientID != $DomainOwnerClientID) && ($Role != "admin")) {
+	if($ResellerPermission == false) {
 		header("location: index.php?Notes=No%20permission!");
 		exit();
 	}
 }
 
 
-if($Action == 'add')
-{
+if($Action == 'add') {
 	//print "<p>10<p>";
 
-	if($oMySQL->MySQLExists($MySQLDatabaseName) > 0)
-	{
+	if($oMySQL->MySQLExists($MySQLDatabaseName) > 0) {
 		header("location: index.php?Notes=The database already exists");
 		exit();
 	}
@@ -112,12 +113,10 @@ if($Action == 'add')
 
 	//print "<p>30<p>";
 	
-	if($x < 1)
-	{ 
+	if($x < 1) { 
 		$Message = "Cannot add MySQL database";
 		
-		if($x == -1)
-		{
+		if($x == -1) {
 			$Message = "You do not have any more MySQL databases on your current hosting plan";
 		}
 
@@ -126,18 +125,11 @@ if($Action == 'add')
 	}
 	//exit();
 	header("location: index.php?Notes=MySQL database added");
-}
-else
-{
-	if($oMySQL->EditUser($cpDatabaseName, $DatabaseUsername, $Password, $MySQLID, $ClientID) < 1)
-	{
+} else {
+	if($oMySQL->EditUser($cpDatabaseName, $DatabaseUsername, $Password, $MySQLID, $ClientID) < 1) {
 		header("location: index.php?Notes=Cannot edit the database");
 		exit();
 	}
 	exit();
 	header("location: index.php?Notes=MySQL updated");
 }
-
-?>
-
-

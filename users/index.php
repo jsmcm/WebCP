@@ -257,7 +257,16 @@ if($ClientID < 1)
 	
 			if($Array[$x]["role"] == "client")
 			{
-				$ResellerID = $oReseller->GetClientResellerID($Array[$x]["id"]);
+
+				
+				$oSimpleNonce = new SimpleNonce();
+				$nonceArray = [	
+					$oUser->Role,
+					$oUser->ClientID,
+					$Array[$x]["id"]
+				];
+				$nonce = $oSimpleNonce->GenerateNonce("getClientResellerID", $nonceArray);
+				$ResellerID = $oReseller->GetClientResellerID($Array[$x]["id"], $nonce);
 				if($ResellerID > 0)
 				{
 					$oReseller->GetResellerDetails($ResellerID, $ResellerArray, $ResellerArrayCount, $oUser->Role, $oUser->ClientID);
