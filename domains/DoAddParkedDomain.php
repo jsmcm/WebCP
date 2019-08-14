@@ -136,6 +136,16 @@ if ($parkedDomainId < 1 ) {
 	exit();
 }
 
-$oDomain->saveDomainSetting($parkedDomainId, "parked_redirect", "redirect", "", "");
+
+$nonceArray = [
+	$oUser->Role,
+	$oUser->ClientID,
+	$parkedDomainId,
+	"parked_redirect",
+	"redirect"
+];
+
+$nonce = $oSimpleNonce->GenerateNonce("saveDomainSetting", $nonceArray);
+$oDomain->saveDomainSetting($parkedDomainId, "parked_redirect", "redirect", "", "", $nonce);
 
 header("location: ListParkedDomains.php?DomainID=".$AncestorDomainID."&NoteType=Success&Notes=Domain added<br><b>Please wait 1 minute before adding email or FTP accounts for this domains!</b>".$Error);

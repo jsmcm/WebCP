@@ -8,10 +8,9 @@ $oUser = new User();
 require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 
 $ClientID = $oUser->getClientId();
-if($ClientID < 1)
-{
-        header("Location: /index.php");
-        exit();
+if($ClientID < 1) {
+	header("Location: /index.php");
+	exit();
 }
 
 $parkedDomainId = intVal($_REQUEST["ParkedDomainID"]);
@@ -25,6 +24,7 @@ $nonceArray = [
 	$random
 ];
 
+$oSimpleNonce = new SimpleNonce();
 $nonce = $oSimpleNonce->GenerateNonce("getDomainOwner", $nonceArray);
 $ParkedDomainOwnerClientID = $oDomain->GetDomainOwner($parkedDomainId, $random, $nonce);
 

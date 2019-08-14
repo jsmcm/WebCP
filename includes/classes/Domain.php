@@ -1,10 +1,10 @@
 <?php
 /*********************************************************************
 *********************************************************************/
-if(!isset($_SESSION)) 
-{
-     session_start();
+if(!isset($_SESSION))  {
+    session_start();
 }
+
 include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 
 class Domain
@@ -180,19 +180,15 @@ class Domain
 
 	function GetAccountsCreatedCount()
 	{
-		try
-		{
+		try {
 			$query = $this->DatabaseConnection->prepare("SELECT COUNT(id) AS count FROM domains WHERE deleted = 0 AND domain_type = 'primary'");
 
 			$query->execute();
 
-			if($result = $query->fetch(PDO::FETCH_ASSOC))
-			{
+			if($result = $query->fetch(PDO::FETCH_ASSOC)) {
 				return $result["count"];
 			}
-		}
-		catch(PDOException $e)
-		{
+		} catch(PDOException $e) {
 			$oLog = new Log();
 			$oLog->WriteLog("error", "/class.Domain.php -> GetAccountsCreatedCount(); Error = ".$e);
 		}
@@ -202,8 +198,7 @@ class Domain
 
 	function MakeUnsuspendFile($UserName)
 	{
-		if(file_exists($_SERVER["DOCUMENT_ROOT"]."/nm/".$UserName.".suspend"))
-		{
+		if(file_exists($_SERVER["DOCUMENT_ROOT"]."/nm/".$UserName.".suspend")) {
 			unlink($_SERVER["DOCUMENT_ROOT"]."/nm/".$UserName.".suspend");
 		}
 
@@ -216,8 +211,7 @@ class Domain
 
 	function MakeSuspendFile($UserName)
 	{
-		if(file_exists($_SERVER["DOCUMENT_ROOT"]."/nm/".$UserName.".unsuspend"))
-		{
+		if(file_exists($_SERVER["DOCUMENT_ROOT"]."/nm/".$UserName.".unsuspend")) {
 			unlink($_SERVER["DOCUMENT_ROOT"]."/nm/".$UserName.".unsuspend");
 		}
 
@@ -231,8 +225,7 @@ class Domain
 	function UpdateMailRouting($DomainID, $Routing)
 	{
 
-		try
-		{
+		try {
 			$query = $this->DatabaseConnection->prepare("UPDATE domains SET mail_type = :routing WHERE id = :id");
 
 			$query->bindParam(":routing", strtolower($Routing));
@@ -240,9 +233,7 @@ class Domain
 
 			$query->execute();
 
-		}
-		catch(PDOException $e)
-		{
+		} catch(PDOException $e) {
 			$oLog = new Log();
 			$oLog->WriteLog("error", "/class.Domain.php -> UpdateMailRouting(); Error = ".$e);
 		}
@@ -268,9 +259,7 @@ class Domain
 
 			$query->execute();
 
-		}
-		catch(PDOException $e)
-		{
+		} catch(PDOException $e) {
 			$oLog = new Log();
 			$oLog->WriteLog("error", "/class.Domain.php -> Unsuspend(); Error = ".$e);
 		}
@@ -354,8 +343,7 @@ class Domain
 
 		$TotalDiskUsage = 0;
 
-		for($x = 0; $x < $ArrayCount; $x++)
-		{
+		for($x = 0; $x < $ArrayCount; $x++) {
 			$TotalDiskUsage = $TotalDiskUsage + $PackageStatsArray[$x]["PackageCount"] * $PackageStatsArray[$x]["DiskSpace"];
 		}
 
@@ -375,8 +363,7 @@ class Domain
 
 		$TotalTrafficUsage = 0;
 
-		for($x = 0; $x < $ArrayCount; $x++)
-		{
+		for($x = 0; $x < $ArrayCount; $x++) {
 			$TotalTrafficUsage = $TotalTrafficUsage + $PackageStatsArray[$x]["PackageCount"] * $PackageStatsArray[$x]["Traffic"];
 		}
 
@@ -391,55 +378,42 @@ class Domain
 		$DomainName = strtolower($DomainName);
 
 		// check for double period
-		if(strstr($DomainName, ".."))
-		{
+		if(strstr($DomainName, "..")) {
 			return -1;
 		}
 
 		// First char must be alphanum
-		if( (substr($DomainName, 0, 1) < 'a') || (substr($DomainName, 0, 1) > 'z') )
-		{
-			if( (substr($DomainName, 0, 1) < '0') || (substr($DomainName, 0, 1) > '9') )
-			{
+		if( (substr($DomainName, 0, 1) < 'a') || (substr($DomainName, 0, 1) > 'z') ) {
+			if( (substr($DomainName, 0, 1) < '0') || (substr($DomainName, 0, 1) > '9') ) {
 				return -2;
 			}
 		}
 
 
 
-		for($x = 0; $x < strlen($DomainName); $x++)
-		{
-			if( (substr($DomainName, $x, 1) < 'a') || (substr($DomainName, $x, 1) > 'z') )
-			{
-				if( (substr($DomainName, $x, 1) < '0') || (substr($DomainName, $x, 1) > '9') )
-				{
-					if( (substr($DomainName, $x, 1) != '-') && (substr($DomainName, $x, 1) != '.') )
-					{
+		for($x = 0; $x < strlen($DomainName); $x++) {
+			if( (substr($DomainName, $x, 1) < 'a') || (substr($DomainName, $x, 1) > 'z') ) {
+				if( (substr($DomainName, $x, 1) < '0') || (substr($DomainName, $x, 1) > '9') ) {
+					if( (substr($DomainName, $x, 1) != '-') && (substr($DomainName, $x, 1) != '.') ) {
 						return -3;
 					}
 				}
 			}
 		}
 
-		if(strlen($DomainName) > 100)
-		{
+		if(strlen($DomainName) > 100) {
 			return -4;
 		}
 
 
-		if(strlen($DomainName) < 4)
-		{
+		if(strlen($DomainName) < 4) {
 			return -5;
 		}
 
 		// must contain at least 1 .
-		if(!strstr($DomainName, "."))
-		{
+		if(!strstr($DomainName, ".")) {
 			return -6;
 		}
-
-
-
 
 		return 1;
 	}
@@ -2251,66 +2225,36 @@ class Domain
 		$FQDN = $SubDomain.".".$DomainName;			
 		$SubDomain = substr($FQDN, 0, strlen($FQDN) - (strlen($ParentDomainName) + 1));
 		
-		try	
-		{
+		try	 {
 			$ServerType = $oDNS->GetSetting("server_type");
 
-			if($ServerType == "master")
-			{
-				$oDNS->AddSubDomain($SubDomain, $ParentDomainName, $oDNS->GetDomainIP($ParentDomainName), "");	
-
+			if($ServerType == "master") {
+				$oDNS->AddSubDomain($SubDomain, $ParentDomainName, $oDNS->GetDomainIP($ParentDomainName), "");
 				$Error = "DNS Added";
+			} else if($ServerType == "slave") {
 
+				$HostName = $oDNS->GetSetting("master_host_name");
+				$IPAddress = $oDNS->GetSetting("master_ip_address");
+				$Password = $oDNS->GetSetting("master_password");
+				$PublicKey = $oDNS->GetSetting("master_public_key");
+
+				$port = 8443;
+			
+				$result = $oDNS->createSubDomainInZone($SubDomain, $ParentDomainName, $IPAddress, $HostName, $port, $Password, $PublicKey);
+
+				if ( $result == false ) {
+					// try non-ssl
+					$port = 8880;
+
+					$result = $oDNS->createSubDomainInZone($SubDomain, $ParentDomainName, $IPAddress, $HostName, $port, $Password, $PublicKey);
+				}
+
+			} else {
+				$Error = "<p><b>Domain created. Please ensure you update your DNS server</b>";
 			}
-                        else if($ServerType == "slave")
-                        {
-                                $HostName = $oDNS->GetSetting("master_host_name");
-                                $IPAddress = $oDNS->GetSetting("master_ip_address");
-                                $Password = $oDNS->GetSetting("master_password");
-                                $PublicKey = $oDNS->GetSetting("master_public_key");
-
-
-                                $options = array(
-                                'uri' => $IPAddress,
-                                'location' => 'http://'.$HostName.':8880/API/dns/DNS.php',
-                                'trace' => 1);
-
-				$Message = json_encode(array("Password" => $Password, "SubDomain" => $SubDomain, "ParentDomainName" => $ParentDomainName, "IPv4" => $oDNS->GetDomainIP($ParentDomainName), "IPv6" => ""));
-
-
-                                $EncryptedMessage = "";
-                                openssl_public_encrypt($Message, $EncryptedMessage, $PublicKey);
-
-                                $Message = base64_encode($EncryptedMessage);
-                                try
-                                {
-                                        $client = new SoapClient(NULL, $options);
-                                        $Result = $client->AddSubDomainForSlave($Message);
-					$Error = $Result;
-                                        if($Result < 1)
-                                        {
-                                                $oLog->WriteLog("DEBUG", "Error registering DNS, return code: ".$Result);
-                                                $Error = "<p><b>Domain DNS could not be registered, return code: ".$Result.". Please contact support</b>";
-                                        }
-					
-                                }
-                                catch (Exception $e)
-                                {
-					$Error = $e->getMessage();
-                                }
-
-                        }
-                        else
-                        {
-                                $Error = "<p><b>Domain created. Please ensure you update your DNS server</b>";
-                        }
-		}
-		catch(Exception $e)
-		{
+		} catch(Exception $e) {
 			$Error = "<p><b>The DNS could not be registered due to an error:<p>".$e->getMessage()."</b>";
 		}
-
-		//exit();
 
 		return $lastInsertId;
 		
@@ -2343,9 +2287,8 @@ class Domain
 		$IPV6Address = "";
 		$DNSSEC = 0;
 		
-		if(file_exists($_SERVER["DOCUMENT_ROOT"]."/includes/ipv6.txt"))
-		{
-		        $IPV6Address = trim(file_get_contents($_SERVER["DOCUMENT_ROOT"]."/includes/ipv6.txt"));
+		if(file_exists($_SERVER["DOCUMENT_ROOT"]."/includes/ipv6.txt")) {
+		    $IPV6Address = trim(file_get_contents($_SERVER["DOCUMENT_ROOT"]."/includes/ipv6.txt"));
 		}
 
 
@@ -2373,8 +2316,7 @@ class Domain
 
 		
 
-		try
-		{
+		try {
 			$query = $this->DatabaseConnection->prepare("INSERT INTO domains VALUES (0, :client_id, :user_name, :group_id, :user_id, :parked_domain, :path, :domain_owner, 1, 0, '".date('Y-m-d H:i:s')."', '".date('Y-m-d H:i:s')."', 'local', 'parked',  :primary_domain_id, :ancestor_id, :package_id, 0)");
 			
 			$query->bindParam(":client_id", $ClientID);
@@ -2390,75 +2332,48 @@ class Domain
 			
 			$query->execute();
 	
-		}
-		catch(PDOException $e)
-		{
+		} catch(PDOException $e) {
 			$oLog = new Log();
 			$oLog->WriteLog("error", "/class.Domain.php -> AddParkedDomain(); Error = ".$e);
 		}
 		
 		$lastInsertId = $this->DatabaseConnection->lastInsertId();
 		
-		try
-		{
+		try {
 			$ServerType = $oDNS->GetSetting("server_type");
 
-			if($ServerType == "master")
-			{
+			if($ServerType == "master") {
 				$x = $oDNS->AddZone($ParkedDomain, $oDNS->GetDomainIP($DomainName), "");	
-				if($x < 1)
-				{
+				if($x < 1) {
 					$oLog->WriteLog("DEBUG", "Error registering DNS, return code: ".$x);
 					$Error = "<p><b>Domain DNS could not be registered, return code: ".$x.". Please contact support</b>";
 				}
-			}
-			else if($ServerType == "slave")
-			{
+			} else if($ServerType == "slave") {
+
 				$HostName = $oDNS->GetSetting("master_host_name");
 				$IPAddress = $oDNS->GetSetting("master_ip_address");
 				$Password = $oDNS->GetSetting("master_password");
 				$PublicKey = $oDNS->GetSetting("master_public_key");
 
-				
-				$options = array(
-				'uri' => $IPAddress,
-				'location' => 'http://'.$HostName.':8880/API/dns/DNS.php',
-				'trace' => 1);
+				$port = 8443;
+			
+				$result = $oDNS->createMasterZone($ParkedDomain, $IPAddress, $HostName, $port, $Password, $PublicKey);
+				if ( $result == false ) {
+					// try non-ssl
+					$port = 8880;
 
-				$Message = json_encode(array("Password" => $Password, "DomainName" => $ParkedDomain, "IPv4" => $oDNS->GetDomainIP($ParentDomainName), "IPv6" => ""));
-				$EncryptedMessage = "";
-				openssl_public_encrypt($Message, $EncryptedMessage, $PublicKey);
-				
-				$Message = base64_encode($EncryptedMessage);
-				try
-				{
-					$client = new SoapClient(NULL, $options);
-					$Result = $client->AddZoneForSlave($Message);
-				
-					if($Result < 1)
-					{
-						$oLog->WriteLog("DEBUG", "Error registering DNS, return code: ".$Result);
-						$Error = "<p><b>Domain DNS could not be registered, return code: ".$Result.". Please contact support</b>";
-					}
-				}
-				catch (Exception $e)
-				{
+					$result = $oDNS->createMasterZone($ParkedDomain, $IPAddress, $HostName, $port, $Password, $PublicKey);
 				}
 
-			}
-			else
-			{
+
+			} else {
 				$Error = "<p><b>Domain created. Please ensure you update your DNS server</b>";
 			}
-		}
-		catch(Exception $e)
-		{
+		} catch(Exception $e) {
 			$Error = "The DNS could not be registered due to an error:<p>".$e->getMessage();
 			$oLog->WriteLog("DEBUG", $Error);
 			$Error = "<p><b>".$Error."</b>";
 		}
-
-		//exit();
 
 		
 		$this->DeleteDomainFile($this->GetParentDomainIDRecursive($PrimaryDomainID));
@@ -2485,9 +2400,8 @@ class Domain
 		$oLog->WriteLog("DEBUG", "DomainName: '".$DomainName."', DomainType: '".$DomainType."', PackageID: '".$PackageID."', ClientID: '".$ClientID."'");
 
 
-		if(file_exists($_SERVER["DOCUMENT_ROOT"]."/includes/ipv6.txt"))
-		{
-		        $IPV6Address = trim(file_get_contents($_SERVER["DOCUMENT_ROOT"]."/includes/ipv6.txt"));
+		if(file_exists($_SERVER["DOCUMENT_ROOT"]."/includes/ipv6.txt")) {
+		    $IPV6Address = trim(file_get_contents($_SERVER["DOCUMENT_ROOT"]."/includes/ipv6.txt"));
 		}
 		
 		$TempUser = new User();
@@ -2499,8 +2413,7 @@ class Domain
 		$UserName = $this->CreateUserName($DomainName);
 
 
-		try
-		{
+		try {
 			$query = $this->DatabaseConnection->prepare("INSERT INTO domains VALUES (0, :client_id, :user_name, :next_uid, :next_uid1, :domain_name, '/home/".$UserName."/public_html', :account_user_name, 1, 0, '".date('Y-m-d H:i:s')."', '".date('Y-m-d H:i:s')."', 'local', 'primary', 0, 0, :package_id, 0)");
 			
 			$query->bindParam(":client_id", $ClientID);
@@ -2513,9 +2426,7 @@ class Domain
 			
 			$query->execute();
 	
-		}
-		catch(PDOException $e)
-		{
+		} catch(PDOException $e) {
 			$oLog->WriteLog("error", "/class.Domain.php -> AddDomain(); Error = ".$e);
 		}
 		
@@ -2524,14 +2435,12 @@ class Domain
 		
 		$this->SendNewDomainEmail($DomainName, $FirstName, $Surname, $EmailAddress);
 	
-		try
-		{
+		try {
 			$ServerType = $oDNS->GetSetting("server_type");
 
 			$oLog->WriteLog("Domains", "Server Type: ".$ServerType);
 
-			if($ServerType == "master")
-			{
+			if($ServerType == "master") {
 
 				$dkimKey = "";
 				if( file_exists("/etc/exim4/dkim.public.key") ) {
@@ -2555,14 +2464,11 @@ class Domain
 				}
 
 				$x = $oDNS->AddZone($DomainName, $oDNS->GetDomainIP($DomainName), "", $dkimKey);	
-				if($x < 1)
-				{
+				if($x < 1) {
 					$oLog->WriteLog("DEBUG", "Error registering DNS, return code: ".$x);
 					$Error = "<p><b>Domain DNS could not be registered, return code: ".$x.". Please contact support</b>";
 				}
-			}
-			else if($ServerType == "slave")
-			{
+			} else if($ServerType == "slave") {
 				$HostName = $oDNS->GetSetting("master_host_name");
 				$IPAddress = $oDNS->GetSetting("master_ip_address");
 				$Password = $oDNS->GetSetting("master_password");
@@ -3281,9 +3187,21 @@ class Domain
 	{
 		$oSettings = new Settings();
 		$oDNS = new DNS();
-	
-		if($ClientID != $this->GetDomainOwner($ParkedDomainID))
-		{
+		$oUser = new User();
+
+		$random = random_int(1, 100000);
+		$nonceArray = [
+			$oUser->Role,
+			$oUser->ClientID,
+			$ParkedDomainID,
+			$random
+		];
+		
+		$oSimpleNonce = new SimpleNonce();
+		
+		$nonce = $oSimpleNonce->GenerateNonce("getDomainOwner", $nonceArray);
+
+		if($ClientID != $this->GetDomainOwner($ParkedDomainID, $random, $nonce)) {
 			return 0;
 		}
 
