@@ -7,10 +7,9 @@ $oUser = new User();
 $oMySQL = new MySQL();
 
 $ClientID = $oUser->getClientId();
-if($ClientID < 1)
-{
-        header("Location: /index.php");
-        exit();
+if($ClientID < 1) {
+	header("Location: /index.php");
+	exit();
 }
 
 $ID = $_POST["id"];
@@ -30,25 +29,35 @@ $DomainUserName = substr($UserName, 0, strpos($UserName, "_"));
 $Password = $oMySQL->GetDatabasePassword($ID, $DomainUserName, $UserName, $MySQLDatabaseName, $MySQLOwner);
 
 $ResellerPermission = false;
-if($oUser->Role == "reseller")
-{
-        if($oReseller->GetClientResellerID($MySQLOwner) == $ClientID)
-        {
-                $ResellerPermission = true;
-        }
+if($oUser->Role == "reseller") {
+
+	$random = random_int(1, 100000);
+	$nonceArray = [
+		$oUser->Role,
+		$oUser->getClientId(),
+		$MySQLOwner,
+		$random
+	];
+	
+	$oSimpleNonce = new SimpleNonce();
+	
+	$nonce = $oSimpleNonce->GenerateNonce("getClientResellerID", $nonceArray);
+	$ResellerID = $oReseller->GetClientResellerID($MySQLOwner, $random, $nonce);
+	
+	if($ResellerID == $ClientID) {
+		$ResellerPermission = true;
+	}
+	
 }
 
-if( ($MySQLOwner != $ClientID) && ($Role != "admin") )
-{
-	if($ResellerPermission == false)
-	{
+if( ($MySQLOwner != $ClientID) && ($Role != "admin") ) {
+	if($ResellerPermission == false) {
 		header("location: index.php?NoteType=oops, something went wrong&NoteType=error");
 		exit();
 	}
 }
 
-if($UserName != $MySQLUserName)
-{
+if($UserName != $MySQLUserName) {
 	header("location: index.php?NoteType=oops, something went wrong&NoteType=error");
 	exit();
 }

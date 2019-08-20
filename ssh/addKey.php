@@ -24,25 +24,28 @@ $domainId = intVal( $_REQUEST["domainId"] );
 $clientId = $ClientID;
 $clientRole = $oUser->Role;
 
+$random = random_int(1, 100000);
 $nonceArray = [
 	$oUser->Role,
 	$oUser->ClientID,
-	$domainId
+	$domainId,
+	$random
 ];
 
 $nonce = $oSimpleNonce->GenerateNonce("getDomainOwner", $nonceArray);
-$domainOwnerId = $oDomain->GetDomainOwner($domainId);
+$domainOwnerId = $oDomain->GetDomainOwner($domainId, $random, $nonce);
 
-
+$random = random_int(1, 100000);
 $nonceArray = [
     $oUser->Role,
     $oUser->ClientID,
-    $domainOwnerId
+	$domainOwnerId,
+	$random
 ];
 
 $oReseller = new Reseller();
 $nonce = $oSimpleNonce->GenerateNonce("getClientResellerID", $nonceArray);
-$resellerId = $oReseller->GetClientResellerID($domainOwnerId, $nonce);
+$resellerId = $oReseller->GetClientResellerID($domainOwnerId, $random, $nonce);
 
 if ( $clientId != $domainOwnerId ) {
 	if ( $resellerId != $clientId ) {
