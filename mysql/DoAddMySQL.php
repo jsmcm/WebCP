@@ -70,6 +70,7 @@ print "PackageID:  ".$PackageID."<p>";
 $ResellerPermission = false;
 if($oUser->Role == "reseller") {
 
+
 	$random = random_int(1, 100000);
 	$nonceArray = [
 		$oUser->Role,
@@ -83,28 +84,23 @@ if($oUser->Role == "reseller") {
 	$nonce = $oSimpleNonce->GenerateNonce("getClientResellerID", $nonceArray);
 	$ResellerID = $oReseller->GetClientResellerID($DomainOwnerID, $random, $nonce);
 	
-	
 	if($ResellerID == $ClientID) {
 		$ResellerPermission = true;
 	}
 }
 
-if( ($ClientID != $DomainOwnerClientID) && ($Role != "admin"))
-{
-	if($ResellerPermission == false)
-	{
+if( ($ClientID != $DomainOwnerClientID) && ($Role != "admin")) {
+	if($ResellerPermission == false) {
 		header("location: index.php?Notes=No%20permission!");
 		exit();
 	}
 }
 
 
-if($Action == 'add')
-{
+if($Action == 'add') {
 	//print "<p>10<p>";
 
-	if($oMySQL->MySQLExists($MySQLDatabaseName) > 0)
-	{
+	if($oMySQL->MySQLExists($MySQLDatabaseName) > 0) {
 		header("location: index.php?Notes=The database already exists");
 		exit();
 	}
@@ -123,12 +119,10 @@ if($Action == 'add')
 
 	//print "<p>30<p>";
 	
-	if($x < 1)
-	{ 
+	if($x < 1) { 
 		$Message = "Cannot add MySQL database";
 		
-		if($x == -1)
-		{
+		if($x == -1) {
 			$Message = "You do not have any more MySQL databases on your current hosting plan";
 		}
 
@@ -137,18 +131,11 @@ if($Action == 'add')
 	}
 	//exit();
 	header("location: index.php?Notes=MySQL database added");
-}
-else
-{
-	if($oMySQL->EditUser($cpDatabaseName, $DatabaseUsername, $Password, $MySQLID, $ClientID) < 1)
-	{
+} else {
+	if($oMySQL->EditUser($cpDatabaseName, $DatabaseUsername, $Password, $MySQLID, $ClientID) < 1) {
 		header("location: index.php?Notes=Cannot edit the database");
 		exit();
 	}
 	exit();
 	header("location: index.php?Notes=MySQL updated");
 }
-
-?>
-
-

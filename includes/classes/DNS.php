@@ -519,21 +519,17 @@ class DNS
 	function GetDomainIP($Domain)
 	{
 	   
-		try
-		{
+		try {
 			$query = $this->DatabaseConnection->prepare("SELECT option_value FROM dns_options WHERE option_name = 'ip' AND extra1 = :domain AND deleted = 0;");
 
 			$query->bindParam(":domain", $Domain);
 			$query->execute();
 
-			if($result = $query->fetch(PDO::FETCH_ASSOC))
-			{
+			if($result = $query->fetch(PDO::FETCH_ASSOC)) {
 				return $result["option_value"];
 			}
 
-		}
-		catch(PDOException $e)
-		{
+		} catch(PDOException $e) {
 			$oLog = new Log();
 			$oLog->WriteLog("error", "/class.DNS.php -> GetDomainIP(); Error = ".$e);
 		}
@@ -543,22 +539,18 @@ class DNS
 
 	function GetSharedIP($type="ipv4")
 	{
-		try
-		{
+		try {
 			$query = $this->DatabaseConnection->prepare("SELECT option_value FROM dns_options WHERE option_name = 'ip' AND extra1 = 'shared' AND extra2 = :type AND deleted = 0");
 
 			$query->bindParam(":type", $type);
 
 			$query->execute();
 	
-			if($result = $query->fetch(PDO::FETCH_ASSOC))
-			{
+			if($result = $query->fetch(PDO::FETCH_ASSOC)) {
 				return $result["option_value"];
 			}
 	
-		}
-		catch(PDOException $e)
-		{
+		} catch(PDOException $e) {
 			$oLog = new Log();
 			$oLog->WriteLog("error", "/class.DNS.php -> GetSharedIP(); Error = ".$e);
 		}
@@ -1551,6 +1543,67 @@ class DNS
 		return true;
 
 	}
+
+
+
+
+
+	public function createSubDomainInZone($subDomain, $parentDomainName, $ipAddress, $hostName, $port, $password, $publicKey)
+	{
+		$oLog = new Log();
+
+		$options = array(
+			'uri' => $ipAddress,
+			'location' => 'http'.(($port=="8443")?'s':'').'://'.$hostName.':'.$port.'/API/dns/DNS.php',
+			'trace' => 1
+		);
+
+		$dkimKey = "";
+		if( file_exists("/etc/exim4/dkim.public.key") ) {
+			$dkimKey = file_get_contents("/etc/exim4/dkim.public.key");
+
+			$x = strpos($dkimKey, "-----BEGIN PUBLIC KEY-----");
+
+			if( $x !== false) {
+				$dkimKey = trim(substr($dkimKey, $x + strlen("-----BEGIN PUBLIC KEY-----")));
+			}
+
+			$x = strpos($dkimKey, "--");
+				
+			if( $x !== false) {
+				$dkimKey = trim(substr($dkimKey, 0, $x));
+			}
+
+			$dkimKey = str_replace("\r\n", "", $dkimKey);
+			$dkimKey = str_replace("\n", "", $dkimKey);
+		
+		}
+
+		$message = json_encode(array("Password" => $password, "SubDomain" => $subDomain, "ParentDomainName" => $parentDomainName, "IPv4" => $this->GetDomainIP($parentDomainName), "IPv6" => ""));
+
+		$encryptedMessage = "";
+		openssl_public_encrypt($message, $encryptedMessage, $publicKey);
+
+		$message = base64_encode($encryptedMessage);
+
+		try {
+			
+			$client = new SoapClient(NULL, $options);
+			$Result = $client->AddSubDomainForSlave($message);
+			
+			if($Result < 1) {
+				$oLog->WriteLog("DEBUG", "Error registering DNS, return code: ".$Result);
+			}
+
+		} catch (Exception $e) {
+			return false;
+		}
+
+		return true;
+
+	}
+
+
 
 
 

@@ -258,6 +258,7 @@ if($ClientID < 1)
 			if($Array[$x]["role"] == "client")
 			{
 
+
 				$random = random_int(1, 100000);
 				$nonceArray = [
 					$oUser->Role,
@@ -270,6 +271,7 @@ if($ClientID < 1)
 				
 				$nonce = $oSimpleNonce->GenerateNonce("getClientResellerID", $nonceArray);
 				$ResellerID = $oReseller->GetClientResellerID($Array[$x]["id"], $random, $nonce);
+
 				if($ResellerID > 0)
 				{
 					$oReseller->GetResellerDetails($ResellerID, $ResellerArray, $ResellerArrayCount, $oUser->Role, $oUser->ClientID);
