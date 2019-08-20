@@ -38,16 +38,18 @@ $DomainID = $oDomain->GetDomainIDFromSubDomainID($subDomainId);
 $ResellerPermission = false;
 if($oUser->Role == "reseller") {
 
+        $random = random_int(1, 100000);
         $nonceArray = [
             $oUser->Role,
             $oUser->ClientID,
-            $SubDomainOwnerClientID
+            $SubDomainOwnerClientID,
+            $random
         ];
         
         $oReseller = new Reseller();
         $nonce = $oSimpleNonce->GenerateNonce("getClientResellerID", $nonceArray);
 
-        if($oReseller->GetClientResellerID($SubDomainOwnerClientID, $nonce) == $ClientID) {
+        if($oReseller->GetClientResellerID($SubDomainOwnerClientID, $random, $nonce) == $ClientID) {
             $ResellerPermission = true;
         }
 }
