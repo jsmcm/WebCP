@@ -33,16 +33,17 @@ $nonceArray = [
 $nonce = $oSimpleNonce->GenerateNonce("getDomainOwner", $nonceArray);
 $DomainOwnerClientID = $oDomain->GetDomainOwner($domainId, $random, $nonce);
 
-
+$random = random_int(1, 100000);
 $nonceArray = [
     $oUser->Role,
     $oUser->ClientID,
-    $DomainOwnerClientID
+    $DomainOwnerClientID,
+    $random
 ];
 
 $oReseller = new Reseller();
 $nonce = $oSimpleNonce->GenerateNonce("getClientResellerID", $nonceArray);
-$resellerId = $oReseller->GetClientResellerID($DomainOwnerClientID, $nonce);
+$resellerId = $oReseller->GetClientResellerID($DomainOwnerClientID, $random, $nonce);
 
 if ( $oUser->Role != "admin") {
     if ( $ClientID != $DomainOwnerClientID ) {

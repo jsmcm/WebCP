@@ -70,15 +70,21 @@ print "PackageID:  ".$PackageID."<p>";
 $ResellerPermission = false;
 if($oUser->Role == "reseller") {
 
-	$oSimpleNonce = new SimpleNonce();
-	$nonceArray = [	
-		$oUser->Role,
-		$oUser->ClientID,
-		$DomainOwnerClientID
-	];
-	$nonce = $oSimpleNonce->GenerateNonce("getClientResellerID", $nonceArray);
 
-	if($oReseller->GetClientResellerID($DomainOwnerClientID, $nonce) == $ClientID) {
+	$random = random_int(1, 100000);
+	$nonceArray = [
+		$oUser->Role,
+		$oUser->getClientId(),
+		$DomainOwnerID,
+		$random
+	];
+	
+	$oSimpleNonce = new SimpleNonce();
+	
+	$nonce = $oSimpleNonce->GenerateNonce("getClientResellerID", $nonceArray);
+	$ResellerID = $oReseller->GetClientResellerID($DomainOwnerID, $random, $nonce);
+	
+	if($ResellerID == $ClientID) {
 		$ResellerPermission = true;
 	}
 }
