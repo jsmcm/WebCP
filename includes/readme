@@ -1,6 +1,8 @@
 * 2.2.2 *
 = release: =
-
+ - Added username column to ssh index screen
+ - Fixed installer / Wordpress script with type on oUser object (was called oClient)
+ 
 * 2.2.1 *
 = release: 2019-08-20 =
  - Changed logging of failed logins to file_put_contents to prevent non-existing file errors
