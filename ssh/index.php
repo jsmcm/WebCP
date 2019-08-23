@@ -20,7 +20,6 @@ if($ClientID < 1) {
 	exit();
 }
 
-
 $nonceArray = [
 	$oUser->Role,
 	$ClientID,
@@ -246,6 +245,7 @@ if($oDatabase->TableExists("ssh", $nonce) == false) {
 										<thead>
 											<tr>
 												<th>Domain</th>
+												<th>User Name</th>
 											</tr>
 										</thead>
 										
@@ -282,6 +282,7 @@ if($oDatabase->TableExists("ssh", $nonce) == false) {
 												print "<tr>";
 
 												print "<td><a href=\"/ssh/keys.php?domainId=".$Array[$x]["id"]."\" style=\"background:transparent; color:#4D81CC; border: 0;\">".$Array[$x]["domain_name"]."</a></td>\r\n";
+												print "<td>".$Array[$x]["username"]."</td>\r\n";
 												
 												print "</tr>";
 											}

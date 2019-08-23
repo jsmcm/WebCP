@@ -1,7 +1,6 @@
 <?php
 
-if( ! file_exists($_SERVER["DOCUMENT_ROOT"]."/nm"))
-{
+if( ! file_exists($_SERVER["DOCUMENT_ROOT"]."/nm")) {
 	mkdir($_SERVER["DOCUMENT_ROOT"]."/nm", 0755);
 }
 
@@ -21,16 +20,13 @@ function generatePassword($length=15, $Strength=1)
 	if($Strength == 1)
 	{
 		$LongString = $vowels_lower.$number.$vowels_upper.$consonants_lower.$special.$consonants_upper;
-	}
-	else
-	{
+	} else {
 		$LongString = $number;
 	}
 
 	$password = '';
 	
-	for ($i = 0; $i < $length; $i++) 
-	{
+	for ($i = 0; $i < $length; $i++)  {
 		$password .= $LongString[rand(0, strlen($LongString) - 1)];
 	}
 	return $password;
@@ -40,7 +36,7 @@ function generatePassword($length=15, $Strength=1)
 include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 
 $oDomain = new Domain();
-$oClient = new User();
+$oUser = new User();
 $oPackage = new Package();
 $oMySQL = new MySQL();
 
