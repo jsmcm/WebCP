@@ -1,5 +1,5 @@
 * 2.2.2 *
-= release: =
+= release:  2019-09-14 =
  - Added username column to ssh index screen
  - Fixed installer / Wordpress script with type on oUser object (was called oClient)
  - Added nonce to sendGridSettings
