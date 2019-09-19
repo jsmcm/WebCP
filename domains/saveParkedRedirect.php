@@ -38,13 +38,22 @@ $nonceArray = [
     $random
 ];
 
+$oSimpleNonce = new SimpleNonce();
 $nonce = $oSimpleNonce->GenerateNonce("getDomainOwner", $nonceArray);
 if ($ClientID != $oDomain->GetDomainOwner($domainId, $random, $nonce) && ($Role == 'client')) {
     print "error: Permission denied";
     exit();
 }
 
-if ($oDomain->saveDomainSetting($domainId, "parked_redirect", $redirect, "", "")) {
+$nonceArray = [
+	$oUser->Role,
+	$oUser->ClientID,
+    $domainId,
+    "parked_redirect",
+    $redirect
+];
+$nonce = $oSimpleNonce->GenerateNonce("saveDomainSetting", $nonceArray);
+if ($oDomain->saveDomainSetting($domainId, "parked_redirect", $redirect, "", "", $nonce)) {
 	$domainAncestorId = $oDomain->GetAncestorDomainID($domainId);
 	touch($_SERVER["DOCUMENT_ROOT"]."/nm/".$domainAncestorId.".subdomain", 0755);
     print "Parked Redirect Saved";
