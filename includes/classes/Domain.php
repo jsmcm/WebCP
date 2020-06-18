@@ -2489,7 +2489,7 @@ class Domain
 
 		try
 		{
-			$query = $this->DatabaseConnection->prepare("INSERT INTO domains VALUES (0, :client_id, :user_name, :next_uid, :next_uid1, :domain_name, '/home/".$UserName."/public_html', :account_user_name, 1, 0, '".date('Y-m-d H:i:s')."', '".date('Y-m-d H:i:s')."', 'local', 'primary', 0, 0, :package_id, 0)");
+			$query = $this->DatabaseConnection->prepare("INSERT INTO domains VALUES (0, :client_id, :user_name, :next_uid, :next_uid1, :domain_name, '/home/".$UserName."/home/public_html', :account_user_name, 1, 0, '".date('Y-m-d H:i:s')."', '".date('Y-m-d H:i:s')."', 'local', 'primary', 0, 0, :package_id, 0)");
 			
 			$query->bindParam(":client_id", $ClientID);
 			$query->bindParam(":user_name", $UserName);
@@ -3269,9 +3269,20 @@ class Domain
 	{
 		$oSettings = new Settings();
 		$oDNS = new DNS();
-	
-		if($ClientID != $this->GetDomainOwner($ParkedDomainID))
-		{
+		$oUser = new User();
+
+		$random = random_int(1, 100000);
+		$nonceArray = [
+			$oUser->Role,
+			$oUser->ClientID,
+			$ParkedDomainID,
+			$random
+		];
+		
+		$oSimpleNonce = new SimpleNonce();
+		
+		$nonce = $oSimpleNonce->GenerateNonce("getDomainOwner", $nonceArray);
+		if($ClientID != $this->GetDomainOwner($ParkedDomainID, $random, $nonce)) {
 			return 0;
 		}
 

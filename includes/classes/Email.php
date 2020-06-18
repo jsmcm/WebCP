@@ -1426,9 +1426,9 @@ class Email
 
 						$Text = $Text."\n\t\t"."mail\n";
 
-						$Text = $Text."\n\t\t"."expand file /home/".$result["domain_user_name"]."/mail/".$result["fqdn"]."/".$result["local_part"]."/.vacation.msg\n";
-						$Text = $Text."\t\t"."once /home/".$result["domain_user_name"]."/mail/".$result["fqdn"]."/".$result["local_part"]."/.vacation.db\n";
-						$Text = $Text."\t\t"."log /home/".$result["domain_user_name"]."/mail/".$result["fqdn"]."/".$result["local_part"]."/.vacation.log\n";
+						$Text = $Text."\n\t\t"."expand file /home/".$result["domain_user_name"]."/home/mail/".$result["fqdn"]."/".$result["local_part"]."/.vacation.msg\n";
+						$Text = $Text."\t\t"."once /home/".$result["domain_user_name"]."/home/mail/".$result["fqdn"]."/".$result["local_part"]."/.vacation.db\n";
+						$Text = $Text."\t\t"."log /home/".$result["domain_user_name"]."/home/mail/".$result["fqdn"]."/".$result["local_part"]."/.vacation.log\n";
 
 						$Text = $Text."\n\t\t"."once_repeat ".$result["frequency"]."\n";
 						$Text = $Text."\t\t"."to \$reply_address\n";
@@ -3058,7 +3058,7 @@ class Email
 
 		$myfile = $FileName;
 		$fh = fopen($myfile, 'a') or die("can't open file");
-		fwrite($fh, "/home/".$UserName."/mail/".$DomainName."/".$LocalPart);
+		fwrite($fh, "/home/".$UserName."/home/mail/".$DomainName."/".$LocalPart);
 		fclose($fh);
 
 	}
@@ -3076,7 +3076,7 @@ class Email
 
 		$myfile = $FileName;
 		$fh = fopen($myfile, 'a') or die("can't open file");
-		fwrite($fh, "/home/".$UserName."/mail/".$DomainName."/".$LocalPart);
+		fwrite($fh, "/home/".$UserName."/home/mail/".$DomainName."/".$LocalPart);
 		fclose($fh);
 
 	}

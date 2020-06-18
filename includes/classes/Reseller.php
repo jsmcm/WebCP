@@ -247,7 +247,7 @@ class Reseller
 		if ( ! ( is_array($nonceArray) && !empty($nonceArray)) ) {
 			$oLog = new Log();
 			$oLog->WriteLog("error", "/class.Reseller.php -> GetClientResellerID(); No nonce given");
-			throw new Exception("<p><b>No nonce given in Reseller::getDoGetClientResellerIDmainPath</b></p>");
+			throw new Exception("<p><b>No nonce given in Reseller::getGetClientResellerID</b></p>");
 		}
 
 		$nonceMeta = [
@@ -260,7 +260,7 @@ class Reseller
 		if ( ! $nonceResult ) {
 			$oLog = new Log();
 			$oLog->WriteLog("error", "/class.Reseller.php -> GetClientResellerID(); Nonce failed");
-			throw new Exception("<p><b>Nonce Reseller in Domain::GetClientResellerID()</b></p>");
+			throw new Exception("<p><b>Nonce failed in Reseller::GetClientResellerID()</b></p>");
 		}
 
 		try {

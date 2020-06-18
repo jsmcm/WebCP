@@ -42,7 +42,6 @@ while (false !== ($line = fgets(STDIN)))
                 {
 			print "Line: ".$line."\r\n";
 
-			//197.228.174.109 - nodecprs_john [19/May/2014:20:37:17 +0200] "GET /home/nodecprs/public_html/database-example.xlsx.zip" 200 12163
 
 			$DomainUserName = substr($line, strpos($line, " - ") + 3);
 			$DomainUserName = substr($DomainUserName, 0, strpos($DomainUserName, "_")); 

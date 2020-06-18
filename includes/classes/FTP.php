@@ -473,7 +473,7 @@ class FTP
 		
 	
 			$DomainUser = $DomainUserName."_".$UserName;
-			$Path = "/home/".$DomainUserName."/public_html";
+			$Path = "/home/".$DomainUserName."/home/public_html";
 			$Password = md5($Password);
 			
 			$query->bindParam(":domain_user", $DomainUser);
