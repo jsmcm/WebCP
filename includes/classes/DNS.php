@@ -246,19 +246,15 @@ class DNS
 
         function SetSlaveStatus($ID, $Status)
         {
-                try
-                {
-                        $query = $this->DatabaseConnection->prepare("UPDATE dns_slaves SET status = :status, status_date = '".date("Y-m-d H:i:s")."' WHERE id = :id;");
-                        $query->bindParam(":status", $Status);
-                        $query->bindParam(":id", $ID);
-                        $query->execute();
-
-                }
-                catch(PDOException $e)
-                {
-                        $oLog = new Log();
-                        $oLog->WriteLog("error", "/class.DNS.php -> SetSlaveStatus() Error = ".$e);
-                }
+			try {
+				$query = $this->DatabaseConnection->prepare("UPDATE dns_slaves SET status = :status, status_date = '".date("Y-m-d H:i:s")."' WHERE id = :id;");
+				$query->bindParam(":status", $Status);
+				$query->bindParam(":id", $ID);
+				$query->execute();
+			} catch(PDOException $e) {
+				$oLog = new Log();
+				$oLog->WriteLog("error", "/class.DNS.php -> SetSlaveStatus() Error = ".$e);
+			}
         }
 	
 	function GetSlaveData($ID, &$HostName, &$IPAddress, &$Password, &$PublicKey)
@@ -523,21 +519,17 @@ class DNS
 	function GetDomainIP($Domain)
 	{
 	   
-		try
-		{
+		try {
 			$query = $this->DatabaseConnection->prepare("SELECT option_value FROM dns_options WHERE option_name = 'ip' AND extra1 = :domain AND deleted = 0;");
 
 			$query->bindParam(":domain", $Domain);
 			$query->execute();
 
-			if($result = $query->fetch(PDO::FETCH_ASSOC))
-			{
+			if($result = $query->fetch(PDO::FETCH_ASSOC)) {
 				return $result["option_value"];
 			}
 
-		}
-		catch(PDOException $e)
-		{
+		} catch(PDOException $e) {
 			$oLog = new Log();
 			$oLog->WriteLog("error", "/class.DNS.php -> GetDomainIP(); Error = ".$e);
 		}
@@ -547,22 +539,18 @@ class DNS
 
 	function GetSharedIP($type="ipv4")
 	{
-		try
-		{
+		try {
 			$query = $this->DatabaseConnection->prepare("SELECT option_value FROM dns_options WHERE option_name = 'ip' AND extra1 = 'shared' AND extra2 = :type AND deleted = 0");
 
 			$query->bindParam(":type", $type);
 
 			$query->execute();
 	
-			if($result = $query->fetch(PDO::FETCH_ASSOC))
-			{
+			if($result = $query->fetch(PDO::FETCH_ASSOC)) {
 				return $result["option_value"];
 			}
 	
-		}
-		catch(PDOException $e)
-		{
+		} catch(PDOException $e) {
 			$oLog = new Log();
 			$oLog->WriteLog("error", "/class.DNS.php -> GetSharedIP(); Error = ".$e);
 		}
@@ -1457,17 +1445,17 @@ class DNS
 		for($x = 0; $x < $SlaveArrayCount; $x++) {
 			
 			$port = 8443;
-			$result = $this->createSlaveZone( $DomainName, $SlaveArray[$x]["IPAddress"], $SlaveArray[$x]["HostName"], $port, $SlaveArray[$x]["Password"], $SlaveArray[$x]["PublicKey"]);
+			$result = $this->createSlaveZone( $DomainName, $SlaveArray[$x]["IPAddress"], $SlaveArray[$x]["ID"], $SlaveArray[$x]["HostName"], $port, $SlaveArray[$x]["Password"], $SlaveArray[$x]["PublicKey"]);
 			
 			if ( $result == false && $port == 8443 ) {
 				//try without SSL
 				$port = 8880;
-				$result = $this->createSlaveZone( $DomainName, $SlaveArray[$x]["IPAddress"], $SlaveArray[$x]["HostName"], $port, $SlaveArray[$x]["Password"], $SlaveArray[$x]["PublicKey"]);
+				$result = $this->createSlaveZone( $DomainName, $SlaveArray[$x]["IPAddress"], $SlaveArray[$x]["ID"], $SlaveArray[$x]["HostName"], $port, $SlaveArray[$x]["Password"], $SlaveArray[$x]["PublicKey"]);
 			}
 		}
 	}
 
-	private function createSlaveZone($domainName, $ipAddress, $hostName, $port, $password, $publicKey)
+	private function createSlaveZone($domainName, $ipAddress, $slaveId, $hostName, $port, $password, $publicKey)
 	{
 		$options = array(
 		'uri' => $ipAddress,
@@ -1491,7 +1479,7 @@ class DNS
 				$SlaveStatus = "success";
 			}
 
-			$this->SetSlaveStatus($SlaveArray[$x]["ID"], $SlaveStatus);
+			$this->SetSlaveStatus($slaveId, $SlaveStatus);
 		} catch (Exception $e) {
 			return false;
 		}
@@ -1555,6 +1543,67 @@ class DNS
 		return true;
 
 	}
+
+
+
+
+
+	public function createSubDomainInZone($subDomain, $parentDomainName, $ipAddress, $hostName, $port, $password, $publicKey)
+	{
+		$oLog = new Log();
+
+		$options = array(
+			'uri' => $ipAddress,
+			'location' => 'http'.(($port=="8443")?'s':'').'://'.$hostName.':'.$port.'/API/dns/DNS.php',
+			'trace' => 1
+		);
+
+		$dkimKey = "";
+		if( file_exists("/etc/exim4/dkim.public.key") ) {
+			$dkimKey = file_get_contents("/etc/exim4/dkim.public.key");
+
+			$x = strpos($dkimKey, "-----BEGIN PUBLIC KEY-----");
+
+			if( $x !== false) {
+				$dkimKey = trim(substr($dkimKey, $x + strlen("-----BEGIN PUBLIC KEY-----")));
+			}
+
+			$x = strpos($dkimKey, "--");
+				
+			if( $x !== false) {
+				$dkimKey = trim(substr($dkimKey, 0, $x));
+			}
+
+			$dkimKey = str_replace("\r\n", "", $dkimKey);
+			$dkimKey = str_replace("\n", "", $dkimKey);
+		
+		}
+
+		$message = json_encode(array("Password" => $password, "SubDomain" => $subDomain, "ParentDomainName" => $parentDomainName, "IPv4" => $this->GetDomainIP($parentDomainName), "IPv6" => ""));
+
+		$encryptedMessage = "";
+		openssl_public_encrypt($message, $encryptedMessage, $publicKey);
+
+		$message = base64_encode($encryptedMessage);
+
+		try {
+			
+			$client = new SoapClient(NULL, $options);
+			$Result = $client->AddSubDomainForSlave($message);
+			
+			if($Result < 1) {
+				$oLog->WriteLog("DEBUG", "Error registering DNS, return code: ".$Result);
+			}
+
+		} catch (Exception $e) {
+			return false;
+		}
+
+		return true;
+
+	}
+
+
 
 
 
@@ -2072,18 +2121,18 @@ class DNS
 		for($x = 0; $x < $SlaveArrayCount; $x++) {
 
 			$port = 8443;
-			$result = $this->deleteSlaveZone( $DomainName, $SlaveArray[$x]["IPAddress"], $SlaveArray[$x]["HostName"], $port, $SlaveArray[$x]["Password"], $SlaveArray[$x]["PublicKey"]);
+			$result = $this->deleteSlaveZone( $DomainName, $SlaveArray[$x]["IPAddress"], $SlaveArray[$x]["ID"], $SlaveArray[$x]["HostName"], $port, $SlaveArray[$x]["Password"], $SlaveArray[$x]["PublicKey"]);
 
 			if ( $result == false && $port == 8443 ) {
 				// retry without SSL
 
 				$port = 8880;
-				$result = $this->deleteSlaveZone( $DomainName, $SlaveArray[$x]["IPAddress"], $SlaveArray[$x]["HostName"], $port, $SlaveArray[$x]["Password"], $SlaveArray[$x]["PublicKey"]);
+				$result = $this->deleteSlaveZone( $DomainName, $SlaveArray[$x]["IPAddress"], $SlaveArray[$x]["ID"], $SlaveArray[$x]["HostName"], $port, $SlaveArray[$x]["Password"], $SlaveArray[$x]["PublicKey"]);
 			}
 		}
 	}
 	
-	private function deleteSlaveZone( $domainName, $ipAddress, $hostName, $port, $password, $publicKey)
+	private function deleteSlaveZone( $domainName, $ipAddress, $slaveId, $hostName, $port, $password, $publicKey)
 	{
 		$options = array(
 			'uri' => $ipAddress,
@@ -2106,7 +2155,7 @@ class DNS
 			if($Result > 0) {
 				$SlaveStatus = "success";
 			}
-			$this->SetSlaveStatus($SlaveArray[$x]["ID"], $SlaveStatus);
+			$this->SetSlaveStatus($slaveId, $SlaveStatus);
 		} catch (Exception $e) {
 			//print_r($e);
 

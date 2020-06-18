@@ -69,7 +69,7 @@ if( (! is_numeric($DomainID)) || ($DomainID < 1) ) {
 
 		$random = random_int(1, 1000000);
 		$oUser = new User();
-		$oSimpleNonce = new SimpleNonce();
+	
 		$nonceArray = [	
 			$oUser->Role,
 			$oUser->ClientID,

@@ -32,9 +32,21 @@ $DomainUserName = "";
 
 if($DomainID > -1)
 {
-        $DomainInfoArray = array();
-        $oDomain->GetDomainInfo($DomainID, $DomainInfoArray);
 
+		$random = random_int(1, 1000000);
+		$nonceArray = [	
+			$oUser->Role,
+			$oUser->ClientID,
+			$DomainID,
+			$random
+		];
+		$oSimpleNonce = new SimpleNonce();
+		
+		$nonce = $oSimpleNonce->GenerateNonce("getDomainInfo", $nonceArray);
+		
+		$DomainInfoArray = array();
+		$oDomain->GetDomainInfo($DomainID, $random, $DomainInfoArray, $nonce);
+	
         $DomainUserName = $DomainInfoArray["UserName"];
         $FTPAllowance = $oPackage->GetPackageAllowance("FTP", $DomainInfoArray["PackageID"]);
         $DomainOwnerClientID = $DomainInfoArray["ClientID"];

@@ -19,13 +19,23 @@ $DomainOwnerID = -1;
 $DomainID = -1;
 $Routing = "";
 
-if(isset($_REQUEST["domain_id"]))
-{
+if(isset($_REQUEST["domain_id"])) {
 	$Routing = $_REQUEST["routing"];
-        $DomainID = $_REQUEST["domain_id"];
+	$DomainID = $_REQUEST["domain_id"];
 
-        $InfoArray = array();
-        $oDomain->GetDomainInfo($DomainID, $InfoArray);
+	$InfoArray = array();
+
+	$random = random_int(1, 1000000);
+	$nonceArray = [	
+			$oUser->Role,
+			$oUser->ClientID,
+			$DomainID,
+			$random
+	];
+
+	$oSimpleNonce = new SimpleNonce();
+	$nonce = $oSimpleNonce->GenerateNonce("getDomainInfo", $nonceArray);
+	$oDomain->GetDomainInfo($DomainID, $random, $InfoArray, $nonce);
 
         $DomainName = $InfoArray["DomainName"];
         $DomainOwnerID = $InfoArray["ClientID"];

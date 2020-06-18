@@ -1,5 +1,17 @@
-* 2.2.0 *
+* 2.2.2 *
 = release: =
+ - Added username column to ssh index screen
+ - Fixed installer / Wordpress script with type on oUser object (was called oClient)
+ 
+* 2.2.1 *
+= release: 2019-08-20 =
+ - Changed logging of failed logins to file_put_contents to prevent non-existing file errors
+ - gitignore WebCPLink/Name/Title.inc page parts
+ - Fixed parked / sub domains to add DNS correctly based on SSL / non SSL
+ - Added missing nonces to ssh functions
+
+* 2.2.0 *
+= release: 2019-08-09 =
  - Fixed user/group on exim dkim key files
  - Added SSH main menu item
  - Added SSH Management
@@ -7,7 +19,8 @@
  - Fixed bug which allowed clients to delete their own domains
  - Fixed bug whereby email addresses login credentials were still active after deletion
  - Fixed group by warning in email check 550 status
-  
+ - Fixed call to GetDomainNameFromDomainID in GetDomainTree which caused an error and stalled backups
+
 * 2.1.2 *
 = release: 2019-07-23 =
  - DNS connections now try ssl first and fall back to non ssl

@@ -232,7 +232,7 @@ class Reseller
           	}
      	}
 
-	function GetClientResellerID($ClientID, $nonceArray)
+	function GetClientResellerID($ClientID, $random, $nonceArray)
 	{
 
 		$oSimpleNonce = new SimpleNonce();
@@ -244,6 +244,14 @@ class Reseller
 			throw new Exception("<p><b>ClientID invalid in Reseller::GetClientResellerID</b></p>");
 		}
 
+
+		if ( $random == "" ) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Domain.php -> GetDomainOwner(); random cannot be blank in Domain::GetDomainOwner");
+			throw new Exception("<p><b>random cannot be blank in Domain::GetDomainOwner</b><p>");
+		}
+
+
 		if ( ! ( is_array($nonceArray) && !empty($nonceArray)) ) {
 			$oLog = new Log();
 			$oLog->WriteLog("error", "/class.Reseller.php -> GetClientResellerID(); No nonce given");
@@ -253,8 +261,10 @@ class Reseller
 		$nonceMeta = [
 			$oUser->Role,
 			$oUser->getClientId(),
-			$ClientID
+			$ClientID,
+			$random
 		];
+		
 		$nonceResult = $oSimpleNonce->VerifyNonce($nonceArray["Nonce"], "getClientResellerID", $nonceArray["TimeStamp"], $nonceMeta);
 
 		if ( ! $nonceResult ) {

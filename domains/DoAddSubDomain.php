@@ -43,7 +43,19 @@ $AncestorDomainID = $oDomain->GetAncestorDomainID($DomainID);
 
 $ResellerPermission = false;
 if($oUser->Role == "reseller") {
-	if($oReseller->GetClientResellerID($DomainOwnerClientID) == $ClientID) {	
+
+	$random = random_int(1, 100000);
+	$nonceArray = [
+		$oUser->Role,
+		$ClientID,
+		$DomainOwnerClientID,
+		$random
+	];
+
+	$nonce = $oSimpleNonce->GenerateNonce("getClientResellerID", $nonceArray);
+	$ResellerID = $oReseller->GetClientResellerID($DomainOwnerClientID, $random, $nonce);
+
+	if($ResellerID == $ClientID) {	
 		$ResellerPermission = true;
 	}
 }

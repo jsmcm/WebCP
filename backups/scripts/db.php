@@ -62,8 +62,19 @@ $XMLContent = new SimpleXMLElement('<?xml version="1.0" ?><BackupScript />');
 
 $oDomain = new Domain();
 
+
+$random = random_int(1, 1000000);
+$nonceArray = [	
+	$oUser->Role,
+	$oUser->ClientID,
+	$DomainID,
+	$random
+];
+$oSimpleNonce = new SimpleNonce();
+$nonce = $oSimpleNonce->GenerateNonce("getDomainInfo", $nonceArray);
+
 $DomainArray = array();
-$oDomain->GetDomainInfo($DomainID, $DomainArray);
+$oDomain->GetDomainInfo($DomainID, $random, $DomainArray, $nonce);
 
 
 $oPackage = new Package();

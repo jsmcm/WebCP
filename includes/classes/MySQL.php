@@ -575,26 +575,37 @@ class MySQL
 	
 	function AddMySQL($DomainID, $cpDatabaseName, $Username, $Password, $ClientID, $PackageID)
 	{
-                $oUser = new User();
-                $oDomain = new Domain();
-                $oPackage = new Package();
+		$oUser = new User();
+		$oDomain = new Domain();
+		$oPackage = new Package();
 
 		$DomainInfoArray = array();
-	        $oDomain->GetDomainInfo($DomainID, $DomainInfoArray);
+
+		
+		$random = random_int(1, 1000000);
+		$oUser = new User();
+		$oSimpleNonce = new SimpleNonce();
+		$nonceArray = [	
+			$oUser->Role,
+			$oUser->ClientID,
+			$DomainID,
+			$random
+		];
+		$nonce = $oSimpleNonce->GenerateNonce("getDomainInfo", $nonceArray);
+
+		$oDomain->GetDomainInfo($DomainID, $random, $DomainInfoArray, $nonce);
 		$PackageID = $DomainInfoArray["PackageID"];
 		$DomainUserName = $DomainInfoArray["UserName"];
 
-                $MySQLUsage = $oPackage->GetMySQLUsage($DomainUserName);
-                $MySQLAllowance = $oPackage->GetPackageAllowance("MySQL", $PackageID);
-              
-		if( (($MySQLAllowance - $MySQLUsage) < 1) && ($oUser->Role != "admin") )
-                {
-                        return -1;
-                }
+		$MySQLUsage = $oPackage->GetMySQLUsage($DomainUserName);
+		$MySQLAllowance = $oPackage->GetPackageAllowance("MySQL", $PackageID);
+			
+		if( (($MySQLAllowance - $MySQLUsage) < 1) && ($oUser->Role != "admin") ) {
+			return -1;
+		}
 
 
-		try
-		{
+		try {
 			$pdo_query = $this->DatabaseConnection->prepare("INSERT INTO mysql VALUES (0, :client_id, :domain_username, :username, :database_name, :password, '".date("Y-m-d H:i:s")."', 0);");
 			$pdo_query->bindParam(":client_id", $ClientID);
 			$pdo_query->bindParam(":domain_username", $DomainUserName);
@@ -604,9 +615,7 @@ class MySQL
 
 			$pdo_query->execute();
 	
-		}
-		catch(PDOException $e)
-		{
+		} catch(PDOException $e) {
 			$oLog = new Log();
 			$oLog->WriteLog("error", "/class.MySQL.php -> AddMySQL(); Error = ".$e);
 		}

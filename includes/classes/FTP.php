@@ -429,8 +429,22 @@ class FTP
 		
 
 	        $DomainInfoArray = array();
-        	$oDomain->GetDomainInfo($DomainID, $DomainInfoArray);
-				
+       
+			$random = random_int(1, 1000000);
+			$oUser = new User();
+			$oSimpleNonce = new SimpleNonce();
+
+			$nonceArray = [	
+				$oUser->Role,
+				$oUser->ClientID,
+				$DomainID,
+				$random
+			];
+			$nonce = $oSimpleNonce->GenerateNonce("getDomainInfo", $nonceArray);
+			$oDomain->GetDomainInfo($DomainID, $random, $DomainInfoArray, $nonce);
+		
+			
+
 		//print "1<p>";
 
 		$PackageID = $DomainInfoArray["PackageID"];
@@ -537,18 +551,27 @@ class FTP
 		//print "ftp_id: ".$ftp_id."<p>";
 	
 		$DeleteOK = 0;
-		if($Role == 'admin')
-		{
+		if($Role == 'admin') {
 			$DeleteOK = 1;
-		}
-		else if($Role == "reseller")
-		{
+		} else if($Role == "reseller") {
 			$oReseller = new Reseller();
 
 			$FTPOwnerID = $this->GetFTPOwner($ftp_id);
 
-        		if($oReseller->GetClientResellerID($FTPOwnerID) == $ClientID)
-			{			
+			$random = random_int(1, 100000);
+			$nonceArray = [
+				$oUser->Role,
+				$ClientID,
+				$FTPOwnerID,
+				$random
+			];
+			
+			$oSimpleNonce = new SimpleNonce();
+			
+			$nonce = $oSimpleNonce->GenerateNonce("getClientResellerID", $nonceArray);
+			$ResellerID = $oReseller->GetClientResellerID($FTPOwnerID, $random, $nonce);
+
+        	if($ResellerID == $ClientID) {			
 				$DeleteOK = 1;
 			}
 		}
