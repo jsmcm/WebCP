@@ -228,7 +228,8 @@ class Domain
 		try {
 			$query = $this->DatabaseConnection->prepare("UPDATE domains SET mail_type = :routing WHERE id = :id");
 
-			$query->bindParam(":routing", strtolower($Routing));
+			$Routing = strtolower($Routing);
+			$query->bindParam(":routing", $Routing);
 			$query->bindParam(":id", $DomainID);
 
 			$query->execute();

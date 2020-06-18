@@ -5,6 +5,7 @@ include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 
 $oUser = new User();
 $oEmail = new Email();
+$oSimpleNonce = new SimpleNonce();
 
 require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 
@@ -33,6 +34,13 @@ if ( $sendgridUserName != "" && $sendgridPassword != "" ) {
 	$oEmail->saveSendgridSettings($sendgridUserName, $sendgridPassword, $sendgridDefault);
 }
 
-$oEmail->makeSendgridEximSettings();
+$random = random_int(1, 1000000);
+$nonceArray = [
+	$oUser->Role,
+        $oUser->ClientID,
+        $random
+];
+$nonce = $oSimpleNonce->GenerateNonce("makeSendgridEximSettings", $nonceArray);
+$oEmail->makeSendgridEximSettings($random, $nonce);
 header("Location: index.php?Notes=Saved!");
 
