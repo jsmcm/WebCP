@@ -60,6 +60,3 @@ while (file_exists($_SERVER["DOCUMENT_ROOT"]."/nm/root.password")) {
 
 header("location: index.php?Notes=Password changed");
 
-?>
-
-

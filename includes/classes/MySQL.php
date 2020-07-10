@@ -491,15 +491,25 @@ class MySQL
 	function CreateUserUserName($AccountPrefix, $Username, $Password, $Host)
 	{
 
-		try
-		{
-			$pdo_query = $this->DatabaseConnection->prepare( "CREATE USER '".trim($Username)."'@'".trim($Host)."' IDENTIFIED BY  '".filter_var($Password, FILTER_SANITIZE_STRING)."'");
-			
+
+		try {
+			//https://stackoverflow.com/questions/5555328/error-1396-hy000-operation-create-user-failed-for-jacklocalhost
+			$pdo_query = $this->DatabaseConnection->prepare( "DROP USER '".trim($Username)."'@'".trim($Host)."'");
+		
 			$pdo_query->execute();
 	
+		} catch(PDOException $e) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.MySQL.php -> CreateUserUserName0(); Error = ".$e);
 		}
-		catch(PDOException $e)
-		{
+
+
+		try {
+			$pdo_query = $this->DatabaseConnection->prepare( "CREATE USER '".trim($Username)."'@'".trim($Host)."' IDENTIFIED BY  '".filter_var($Password, FILTER_SANITIZE_STRING)."'");
+		
+			$pdo_query->execute();
+	
+		} catch(PDOException $e) {
 			$oLog = new Log();
 			$oLog->WriteLog("error", "/class.MySQL.php -> CreateUserUserName1(); Error = ".$e);
 		}
@@ -508,9 +518,8 @@ class MySQL
 	
 		try
 		{
-			$pdo_query = $this->DatabaseConnection->prepare("GRANT USAGE ON *.* TO  '".trim($Username)."'@'".trim($Host)."' IDENTIFIED BY :password WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0 ;");
-			
-			$pdo_query->bindParam(":password", $Password);
+			$pdo_query = $this->DatabaseConnection->prepare("GRANT USAGE ON *.* TO  '".trim($Username)."'@'".trim($Host)."' IDENTIFIED BY '".$Password."' WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0 ;");
+
 			$pdo_query->execute();
 	
 		}

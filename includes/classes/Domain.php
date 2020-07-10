@@ -2416,7 +2416,7 @@ class Domain
 
 		try
 		{
-			$query = $this->DatabaseConnection->prepare("INSERT INTO domains VALUES (0, :client_id, :user_name, :next_uid, :next_uid1, :domain_name, '/home/".$UserName."/home/public_html', :account_user_name, 1, 0, '".date('Y-m-d H:i:s')."', '".date('Y-m-d H:i:s')."', 'local', 'primary', 0, 0, :package_id, 0)");
+			$query = $this->DatabaseConnection->prepare("INSERT INTO domains VALUES (0, :client_id, :user_name, :next_uid, :next_uid1, :domain_name, '/home/".$UserName."/home/".$UserName."/public_html', :account_user_name, 1, 0, '".date('Y-m-d H:i:s')."', '".date('Y-m-d H:i:s')."', 'local', 'primary', 0, 0, :package_id, 0)");
 			
 			$query->bindParam(":client_id", $ClientID);
 			$query->bindParam(":user_name", $UserName);

@@ -12,9 +12,9 @@ if($ClientID < 1) {
 	exit();
 }
 
-$ID = $_POST["id"];
-$UserName = $_POST["UserName"];
-$HostList = $_POST["HostList"];
+$ID = intVal($_POST["id"]);
+$UserName = filter_var($_POST["UserName"], FILTER_SANITIZE_STRING);
+$HostList = filter_var($_POST["HostList"], FILTER_SANITIZE_STRING);
 
 $MySQLOwner = $oMySQL->GetMySQLOwner($ID);
 
@@ -27,6 +27,7 @@ $Role = $oUser->Role;
 $DomainUserName = substr($UserName, 0, strpos($UserName, "_"));
 
 $Password = $oMySQL->GetDatabasePassword($ID, $DomainUserName, $UserName, $MySQLDatabaseName, $MySQLOwner);
+
 
 $ResellerPermission = false;
 if($oUser->Role == "reseller") {
@@ -64,7 +65,6 @@ if($UserName != $MySQLUserName) {
 
 $HostArray = array();
 $HostArray = explode("\n", $HostList);
-
 $oMySQL->DeleteUserNameHosts($UserName);
 
 foreach($HostArray as $NextHost)
@@ -78,6 +78,5 @@ foreach($HostArray as $NextHost)
 $oMySQL->FlushPrivileges();
 
 header("location: index.php?NoteType=Success&Notes=Hosts updated");
-?>
 
 
