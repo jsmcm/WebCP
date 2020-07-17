@@ -2180,8 +2180,7 @@ class Domain
 
 		$lastInsertId = 0;
 		
-		try
-		{
+		try {
 			$query = $this->DatabaseConnection->prepare("INSERT INTO domains VALUES (0, ".$ClientID.", '".$DomainInfoArray["UserName"]."', ".$DomainInfoArray["GroupID"].", ".$DomainInfoArray["UserID"].", '".$SubDomain.".".$DomainInfoArray["DomainName"]."', '".$DomainInfoArray["Path"]."/".strtolower($SubDomain)."', '".$DomainInfoArray["DomainOwner"]."', 1, 0, '".date('Y-m-d H:i:s')."', '".date('Y-m-d H:i:s')."', 'local', 'subdomain',  ".$DomainID.", ".$AncestorID.", ".$DomainInfoArray["PackageID"].", 0)");				
 			$query->execute();
 			

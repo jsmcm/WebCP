@@ -74,13 +74,41 @@ if ( file_exists("/etc/letsencrypt/renewal/".$URL.".conf") ) {
 
 
 
+
 $ResultString = trim(curl_exec($c));
 curl_close($c);
 
 
-if(trim($ResultString) != "")
-{
+if(trim($ResultString) != "") {
 	$CronArray = explode("\n", $ResultString);
+
+	if (!empty($CronArray)) {
+
+
+		$domainId = $oDomain->GetDomainIDFromDomainName($URL);
+	
+		$random = random_int(1, 1000000);
+		
+		$nonceArray = [	
+			$oUser->Role,
+			$oUser->ClientID,
+			$domainId,
+			$random
+		];
+		$nonce = $oSimpleNonce->GenerateNonce("getDomainInfo", $nonceArray);
+		
+		$DomainInfoArray = array();
+		$oDomain->GetDomainInfo($domainId, $random, $DomainInfoArray, $nonce);
+
+		// rename user directories to user friendly version (to "overcome" jailed dirs)
+		for($x = 0; $x < count($CronArray); $x++) {
+
+			$CronArray[$x] = str_replace("/home/".$DomainInfoArray["UserName"]."/home/".$DomainInfoArray["UserName"], "/home/".$DomainInfoArray["UserName"], $CronArray[$x]);
+		
+		}
+		
+	}	
+
 } else {
 	$CronArray = array();
 }

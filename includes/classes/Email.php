@@ -8,7 +8,6 @@ if(!isset($_SESSION))
 
 include_once("/var/www/html/webcp/vendor/autoload.php");
 
-
 class Email
 {
 	var $LastErrorDescription = "";
@@ -1426,9 +1425,9 @@ class Email
 
 						$Text = $Text."\n\t\t"."mail\n";
 
-						$Text = $Text."\n\t\t"."expand file /home/".$result["domain_user_name"]."/home/mail/".$result["fqdn"]."/".$result["local_part"]."/.vacation.msg\n";
-						$Text = $Text."\t\t"."once /home/".$result["domain_user_name"]."/home/mail/".$result["fqdn"]."/".$result["local_part"]."/.vacation.db\n";
-						$Text = $Text."\t\t"."log /home/".$result["domain_user_name"]."/home/mail/".$result["fqdn"]."/".$result["local_part"]."/.vacation.log\n";
+						$Text = $Text."\n\t\t"."expand file /home/".$result["domain_user_name"]."/home/".$result["domain_user_name"]."/mail/".$result["fqdn"]."/".$result["local_part"]."/.vacation.msg\n";
+						$Text = $Text."\t\t"."once /home/".$result["domain_user_name"]."/home/".$result["domain_user_name"]."/mail/".$result["fqdn"]."/".$result["local_part"]."/.vacation.db\n";
+						$Text = $Text."\t\t"."log /home/".$result["domain_user_name"]."/home/".$result["domain_user_name"]."/mail/".$result["fqdn"]."/".$result["local_part"]."/.vacation.log\n";
 
 						$Text = $Text."\n\t\t"."once_repeat ".$result["frequency"]."\n";
 						$Text = $Text."\t\t"."to \$reply_address\n";
@@ -1437,7 +1436,7 @@ class Email
 					$Text = $Text."\t"."endif\n";
 				$Text = $Text."endif\n";
 			
-				$FileName = $_SERVER["DOCUMENT_ROOT"]."/nm/_home_". $result["domain_user_name"]."_mail_".$result["fqdn"]."_".$result["local_part"]."_.vacation.autoreply";
+				$FileName = $_SERVER["DOCUMENT_ROOT"]."/nm/_home_". $result["domain_user_name"]."_home_". $result["domain_user_name"]."_mail_".$result["fqdn"]."_".$result["local_part"]."_.vacation.autoreply";
 
 				$f = fopen($FileName, "w");
 				fwrite($f, $result["body"]);
@@ -1470,15 +1469,14 @@ class Email
 	function GenerateUserForwardFile($ClientID)
 	{
 
-		try
-		{
+		try {
 			$query = $this->DatabaseConnection->prepare("SELECT id, fqdn, UserName FROM domains WHERE deleted = 0 AND client_id = :client_id");
 			$query->bindParam(":client_id", $ClientID);
 			$query->execute();
 	
-			while($result = $query->fetch(PDO::FETCH_ASSOC))
-			{
-				$FileName = $_SERVER["DOCUMENT_ROOT"]."/nm/_home_". $result["UserName"]."_mail_".$result["fqdn"]."_.singleforward";
+			while($result = $query->fetch(PDO::FETCH_ASSOC)) {
+
+				$FileName = $_SERVER["DOCUMENT_ROOT"]."/nm/_home_". $result["UserName"]."_home_". $result["UserName"]."_mail_".$result["fqdn"]."_.singleforward";
 
 				$f = fopen($FileName, "w");
 				fwrite($f, "# Exim filter\n\n\n");
@@ -1489,14 +1487,11 @@ class Email
 
 				$this->AddAutoReplyStanza($ClientID, $result["id"], $f);
 			
-
 				fclose($f);
 		
 			}
 	
-		}
-		catch(PDOException $e)
-		{
+		} catch(PDOException $e) {
 			$oLog = new Log();
 			$oLog->WriteLog("error", "/class.Email.php -> GenerateUserForwardFile(); Error = ".$e);
 		}			
@@ -3058,7 +3053,7 @@ class Email
 
 		$myfile = $FileName;
 		$fh = fopen($myfile, 'a') or die("can't open file");
-		fwrite($fh, "/home/".$UserName."/home/mail/".$DomainName."/".$LocalPart);
+		fwrite($fh, "/home/".$UserName."/home/".$UserName."/mail/".$DomainName."/".$LocalPart);
 		fclose($fh);
 
 	}
@@ -3076,7 +3071,7 @@ class Email
 
 		$myfile = $FileName;
 		$fh = fopen($myfile, 'a') or die("can't open file");
-		fwrite($fh, "/home/".$UserName."/home/mail/".$DomainName."/".$LocalPart);
+		fwrite($fh, "/home/".$UserName."/home/".$UserName."/mail/".$DomainName."/".$LocalPart);
 		fclose($fh);
 
 	}

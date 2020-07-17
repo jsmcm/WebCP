@@ -16,14 +16,12 @@ $loggedInId = $ClientID;
 
 $email_ClientID = $oEmail->getLoggedInEmailId();
 
-if($ClientID < 1)
-{
-        if( $email_ClientID < 1 )
-        {
-                header("Location: /index.php");
-                exit();
-        }
-        $loggedInId = $email_ClientID;
+if($ClientID < 1) {
+    if( $email_ClientID < 1 ) {
+        header("Location: /index.php");
+        exit();
+    }
+    $loggedInId = $email_ClientID;
 }
 
 
@@ -33,10 +31,9 @@ $NonceMeta = array("id"=>$loggedInId);
 $Nonce = filter_var($_POST["Nonce"], FILTER_SANITIZE_STRING);
 $TimeStamp = filter_var($_POST["TimeStamp"], FILTER_SANITIZE_STRING);
 
-if( ! $oSimpleNonce->VerifyNonce($Nonce, "addSingleForwarder", $TimeStamp, $NonceMeta) )
-{
-        header("Location: index.php");
-        exit();
+if( ! $oSimpleNonce->VerifyNonce($Nonce, "addSingleForwarder", $TimeStamp, $NonceMeta) ) {
+    header("Location: index.php");
+    exit();
 }
 
 
@@ -54,31 +51,28 @@ $Role = $oUser->Role;
 $DomainName = "";
 $DomainUerName = "";
 
-if($DomainID > -1)
-{
-        $DomainInfoArray = array();
+if($DomainID > -1) {
+    $DomainInfoArray = array();
 
-        $random = random_int(1, 1000000);
-        $nonceArray = [	
-                $oUser->Role,
-                $oUser->ClientID,
-                $DomainID,
-                $random
-        ];
-        $nonce = $oSimpleNonce->GenerateNonce("getDomainInfo", $nonceArray);
-        $oDomain->GetDomainInfo($DomainID, $random, $DomainInfoArray, $nonce);
-        
+    $random = random_int(1, 1000000);
+    $nonceArray = [	
+        $oUser->Role,
+        $oUser->ClientID,
+        $DomainID,
+        $random
+    ];
+    $nonce = $oSimpleNonce->GenerateNonce("getDomainInfo", $nonceArray);
+    $oDomain->GetDomainInfo($DomainID, $random, $DomainInfoArray, $nonce);
+    
 
-        
-        $DomainUserName = $DomainInfoArray["UserName"];
-        $DomainOwnerClientID = $DomainInfoArray["ClientID"];
-        $Role = 'client';
-        $ClientID = $DomainOwnerClientID;
+    
+    $DomainUserName = $DomainInfoArray["UserName"];
+    $DomainOwnerClientID = $DomainInfoArray["ClientID"];
+    $Role = 'client';
+    $ClientID = $DomainOwnerClientID;
 	$DomainName = $DomainInfoArray["DomainName"];
 
-}
-else
-{
+} else {
 	header("Location: forward.php?Notes=Something went wrong, please retry or contact support");
 	exit;
 }
@@ -131,7 +125,3 @@ if($Reply < 1)
 file_put_contents(dirname(__DIR__)."/nm/".$DomainUserName.".forward_address", "LOCAL_PART=".$LocalPart."\r\nDOMAIN_NAME=".$DomainName."\r\n");
 
 header("location: forward.php?Notes=Forward added");
-
-?>
-
-

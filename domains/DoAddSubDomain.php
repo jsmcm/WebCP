@@ -95,10 +95,35 @@ if($oDomain->SubDomainExists($SubDomain, $DomainID) > 0) {
 }
 
 $Error = "";
-if($oDomain->AddSubDomain($SubDomain, $DomainID, $DomainOwnerClientID, $Error) < 1) {
+$subDomainId = $oDomain->AddSubDomain($SubDomain, $DomainID, $DomainOwnerClientID, $Error);
+if($subDomainId < 1) {
+
 	header("location: ListSubDomains.php?DomainID=".$AncestorDomainID."&NoteType=Error&Notes=Cannot add sub domain");
 	exit();
-}
+
+} 
+
+
+// success
+$infoArray = array();
+
+
+$random = random_int(1, 1000000);
+$oUser = new User();
+$oSimpleNonce = new SimpleNonce();
+$nonceArray = [	
+	$oUser->Role,
+	$oUser->ClientID,
+	$AncestorDomainID,
+	$random
+];
+$nonce = $oSimpleNonce->GenerateNonce("getDomainInfo", $nonceArray);
+$oDomain->GetDomainInfo($AncestorDomainID, $random, $infoArray, $nonce);
+
+file_put_contents(dirname(__DIR__)."/nm/".$SubDomain.".".$infoArray["DomainName"].".freessl_tmp", "PrimaryDomainID=".$AncestorDomainID."\nType=subdomain\nPath=".$infoArray["Path"]."/".strtolower($SubDomain)."\nDomainID=".$subDomainId."\nDomainName=".$SubDomain.".".$infoArray["DomainName"]."\nDomainUserName=".$infoArray["UserName"]."\nEmailAddress=".$oUser->EmailAddress."\n");
+
+
+
 header("location: ListSubDomains.php?DomainID=".$AncestorDomainID."&NoteType=Success&Notes=Sub Domain added<br><b>Please wait 1 minute before adding email or FTP accounts for this sub domain</b>");
 
 

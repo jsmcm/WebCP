@@ -2,12 +2,13 @@
 
 include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 $oSimpleNonce = new SimpleNonce();
+$oUser = new User();
+$oDomain = new Domain();
 
 
 $MaxJobs = 10;
-if(file_exists($_SERVER["DOCUMENT_ROOT"]."/cron/max_jobs.dat"))
-{
-        $MaxJobs = (int)file_get_contents($_SERVER["DOCUMENT_ROOT"]."/cron/max_jobs.dat");
+if(file_exists($_SERVER["DOCUMENT_ROOT"]."/cron/max_jobs.dat")) {
+    $MaxJobs = (int)file_get_contents($_SERVER["DOCUMENT_ROOT"]."/cron/max_jobs.dat");
 }
 
 
@@ -74,10 +75,14 @@ function RemoveSpaces($Text)
 
 //print "<p><hr><p>";
 
+$url = "";
+if (isset($_POST["URL"])) {
+	$url = filter_var($_POST["URL"], FILTER_SANITIZE_URL);
+}
+
 $x = 0;
 
-if(isset($_POST["Command_new"]))
-{
+if(isset($_POST["Command_new"])) {
 	$x = 1;
 }
 $Count = ((count($_POST) - $x) / 6) - 1;
@@ -88,14 +93,35 @@ $InvalidEntries = "";
 
 //print "Count: ".$Count."<br>";
 //print "MaxJobs: ".$MaxJobs."<br>";
-if($Count > $MaxJobs)
-{
+if($Count > $MaxJobs) {
 	$Count = $MaxJobs;
 }
 
+$domainId = $oDomain->GetDomainIDFromDomainName($url);
+	
+$random = random_int(1, 1000000);
+
+$nonceArray = [	
+	$oUser->Role,
+	$oUser->ClientID,
+	$domainId,
+	$random
+];
+$nonce = $oSimpleNonce->GenerateNonce("getDomainInfo", $nonceArray);
+
+$DomainInfoArray = array();
+$oDomain->GetDomainInfo($domainId, $random, $DomainInfoArray, $nonce);
+
+
 for($x = 0; $x < $Count; $x++)
 {
-	$NextRow = RemoveSpaces($_POST["Minute_".$x])." ".RemoveSpaces($_POST["Hour_".$x])." ".RemoveSpaces($_POST["Day_".$x])." ".RemoveSpaces($_POST["Month_".$x])." ".RemoveSpaces($_POST["Weekday_".$x])." ".$_POST["Command_".$x];
+
+	$command = $_POST["Command_".$x];
+	
+	$command = str_replace("/home/".$DomainInfoArray["UserName"], "/home/".$DomainInfoArray["UserName"]."/home/".$DomainInfoArray["UserName"], $command);
+	
+
+	$NextRow = RemoveSpaces($_POST["Minute_".$x])." ".RemoveSpaces($_POST["Hour_".$x])." ".RemoveSpaces($_POST["Day_".$x])." ".RemoveSpaces($_POST["Month_".$x])." ".RemoveSpaces($_POST["Weekday_".$x])." ".$command;
 
 	if(trim($NextRow) != "")
 	{
@@ -112,24 +138,26 @@ for($x = 0; $x < $Count; $x++)
 	}
 }
 
-if($Count < $MaxJobs)
-{
+if($Count < $MaxJobs) {
 
-	if(isset($_POST["Command_new"]))
-	{
-		if(trim($_POST["Command_new"]) != "")
-		{
-			$NextRow = RemoveSpaces($_POST["Minute_new"])." ".RemoveSpaces($_POST["Hour_new"])." ".RemoveSpaces($_POST["Day_new"])." ".RemoveSpaces($_POST["Month_new"])." ".RemoveSpaces($_POST["Weekday_new"])." ".$_POST["Command_new"];
+	if(isset($_POST["Command_new"])) {
+	
+		if(trim($_POST["Command_new"]) != "") {
+			$command = $_POST["Command_new"];
+			$command = str_replace("/home/".$DomainInfoArray["UserName"], "/home/".$DomainInfoArray["UserName"]."/home/".$DomainInfoArray["UserName"], $command);
 
-			if(trim($NextRow) != "")
-			{
-				if(assertLineIsValid($NextRow) == false)
-				{
+			$NextRow = RemoveSpaces($_POST["Minute_new"])." ".RemoveSpaces($_POST["Hour_new"])." ".RemoveSpaces($_POST["Day_new"])." ".RemoveSpaces($_POST["Month_new"])." ".RemoveSpaces($_POST["Weekday_new"])." ".$command;
+
+			if(trim($NextRow) != "") {
+
+				if(assertLineIsValid($NextRow) == false) {
+
 					$InvalidEntries =$InvalidEntries.$NextRow."<br>";
-				}
-				else
-				{
+				
+				} else {
+
 					$OutPut = $OutPut.$NextRow."\n";
+				
 				}
 			}
 		}
@@ -139,11 +167,11 @@ if($Count < $MaxJobs)
 
 $Action = "saveUserCron";
 $Meta = array();
-array_push($Meta, $_POST["URL"]);
+array_push($Meta, $url);
 
 $NonceValues = $oSimpleNonce->GenerateNonce($Action, $Meta);
 
-$PostData = "CronData=".addslashes($OutPut)."&Nonce=".$NonceValues["Nonce"]."&TimeStamp=".$NonceValues["TimeStamp"];
+$PostData = "CronData=".urlencode(addslashes($OutPut))."&Nonce=".$NonceValues["Nonce"]."&TimeStamp=".$NonceValues["TimeStamp"];
 
 
 $c = curl_init();
@@ -151,11 +179,11 @@ curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
 curl_setopt($c, CURLOPT_POSTFIELDS,  $PostData);
 curl_setopt($c, CURLOPT_POST, 1);
 
-if ( file_exists("/etc/letsencrypt/renewal/".$_POST["URL"].".conf") ) {
-	curl_setopt($c, CURLOPT_URL, "https://".$_POST["URL"].":2083/write.php");
+if ( file_exists("/etc/letsencrypt/renewal/".$url.".conf") ) {
+	curl_setopt($c, CURLOPT_URL, "https://".$url.":2083/write.php");
 	curl_setopt($c, CURLOPT_SSL_VERIFYPEER, false);	
 } else {
-	curl_setopt($c, CURLOPT_URL, "http://".$_POST["URL"].":2082/write.php");
+	curl_setopt($c, CURLOPT_URL, "http://".$url.":2082/write.php");
 }
 
 curl_exec($c);
@@ -164,9 +192,9 @@ curl_close($c);
 
 if($InvalidEntries != "")
 {
-	header("location: CronEditor.php?URL=".$_POST["URL"]."&Notes=<b>ERROR!</b>. There was an error in your cron entries. Invalid entries were not saved!<p>".$InvalidEntries);
+	header("location: CronEditor.php?URL=".$url."&Notes=<b>ERROR!</b>. There was an error in your cron entries. Invalid entries were not saved!<p>".$InvalidEntries);
 }
 else
 {
-	header("Location: CronEditor.php?Notes=Crontab saved&URL=".$_POST["URL"]);
+	header("Location: CronEditor.php?Notes=Crontab saved&URL=".$url);
 }

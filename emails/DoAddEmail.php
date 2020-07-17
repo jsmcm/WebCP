@@ -120,8 +120,7 @@ for($x = 0; $x < strlen($LocalPart); $x++)
 
 
 
-if($oEmail->EmailExists($LocalPart, $DomainID) > 0)
-{
+if($oEmail->EmailExists($LocalPart, $DomainID) > 0) {
 	header("location: index.php?Notes=Email name already exists");
 	exit();
 }

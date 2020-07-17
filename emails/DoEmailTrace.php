@@ -15,14 +15,12 @@ $loggedInId = $ClientID;
 
 $email_ClientID = $oEmail->getLoggedInEmailId();
 
-if($ClientID < 1)
-{
-        if( $email_ClientID < 1 )
-        {
-                header("Location: /index.php");
-                exit();
-        }
-        $loggedInId = $email_ClientID;
+if($ClientID < 1) {
+	if( $email_ClientID < 1 ) {
+		header("Location: /index.php");
+		exit();
+	}
+	$loggedInId = $email_ClientID;
 }
 
 
