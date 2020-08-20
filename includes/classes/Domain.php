@@ -2522,11 +2522,12 @@ class Domain
 		$this->saveDomainSetting($AddDomainID, "ssl_redirect", "enforce", "", "", $nonce);
 
 		$oEmail = new Email();
-		$transactionalEmailSettings = $oEmail->getSendgridSettings();
-		if ( isset($transactionalEmailSettings["username"]) && $transactionalEmailSettings["username"] != "" && isset($transactionalEmailSettings["password"]) && $transactionalEmailSettings["password"]
+		$transactionalEmailSettings = $oEmail->getTransactionalEmailSettings();
+
+		if ( isset($transactionalEmailSettings["hostname"]) && isset($transactionalEmailSettings["username"]) && $transactionalEmailSettings["username"] != "" && isset($transactionalEmailSettings["password"]) && $transactionalEmailSettings["password"]
 != "" && isset($transactionalEmailSettings["default"]) && $transactionalEmailSettings["default"]
 == "checked") {
-			$oEmail->saveTransactionalDomain("sendgrid", $AddDomainID);
+			$oEmail->saveTransactionalDomain($transactionalEmailSettings["servicename"], $AddDomainID);
 		}
 
 		return $AddDomainID;

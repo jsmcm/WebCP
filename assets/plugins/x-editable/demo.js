@@ -132,10 +132,10 @@ $(function(){
 
         source: [
             {value: 'none', text: 'None'},
-            {value: 'sendgrid', text: 'Using Sendgrid'},
+            {value: 'transactional', text: 'Using Transactional'},
         ],
         display: function(value, sourceData) {
-             var colors = {"": "gray", "none": "red", "sendgrid": "green"},
+             var colors = {"": "gray", "none": "red", "transactional": "green"},
                  elem = $.grep(sourceData, function(o){return o.value == value;});
                  
              if(elem.length) {    

@@ -23,15 +23,17 @@ if($oUser->Role != "admin")
 }
 	
 
+$serviceName = filter_input(INPUT_POST, "serviceName", FILTER_SANITIZE_STRING);
+$hostName = filter_input(INPUT_POST, "hostName", FILTER_SANITIZE_STRING);
+$userName = filter_input(INPUT_POST, "userName", FILTER_SANITIZE_STRING);
+$password = filter_input(INPUT_POST, "password", FILTER_SANITIZE_STRING);
+$default = filter_input(INPUT_POST, "default", FILTER_SANITIZE_STRING);
 
-$sendgridUserName = filter_input(INPUT_POST, "sendgridUserName", FILTER_SANITIZE_STRING);
-$sendgridPassword = filter_input(INPUT_POST, "sendgridPassword", FILTER_SANITIZE_STRING);
-$sendgridDefault = filter_input(INPUT_POST, "sendgridDefault", FILTER_SANITIZE_STRING);
 
-$oEmail->deleteSendgridSettings();
+$oEmail->deleteTransactionalEmailSettings();
 
-if ( $sendgridUserName != "" && $sendgridPassword != "" ) {
-	$oEmail->saveSendgridSettings($sendgridUserName, $sendgridPassword, $sendgridDefault);
+if ( $userName != "" && $password != "" ) {
+	$oEmail->saveTransactionalEmailSettings($serviceName, $hostName, $userName, $password, $default);
 }
 
 $random = random_int(1, 1000000);
@@ -40,7 +42,7 @@ $nonceArray = [
         $oUser->ClientID,
         $random
 ];
-$nonce = $oSimpleNonce->GenerateNonce("makeSendgridEximSettings", $nonceArray);
-$oEmail->makeSendgridEximSettings($random, $nonce);
+$nonce = $oSimpleNonce->GenerateNonce("makeTransactionalEmailEximSettings", $nonceArray);
+$oEmail->makeTransactionalEmailEximSettings($random, $nonce);
 header("Location: index.php?Notes=Saved!");
 

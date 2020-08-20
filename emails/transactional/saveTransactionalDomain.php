@@ -5,6 +5,7 @@ include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 
 $oUser = new User();
 $oEmail = new Email();
+$oSimpleNonce = new SimpleNonce();
 
 require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 
@@ -26,4 +27,12 @@ $transactional = filter_input(INPUT_POST, "transactional", FILTER_SANITIZE_STRIN
 $domainId = filter_input(INPUT_POST, "domain_id", FILTER_SANITIZE_STRING);
 
 $oEmail->saveTransactionalDomain($transactional, $domainId);
-$oEmail->makeSendgridEximSettings();
+
+$random = random_int(1, 1000000);
+$nonceArray = [
+	$oUser->Role,
+        $oUser->ClientID,
+        $random
+];
+$nonce = $oSimpleNonce->GenerateNonce("makeTransactionalEmailEximSettings", $nonceArray);
+$oEmail->makeTransactionalEmailEximSettings($random, $nonce);

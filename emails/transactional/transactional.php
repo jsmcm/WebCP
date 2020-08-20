@@ -35,7 +35,7 @@ if ($oUser->Role != "admin") {
 	<!--<![endif]-->
 	<!-- start: HEAD -->
 	<head>
-		<title>Sendgrid Domains | <?php print $oSettings->GetWebCPTitle(); ?></title>
+		<title>Transactional Domains | <?php print $oSettings->GetWebCPTitle(); ?></title>
 		<!-- start: META -->
 		<meta charset="utf-8" />
 		<!--[if IE]><meta http-equiv='X-UA-Compatible' content="IE=edge,IE=9,IE=8,chrome=1" /><![endif]-->
@@ -139,14 +139,14 @@ if ($oUser->Role != "admin") {
 							<ol class="breadcrumb">
 								<li>
 									<i class="active"></i>
-									<a href="/emails/transactional/sendgrid.php">
-										Sendgrid Domains
+									<a href="/emails/transactional/transactional.php">
+										Transactional Domains
 									</a>
 								</li>
 					
 							</ol>
 							<div class="page-header">
-								<h1>Sendgrid Domains <small>Add / remove domains from using Sendgrid</small></h1>
+								<h1>Transactional Domains <small>Add / remove domains from using Transactional</small></h1>
 							</div>
 							<!-- end: PAGE TITLE & BREADCRUMB -->
 						</div>

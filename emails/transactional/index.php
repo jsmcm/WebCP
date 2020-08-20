@@ -20,22 +20,32 @@ if ($oUser->Role != "admin") {
 	exit();
 }
 
-$settings = $oEmail->getSendgridSettings();
+$settings = $oEmail->getTransactionalEmailSettings();
 
-$sendgridUserName = "";
-$sendgridPassword = "";
-$sendgridDefault = "";
+$serviceName = "";
+$hostName = "";
+$userName = "";
+$password = "";
+$default = "";
+
+if (isset($settings["servicename"])) {
+	$serviceName = $settings["servicename"];
+}
+
+if (isset($settings["hostname"])) {
+	$hostName = $settings["hostname"];
+}
 
 if (isset($settings["username"])) {
-	$sendgridUserName = $settings["username"];
+	$userName = $settings["username"];
 }
 
 if (isset($settings["password"])) {
-	$sendgridPassword = $settings["password"];
+	$password = $settings["password"];
 }
 
 if (isset($settings["default"])) {
-	$sendgridDefault = $settings["default"];
+	$default = $settings["default"];
 }
 
 ?>
@@ -233,17 +243,40 @@ if (isset($settings["default"])) {
 
 							<div class="panel-body">
 	
-							<h1>Sendgrid</h1>
-							Enter your Sendgrid credentials here:
+							<h1>Transactional Email</h1>
+							Enter your transactional email credentials here:
 							<p>
 	
+							<div class="form-group" style="padding-bottom: 50px;">
+								<label class="col-sm-2 control-label">
+								<b>Service Name:</b>
+								<br><i>eg, Transactional</i>
+								</label>
+								<div class="col-sm-10">
+									<span class="input-icon">
+									<input name="serviceName" value="<?php print $serviceName; ?>" type="text" id="form-field-11" class="form-control">
+									</span>
+								</div>
+							</div>
+
+							<div class="form-group" style="padding-bottom: 50px;">
+								<label class="col-sm-2 control-label">
+								<b>Host Name:</b>
+								</label>
+								<div class="col-sm-10">
+									<span class="input-icon">
+									<input name="hostName" value="<?php print $hostName; ?>" type="text" id="form-field-11" class="form-control">
+									</span>
+								</div>
+							</div>
+
 							<div class="form-group" style="padding-bottom: 50px;">
 								<label class="col-sm-2 control-label">
 								<b>User Name:</b>
 								</label>
 								<div class="col-sm-10">
 									<span class="input-icon">
-									<input name="sendgridUserName" value="<?php print $sendgridUserName; ?>" type="text" id="form-field-11" class="form-control">
+									<input name="userName" value="<?php print $userName; ?>" type="text" id="form-field-11" class="form-control">
 									</span>
 								</div>
 							</div>
@@ -255,7 +288,7 @@ if (isset($settings["default"])) {
 								</label>
 								<div class="col-sm-10">
 									<span class="input-icon">
-									<input name="sendgridPassword" value="<?php print $sendgridPassword; ?>" type="password" id="form-field-11" class="form-control">
+									<input name="password" value="<?php print $password; ?>" type="password" id="form-field-11" class="form-control">
 									</span>
 								</div>
 							</div>
@@ -267,12 +300,12 @@ if (isset($settings["default"])) {
 							
 								<div class="col-sm-2">
 		                                                 	<div class="make-switch" data-on="success" data-off="danger">
-		                                                        	<input type="checkbox" <?php print $sendgridDefault; ?> value="checked" name="sendgridDefault">
+		                                                        	<input type="checkbox" <?php print $default; ?> value="checked" name="default">
 		                                                        </div>
 								 </div>
 
 								<div class="col-sm-8">
-									<i>If set to yes then all new domains will use Sendgrid. If set to no then new domains will not be created using Sendgrid. In either case you can manually edit <a href="/emails/transactional/sendgrid.php">domains using Sendgrid</a>
+									<i>If set to yes then all new domains will use this. If set to no then new domains will not be created using this setting. In either case you can manually edit <a href="/emails/transactional/transactional.php">domains using transactional emails</a>
 								</div>
 		                                     	</div>
 
@@ -280,6 +313,13 @@ if (isset($settings["default"])) {
 						</div>
 					</div>
 	
+
+
+
+
+
+
+
 
 
 

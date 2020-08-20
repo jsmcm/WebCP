@@ -98,8 +98,8 @@ if($oDomain->DeleteDomain($DomainOwnerClientID, $domainId, $Error, $nonce) == 1)
         $random
     ];
     
-    $nonce = $oSimpleNonce->GenerateNonce("makeSendgridEximSettings", $nonceArray);
-	$oEmail->makeSendgridEximSettings($random, $nonce);
+    $nonce = $oSimpleNonce->GenerateNonce("makeTransactionalEximSettings", $nonceArray);
+	$oEmail->makeTransactionalEximSettings($random, $nonce);
 	$Notes="Domain Deleted";
 } else {	
     $Notes="Domain cannot be deleted";

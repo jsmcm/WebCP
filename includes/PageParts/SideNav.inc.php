@@ -473,7 +473,7 @@
 				</a>
 
 					<?php
-					if(strstr($_SERVER["SCRIPT_FILENAME"], "/emails/transactional/sendgrid.php"))
+					if(strstr($_SERVER["SCRIPT_FILENAME"], "/emails/transactional/transactional.php"))
 					{
 						print "<li class=\"active open\">";
 					}
@@ -482,8 +482,8 @@
 						print "<li>";
 					}
 					?>
-					<a href="/emails/transactional/sendgrid.php">
-						<span class="title"> > Sendgrid Domains </span>
+					<a href="/emails/transactional/transactional.php">
+						<span class="title"> > Transactional Domains </span>
 					</a>
 
 				</li>

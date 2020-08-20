@@ -110,13 +110,13 @@ $oDomain->GetDomainInfo($domainId, $random, $infoArray, $nonce);
 
 file_put_contents(dirname(__DIR__)."/nm/".$DomainName.".freessl_tmp", "PrimaryDomainID=".$domainId."\nType=".$_POST["DomainType"]."\nPath=".$infoArray["Path"]."\nDomainID=".$domainId."\nDomainName=".$DomainName."\nDomainUserName=".$infoArray["UserName"]."\nEmailAddress=".$oUser->EmailAddress."\n");
 
-$sendGridSettings = $oEmail->getSendgridSettings();
-$sendgridDefault = "";
+$transactionalSettings = $oEmail->getTransactionalSettings();
+$transactionalDefault = "";
 
-if (isset($sendGridSettings["default"])) {
-        $sendgridDefault = trim($sendGridSettings["default"]);
-	if ( $sendgridDefault == "checked" ) {
-		$oEmail->makeSendgridEximSettings();
+if (isset($transactionalSettings["default"])) {
+        $transactionalDefault = trim($transactionalSettings["default"]);
+	if ( $transactionalDefault == "checked" ) {
+		$oEmail->makeTransactionalEximSettings();
 	}
 }
 

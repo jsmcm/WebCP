@@ -147,20 +147,21 @@ class Email
 
 
 
-	function makeSendgridEximSettings($random, $nonceArray)
+	function makeTransactionalEmailEximSettings($random, $nonceArray)
 	{
 
+		
 		if ( $random == "" ) {
 			$oLog = new Log();
-			$oLog->WriteLog("error", "/class.Email.php -> makeSendgridEximSettings(); random cannot be blank in Email::makeSendgridEximSettings");
-			throw new Exception("<p><b>random cannot be blank in Email::makeSendgridEximSettings</b><p>");
+			$oLog->WriteLog("error", "/class.Email.php -> makeTransactionalEmailEximSettings(); random cannot be blank in Email::makeTransactionalEmailEximSettings");
+			throw new Exception("<p><b>random cannot be blank in Email::makeTransactionalEmailEximSettings</b><p>");
 		}
 
 
 		if ( ! (is_array($nonceArray) && !empty($nonceArray) ) ) {
 			$oLog = new Log();
-			$oLog->WriteLog("error", "/class.Email.php -> makeSendgridEximSettings(); Nonce not set");
-			throw new Exception("<p><b>Nonce not set in Email::makeSendgridEximSettings</b><p>");
+			$oLog->WriteLog("error", "/class.Email.php -> makeTransactionalEmailEximSettings(); Nonce not set");
+			throw new Exception("<p><b>Nonce not set in Email::makeTransactionalEmailEximSettings</b><p>");
 		}
 		
 		$oUser = new User();
@@ -168,27 +169,32 @@ class Email
 
 		$nonceMeta = [
 			$oUser->Role,
-			$ClientID,
+			$oUser->ClientID,
 			$random
 		];
 
 		$oSimpleNonce = new SimpleNonce();
-		$nonceResult = $oSimpleNonce->VerifyNonce($nonceArray["Nonce"], "makeSendgridEximSettings", $nonceArray["TimeStamp"], $nonceMeta);
+		$nonceResult = $oSimpleNonce->VerifyNonce($nonceArray["Nonce"], "makeTransactionalEmailEximSettings", $nonceArray["TimeStamp"], $nonceMeta);
 
 		if ( ! $nonceResult ) {
 			$oLog = new Log();
-			$oLog->WriteLog("error", "/class.Email.php -> makeSendgridEximSettings(); Nonce failed");
-			throw new Exception("<p><b>Nonce failed in Email::makeSendgridEximSettings</b></p>");
+			$oLog->WriteLog("error", "/class.Email.php -> makeTransactionalEmailEximSettings(); Nonce failed 1");
+			throw new Exception("<p><b>Nonce failed in Email::makeTransactionalEmailEximSettings</b></p>");
 		}
 
-		if ( ! file_exists("/var/www/html/mail/sendgrid")) {
-			mkdir("/var/www/html/mail/sendgrid", 0755);
+		if ( ! file_exists("/var/www/html/mail/TransactionalEmail")) {
+			mkdir("/var/www/html/mail/TransactionalEmail", 0755);
 		}
 
-		$settings = $this->getSendgridSettings();
+		$settings = $this->getTransactionalEmailSettings();
 
+		$hostName = "";
 		$username = "";
 		$password = "";
+
+		if (isset($settings["hostname"]) ) {
+			$hostName = $settings["hostname"];
+		}
 
 		if (isset($settings["username"]) ) {
 			$username = $settings["username"];
@@ -199,8 +205,11 @@ class Email
 		}
 
 		if ( $username != "" && $password != "" ) {
-			file_put_contents("/var/www/html/mail/sendgrid/username", $username);
-			file_put_contents("/var/www/html/mail/sendgrid/password", $password);
+
+	
+			file_put_contents("/var/www/html/mail/TransactionalEmail/hostname", $hostName);
+			file_put_contents("/var/www/html/mail/TransactionalEmail/username", $username);
+			file_put_contents("/var/www/html/mail/TransactionalEmail/password", $password);
 
 			$random = random_int(1, 1000000);
 			$oUser = new User();
@@ -210,33 +219,33 @@ class Email
 				$oUser->ClientID,
 				$random
 			];
-			$nonce = $oSimpleNonce->GenerateNonce("getSendgridDomains", $nonceArray);
+			$nonce = $oSimpleNonce->GenerateNonce("getTransactionalEmailDomains", $nonceArray);
 			
-			$domains = $this->getSendgridDomains($random, $nonce);
+			$domains = $this->getTransactionalEmailDomains($random, $nonce);
 
-			file_put_contents("/var/www/html/mail/sendgrid/domains", "");
+			file_put_contents("/var/www/html/mail/TransactionalEmail/domains", "");
 			if (!empty($domains) ) {
-				file_put_contents("/var/www/html/mail/sendgrid/domains", implode(":", $domains));
+				file_put_contents("/var/www/html/mail/TransactionalEmail/domains", implode(":", $domains));
 			}
 		}
 
 	}
 
-	function getSendgridDomains($random, $nonceArray)
+	function getTransactionalEmailDomains($random, $nonceArray)
 	{
 
 
 		if ( $random == "" ) {
 			$oLog = new Log();
-			$oLog->WriteLog("error", "/class.Email.php -> getSendgridDomains(); random cannot be blank in Email::getSendgridDomains");
-			throw new Exception("<p><b>random cannot be blank in Email::getSendgridDomains</b><p>");
+			$oLog->WriteLog("error", "/class.Email.php -> getTransactionalEmailDomains(); random cannot be blank in Email::getTransactionalEmailDomains");
+			throw new Exception("<p><b>random cannot be blank in Email::getTransactionalEmailDomains</b><p>");
 		}
 
 
 		if ( ! (is_array($nonceArray) && !empty($nonceArray) ) ) {
 			$oLog = new Log();
-			$oLog->WriteLog("error", "/class.Email.php -> getSendgridDomains(); Nonce not set");
-			throw new Exception("<p><b>Nonce not set in Email::getSendgridDomains</b><p>");
+			$oLog->WriteLog("error", "/class.Email.php -> getTransactionalEmailDomains(); Nonce not set");
+			throw new Exception("<p><b>Nonce not set in Email::getTransactionalEmailDomains</b><p>");
 		}
 		
 		$oUser = new User();
@@ -249,18 +258,18 @@ class Email
 		];
 
 		$oSimpleNonce = new SimpleNonce();
-		$nonceResult = $oSimpleNonce->VerifyNonce($nonceArray["Nonce"], "getSendgridDomains", $nonceArray["TimeStamp"], $nonceMeta);
+		$nonceResult = $oSimpleNonce->VerifyNonce($nonceArray["Nonce"], "getTransactionalEmailDomains", $nonceArray["TimeStamp"], $nonceMeta);
 
 		if ( ! $nonceResult ) {
 			$oLog = new Log();
-			$oLog->WriteLog("error", "/class.Email.php -> getSendgridDomains(); Nonce failed");
-			throw new Exception("<p><b>Nonce failed in Email::getSendgridDomains</b></p>");
+			$oLog->WriteLog("error", "/class.Email.php -> getTransactionalEmailDomains(); Nonce failed");
+			throw new Exception("<p><b>Nonce failed in Email::getTransactionalEmailDomains</b></p>");
 		}
 
 		$domains = array();
 
 		try {
-			$query = $this->DatabaseConnection->prepare("SELECT fqdn FROM email_options, domains WHERE option_name = 'domain_transactional_email' AND email_options.deleted = 0 AND domains.deleted = 0 AND option_value = 'sendgrid' AND extra1 = domains.id;");
+			$query = $this->DatabaseConnection->prepare("SELECT fqdn FROM email_options, domains WHERE option_name = 'domain_transactional_email' AND email_options.deleted = 0 AND domains.deleted = 0 AND option_value = 'transactional' AND extra1 = domains.id;");
 			$query->execute();
 	
 			while ($result = $query->fetch(PDO::FETCH_ASSOC)) {
@@ -269,7 +278,7 @@ class Email
 	
 		} catch(PDOException $e) {
 			$oLog = new Log();
-			$oLog->WriteLog("error", "/class.Email.php -> getSendgridDomains(); Error = ".$e);
+			$oLog->WriteLog("error", "/class.Email.php -> getTransactionalEmailDomains(); Error = ".$e);
 		}		
 
 		return $domains;
@@ -277,51 +286,55 @@ class Email
         }
 
 
-	function deleteSendgridSettings()
+	function deleteTransactionalEmailSettings()
 	{
 
 		try {
-			$query = $this->DatabaseConnection->prepare("UPDATE email_options SET deleted = 1 WHERE option_name LIKE 'sendgrid_setting_%'");
+			$query = $this->DatabaseConnection->prepare("UPDATE email_options SET deleted = 1 WHERE option_name LIKE 'transactional_email_setting_%'");
 				
 			$query->execute();
 	
 			
 		} catch(PDOException $e) {
 			$oLog = new Log();
-			$oLog->WriteLog("error", "/class.Email.php -> deleteSendgridSettings(); Error = ".$e);
+			$oLog->WriteLog("error", "/class.Email.php -> deleteTransactionalEmailSettings(); Error = ".$e);
 		}
 		
 	}
 
-        function getSendgridSettings()
-        {
+	function getTransactionalEmailSettings()
+	{
 
 		$settings = array();
 
 		try {
-			$query = $this->DatabaseConnection->prepare("SELECT option_name, option_value FROM email_options WHERE option_name LIKE 'sendgrid_setting_%' AND deleted = 0");
+			$query = $this->DatabaseConnection->prepare("SELECT option_name, option_value FROM email_options WHERE option_name LIKE 'transactional_email_setting_%' AND deleted = 0");
 			$query->execute();
 	
 			while ($result = $query->fetch(PDO::FETCH_ASSOC)) {
 				
-				if ($result["option_name"] == "sendgrid_setting_username") {
+				if ($result["option_name"] == "transactional_email_setting_username") {
 					$settings["username"] = $result["option_value"];
-				} else if ($result["option_name"] == "sendgrid_setting_password") {
+				} else if ($result["option_name"] == "transactional_email_setting_password") {
 					$settings["password"] = $result["option_value"];
-				} else if ($result["option_name"] == "sendgrid_setting_default") {
+				} else if ($result["option_name"] == "transactional_email_setting_default") {
 					$settings["default"] = $result["option_value"];
+				} else if ($result["option_name"] == "transactional_email_setting_service_name") {
+					$settings["servicename"] = $result["option_value"];
+				} else if ($result["option_name"] == "transactional_email_setting_host_name") {
+					$settings["hostname"] = $result["option_value"];
 				}
 
 			}
 	
 		} catch(PDOException $e) {
 			$oLog = new Log();
-			$oLog->WriteLog("error", "/class.Email.php -> getSendgridSettings(); Error = ".$e);
+			$oLog->WriteLog("error", "/class.Email.php -> getTransactionalEmailSettings(); Error = ".$e);
 		}		
 
 		return $settings;
 
-        }
+    }
 
 	function getDomainTransactionalSetting($domainId)
 	{
@@ -369,16 +382,18 @@ class Email
 	}
 
 
-	function saveSendgridSettings($userName, $password, $default)
+	function saveTransactionalEmailSettings($serviceName, $hostName, $userName, $password, $default)
 	{
-		$this->insertEmailOptions("sendgrid_setting_username", $userName, "", "");
-		$this->insertEmailOptions("sendgrid_setting_password", $password, "", "");
-		$this->insertEmailOptions("sendgrid_setting_default", $default, "", "");
+		$this->insertEmailOptions("transactional_email_setting_service_name", $serviceName, "", "");
+		$this->insertEmailOptions("transactional_email_setting_host_name", $hostName, "", "");
+		$this->insertEmailOptions("transactional_email_setting_username", $userName, "", "");
+		$this->insertEmailOptions("transactional_email_setting_password", $password, "", "");
+		$this->insertEmailOptions("transactional_email_setting_default", $default, "", "");
 	}
 
 
-        function insertEmailOptions($optionName, $optionValue, $extra1 = "", $extra2 = "")
-        {
+	function insertEmailOptions($optionName, $optionValue, $extra1 = "", $extra2 = "")
+	{
 
 		try {
 		
