@@ -1,10 +1,10 @@
 <?php
 session_start();
 
-if (! file_exists($_SERVER["DOCUMENT_ROOT"]."/includes/license.conf")) {
-    header("Location: index.php?Notes=License file not found, please contact support OR<br><a href=\"enter_license.php\">Click here to enter your license key</a>");
-    exit();
-}
+//if (! file_exists($_SERVER["DOCUMENT_ROOT"]."/includes/license.conf")) {
+//    header("Location: index.php?Notes=License file not found, please contact support OR<br><a href=\"enter_license.php\">Click here to enter your license key</a>");
+//    exit();
+//}
 
 include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 
@@ -13,7 +13,12 @@ $oUser = new User();
 $oLog = new Log();
 $oUtils = new Utils();
 
-$LicenseKey = file_get_contents($_SERVER["DOCUMENT_ROOT"]."/includes/license.conf");
+/*
+$LicenseKey = "free";
+
+if (file_exists($_SERVER["DOCUMENT_ROOT"]."/includes/license.conf")) {
+	$LicenseKey = file_get_contents($_SERVER["DOCUMENT_ROOT"]."/includes/license.conf");
+}
 $key = $oUtils->getValidationKey($LicenseKey);
 
 
@@ -43,6 +48,7 @@ if ( ($oUtils->ValidateHash($validationArray["hash"], $LicenseKey) !== true) || 
 	header("location: index.php?Notes=License failed, please try logging in again or contact support.<p>Note: We have a known bug which reports this error from time to time. Usually logging in again resolves it.</p>");
 	exit();
 }
+*/
 
 $emailAddress = "";
 
@@ -64,33 +70,24 @@ $oLog->WriteLog("DEBUG", "/DoLogin.php -> CheckingLoginCredentials");
 
 $ClientID = $oUser->CheckLoginCredentials($emailAddress, $password);
 
-if($ClientID > 0)
-{
+if($ClientID > 0) {
 	$oLog->WriteLog("DEBUG", "/DoLogin.php -> Log in suceeded, redirecting to /domains/index.php");
 
-	if($emailAddress == "admin@admin.admin")
-	{
+	if($emailAddress == "admin@admin.admin") {
 		header("Location: /users/AddUser.php?NoteType=Error&Notes=Please update your profile before continuing...&ClientID=".$ClientID);
-	}
-	else
-	{
+	} else {
 		header("Location: /domains/index.php");
 	}
 
 	exit();
-}
-else
-{
+} else {
 	$x = $oEmail->logInEmailAccount($emailAddress, $password);
 
 	// Check if its a mail user trying to admin their own email address...
-	if( $x !== false )
-	{
+	if( $x !== false ) {
 		header("Location: /emails/index.php");
 		exit();
-	}
-	else
-	{
+	} else {
 		// If we're here, the login failed. Write it to a failed log so that it can be picked up by fail2ban
 
 

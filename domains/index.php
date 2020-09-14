@@ -765,7 +765,7 @@ if($Traffic == 0)
 										}
 
 										if ( $serverLicenseType == "free" && ($serverAccountsCreated >= $serverAccountsAllowed) ) {
-											$BlockReason = "You can only create ".$serverAccountsAllowed." accounts on the free plan. Please <a href=\"https://webcp.io\" target=\"_new\">upgrade</a> if you need to add more accounts";
+											$BlockReason = "You can only create ".$serverAccountsAllowed." accounts on the free plan. Please <a href=\"/enter_license.php\">upgrade</a> if you need to add more accounts";
 										}
 
 										if($BlockReason == "")

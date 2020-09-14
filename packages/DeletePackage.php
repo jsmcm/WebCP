@@ -22,5 +22,3 @@ else
 }
 
 header("location: index.php?Notes=".$Notes);	
-
-exit();

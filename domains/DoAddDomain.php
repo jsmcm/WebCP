@@ -110,7 +110,7 @@ $oDomain->GetDomainInfo($domainId, $random, $infoArray, $nonce);
 
 file_put_contents(dirname(__DIR__)."/nm/".$DomainName.".freessl_tmp", "PrimaryDomainID=".$domainId."\nType=".$_POST["DomainType"]."\nPath=".$infoArray["Path"]."\nDomainID=".$domainId."\nDomainName=".$DomainName."\nDomainUserName=".$infoArray["UserName"]."\nEmailAddress=".$oUser->EmailAddress."\n");
 
-$transactionalSettings = $oEmail->getTransactionalSettings();
+$transactionalSettings = $oEmail->getTransactionalEmailSettings();
 $transactionalDefault = "";
 
 if (isset($transactionalSettings["default"])) {

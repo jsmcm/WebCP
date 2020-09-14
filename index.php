@@ -1,5 +1,6 @@
 <?php
 
+
 if ( ! file_exists($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php") ) {
     print "<h1>Missing dependencies</h1><p>I'm going to try and install them. This might take several minutes. Please wait 30 minutes then try again</p><p>If you've already waited 30 minutes and still see this please contact support@webcp.io for support</p>";
 

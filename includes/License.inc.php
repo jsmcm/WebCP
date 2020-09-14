@@ -4,7 +4,12 @@ include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 
 $oUtils = new Utils();
 
-$LicenseKey = file_get_contents($_SERVER["DOCUMENT_ROOT"]."/includes/license.conf");
+$LicenseKey = "free";
+
+if ( file_exists($_SERVER["DOCUMENT_ROOT"]."/includes/license.conf")) {
+        $LicenseKey = file_get_contents($_SERVER["DOCUMENT_ROOT"]."/includes/license.conf");
+}
+
 $key = $oUtils->getValidationKey($LicenseKey);
 
 if( $key == "expired" ) {
@@ -20,8 +25,10 @@ $validationData = $oUtils->getValidationData($key);
 
 $validationArray = json_decode($validationData, true);
 
-if ( ($oUtils->ValidateHash($validationArray["hash"], $LicenseKey) !== true) || $validationArray["status"] != "valid" ) {
-        header("location: index.php?Notes=License failed, please try logging in again or contact support");
-        exit();
+if ($validationArray["type"] != "free") {
+        if ( ($oUtils->ValidateHash($validationArray["hash"], $LicenseKey) !== true) || $validationArray["status"] != "valid" ) {
+                header("location: index.php?Notes=License failed, please try logging in again or contact support");
+                exit();
+        }
 }
 
