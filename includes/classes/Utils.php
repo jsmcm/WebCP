@@ -84,7 +84,11 @@ class Utils
 
 
 		
+		$LicenseKey = "free";
 
+		if ( file_exists($_SERVER["DOCUMENT_ROOT"]."/includes/license.conf")) {
+			$LicenseKey = file_get_contents($_SERVER["DOCUMENT_ROOT"]."/includes/license.conf");
+		}
 
 		$oDomain = new Domain();
 
@@ -96,8 +100,6 @@ class Utils
 
 			if ($this->ValidateFreeKey($hash)) {
 				$data = '{"allowed":5,"type":"free","date":"'.date("Y-m-d H:i:s").'","status":"valid","hash":"16e2eebda7c4c0fcba6a253f79607ca2ab","message":""}';
-			} else {
-				print "Free key fails<P>";
 			}
 			
 
@@ -125,6 +127,7 @@ class Utils
 			if( (time() - filemtime("/tmp/webcp/getValidationKey_".$LicenseKey)) > 3600 ) {
 				unlink("/tmp/webcp/getValidationKey_".$LicenseKey);
 			} else {
+				//print "returning from cache<p>";
 				return file_get_contents("/tmp/webcp/getValidationKey_".$LicenseKey);
 			}
 		}
@@ -132,6 +135,8 @@ class Utils
 		$oDomain = new Domain();
 
 		$AccountsCreated = $oDomain->GetAccountsCreatedCount();
+
+		//print "AccountsCreated: ".$AccountsCreated."<p>";
 
 		if ($AccountsCreated < 6 && $LicenseKey == "free") {
 		
