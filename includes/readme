@@ -1,3 +1,7 @@
+* 3.0.1 *
+= release: 2020-09-17 =
+ - Fixed licensing to not require license for free version
+
 * 3.0.0 *
 = release: 2020-08-21 = 
  - Sendgrid settings changed to transactional settings
