@@ -1,6 +1,6 @@
 * 3.0.2 *
 = release: 2020-09-22 =
- - Fixed Skel editor
+ - Fixed Skel editor 
  - Cron editor replaces ~ with /home/username/home/username path
 
 * 3.0.1 *
