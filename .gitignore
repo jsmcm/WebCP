@@ -34,3 +34,4 @@ modules/*
 includes/PageParts/WebCPLink.inc
 includes/PageParts/WebCPName.inc
 includes/PageParts/WebCPTitle.inc
+skel/public_html/

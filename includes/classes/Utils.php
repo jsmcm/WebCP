@@ -94,7 +94,8 @@ class Utils
 
 		$AccountsCreated = $oDomain->GetAccountsCreatedCount();
 
-		if ($AccountsCreated < 6 && $LicenseKey == "free") {
+		//if ($AccountsCreated < 6 && $LicenseKey == "free") {
+		if ($LicenseKey == "free") {
 		
 			$data = '{"allowed":0,"type":"free","date":"'.date("Y-m-d H:i:s").'","status":"failed","hash":"","message":"License not valid for free service"}';
 
@@ -138,7 +139,8 @@ class Utils
 
 		//print "AccountsCreated: ".$AccountsCreated."<p>";
 
-		if ($AccountsCreated < 6 && $LicenseKey == "free") {
+		//if ($AccountsCreated < 6 && $LicenseKey == "free") {
+		if ($LicenseKey == "free") {
 		
 			// free, doesn't need license
 			$key = $this->makeFreeKey();

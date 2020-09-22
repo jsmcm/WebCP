@@ -3,7 +3,7 @@
 	function FetchIconListFromRemoteServer()
 	{
 		$LocalMD5 = "";
-		$RemoteMD5 = md5_file("http://localhost:10025/Editor/icon_list.txt");
+		$RemoteMD5 = md5_file("http://localhost:8880/Editor/icon_list.txt");
 
 		if( file_exists($_SERVER["DOCUMENT_ROOT"]."/skel/editor/images/icon_list.txt"))
 		{
@@ -24,7 +24,7 @@
 			unlink($_SERVER["DOCUMENT_ROOT"]."/skel/editor/images/icon_list.txt");
 		}
 
-		file_put_contents($_SERVER["DOCUMENT_ROOT"]."/skel/editor/images/icon_list.txt", file_get_contents("http://localhost:10025/Editor/icon_list.txt"));
+		file_put_contents($_SERVER["DOCUMENT_ROOT"]."/skel/editor/images/icon_list.txt", file_get_contents("http://localhost:8880/Editor/icon_list.txt"));
 
                 $IconArray = file($_SERVER["DOCUMENT_ROOT"]."/skel/editor/images/icon_list.txt");
 
@@ -37,7 +37,7 @@
                                 unlink($_SERVER["DOCUMENT_ROOT"]."/skel/editor/images/icons/".$val);
                         }
 
-                        file_put_contents($_SERVER["DOCUMENT_ROOT"]."/skel/editor/images/icons/".$val, file_get_contents("http://localhost:10025/Editor/icons/".$val));
+                        file_put_contents($_SERVER["DOCUMENT_ROOT"]."/skel/editor/images/icons/".$val, file_get_contents("http://localhost:8880/Editor/icons/".$val));
                 }
 
 
@@ -47,7 +47,7 @@
 	function FetchEditableListFromRemoteServer()
 	{
 		$LocalMD5 = "";
-		$RemoteMD5 = md5_file("http://localhost:10025/Editor/editable_list.txt");
+		$RemoteMD5 = md5_file("http://localhost:8880/Editor/editable_list.txt");
 
 
 		if( file_exists($_SERVER["DOCUMENT_ROOT"]."/skel/editor/editable_list.txt"))
@@ -69,7 +69,7 @@
 			unlink($_SERVER["DOCUMENT_ROOT"]."/skel/editor/editable_list.txt");
 		}
 
-		file_put_contents($_SERVER["DOCUMENT_ROOT"]."/skel/editor/editable_list.txt", file_get_contents("http://localhost:10025/Editor/editable_list.txt"));
+		file_put_contents($_SERVER["DOCUMENT_ROOT"]."/skel/editor/editable_list.txt", file_get_contents("http://localhost:8880/Editor/editable_list.txt"));
 		
 	}
 

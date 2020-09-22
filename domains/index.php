@@ -13,8 +13,8 @@ $oReseller = new Reseller();
 $oDatabase = new Database();
 $oSimpleNonce = new SimpleNonce();
 
+//print "license<p>";
 require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
-
 
 $ClientID = $oUser->getClientId();
 

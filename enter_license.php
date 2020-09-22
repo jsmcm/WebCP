@@ -90,8 +90,7 @@ $oSettings = new Settings();
 			<div class="box-login">
 	
 				<?php
-				if(isset($_REQUEST["Notes"]))
-				{
+				if(isset($_REQUEST["Notes"])) {
 					print "<font color=\"red\">".$_REQUEST["Notes"]."</font><p>";
 				}
 				?>
@@ -203,7 +202,7 @@ $oSettings = new Settings();
 
 			<div class="copyright">
 
-				2014 &copy; <?php print $oSettings->GetWebCPLink(); ?>
+				2020 &copy; <?php print $oSettings->GetWebCPLink(); ?>
 
 			</div>
 

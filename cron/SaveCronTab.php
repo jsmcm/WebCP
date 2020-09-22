@@ -119,6 +119,7 @@ for($x = 0; $x < $Count; $x++)
 	$command = $_POST["Command_".$x];
 	
 	$command = str_replace("/home/".$DomainInfoArray["UserName"], "/home/".$DomainInfoArray["UserName"]."/home/".$DomainInfoArray["UserName"], $command);
+	$command = str_replace("~", "/home/".$DomainInfoArray["UserName"]."/home/".$DomainInfoArray["UserName"], $command);
 	
 
 	$NextRow = RemoveSpaces($_POST["Minute_".$x])." ".RemoveSpaces($_POST["Hour_".$x])." ".RemoveSpaces($_POST["Day_".$x])." ".RemoveSpaces($_POST["Month_".$x])." ".RemoveSpaces($_POST["Weekday_".$x])." ".$command;
@@ -145,6 +146,7 @@ if($Count < $MaxJobs) {
 		if(trim($_POST["Command_new"]) != "") {
 			$command = $_POST["Command_new"];
 			$command = str_replace("/home/".$DomainInfoArray["UserName"], "/home/".$DomainInfoArray["UserName"]."/home/".$DomainInfoArray["UserName"], $command);
+			$command = str_replace("~", "/home/".$DomainInfoArray["UserName"]."/home/".$DomainInfoArray["UserName"], $command);
 
 			$NextRow = RemoveSpaces($_POST["Minute_new"])." ".RemoveSpaces($_POST["Hour_new"])." ".RemoveSpaces($_POST["Day_new"])." ".RemoveSpaces($_POST["Month_new"])." ".RemoveSpaces($_POST["Weekday_new"])." ".$command;
 

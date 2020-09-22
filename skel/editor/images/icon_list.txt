@@ -1,8 +1,0 @@
-2014-01-08 22:02:49
-odt.png
-xls.png
-doc.png
-ods.png
-txt.png
-pdf.png
-zip.png

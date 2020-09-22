@@ -24,22 +24,27 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/skel/editor/includes/functions.inc.php"
 
 
 if(isset($_REQUEST["URL"]))
-{
-	$URL = $_REQUEST["URL"];
-}
-else
-{
+{ 
+	$URL = $_REQUEST["URL"]; 
+} else {
 	$URL = $_SERVER["SERVER_NAME"];
 }
 
 
-if(isset($_REQUEST["Path"]))
-{
-	$Path = $_REQUEST["Path"];
-}
-else
-{
+if(isset($_REQUEST["Path"])) {
+    $Path = $_REQUEST["Path"];
+} else {
 	$Path = $_SERVER["DOCUMENT_ROOT"]."/skel/public_html";
+	
+	if (!file_exists($Path)) {
+	    mkdir($Path, true);
+	    chmod($Path, 0755);
+	}
+
+	if (!file_exists($Path."/index.php") && !file_exists($Path."/index.html") && !file_exists($Path."/index.htm")) {
+		copy(dirname(__DIR__)."/failsafe", $Path."/index.php");
+	}
+
 }
 
 if(substr($Path, strlen($Path) - 1) != "/")
