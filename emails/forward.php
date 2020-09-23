@@ -284,8 +284,10 @@ $AddForwarderNonceArray = $oSimpleNonce->GenerateNonce("addSingleForwarder", $No
 
 										for($x = 0; $x < $ArrayCount; $x++)
 										{
+											$localPart = substr($Array[$x]["EmailAddress"], 0, strpos($Array[$x]["EmailAddress"], "@"));
+
 											$NonceArrayMeta = array();
-											$NonceArrayMeta = array("loggedInId"=>$loggedInId, "forwarderId"=>$Array[$x]["ID"]);
+											$NonceArrayMeta = array("loggedInId"=>$loggedInId, "forwarderId"=>$Array[$x]["ID"], "localPart" => $localPart);
 
 											$DeleteForwarderNonceArray = $oSimpleNonce->GenerateNonce("deleteSingleForwarder", $NonceArrayMeta);
 											print "<tr>";
@@ -296,7 +298,7 @@ $AddForwarderNonceArray = $oSimpleNonce->GenerateNonce("addSingleForwarder", $No
 													print "<td class=\"center\">";
 													print "<div class=\"visible-md visible-lg hidden-sm hidden-xs\">";
 														
-													print "<a href=\"DeleteSingleForwarder.php?Nonce=".$DeleteForwarderNonceArray["Nonce"]."&TimeStamp=".$DeleteForwarderNonceArray["TimeStamp"]."&id=".$Array[$x]["ID"]."\" onclick=\"return ConfirmDelete(); return false;\" class=\"btn btn-bricky tooltips\" data-placement=\"top\" data-original-title=\"Delete Forwarder\"><i class=\"fa fa-times fa fa-white\" style=\"color:white;\"></i></a>\n";
+													print "<a href=\"DeleteSingleForwarder.php?Nonce=".$DeleteForwarderNonceArray["Nonce"]."&TimeStamp=".$DeleteForwarderNonceArray["TimeStamp"]."&id=".$Array[$x]["ID"]."&localPart=".$localPart."\" onclick=\"return ConfirmDelete(); return false;\" class=\"btn btn-bricky tooltips\" data-placement=\"top\" data-original-title=\"Delete Forwarder\"><i class=\"fa fa-times fa fa-white\" style=\"color:white;\"></i></a>\n";
 													print "</div>";
 													print "<div class=\"visible-xs visible-sm hidden-md hidden-lg\">";
 														print "<div class=\"btn-group\">";
@@ -305,7 +307,7 @@ $AddForwarderNonceArray = $oSimpleNonce->GenerateNonce("addSingleForwarder", $No
 															print "</a>";
 															print "<ul role=\"menu\" class=\"dropdown-menu pull-right\">";
 															print "<li role=\"presentation\">";
-															print "<a role=\"menuitem\" tabindex=\"-1\" href=\"DeleteSingleForwarder.php?Nonce=".$DeleteForwarderNonceArray["Nonce"]."&TimeStamp=".$DeleteForwarderNonceArray["TimeStamp"]."&id=".$Array[$x]["ID"]."\" onclick=\"return ConfirmDelete(); return false;\">";
+															print "<a role=\"menuitem\" tabindex=\"-1\" href=\"DeleteSingleForwarder.php?Nonce=".$DeleteForwarderNonceArray["Nonce"]."&TimeStamp=".$DeleteForwarderNonceArray["TimeStamp"]."&id=".$Array[$x]["ID"]."&localPart=".$localPart."\" onclick=\"return ConfirmDelete(); return false;\">";
 															print "<i class=\"fa fa-times\"></i> Delete Forwarder";
 															print "</a>";
 															print "</li>";																
