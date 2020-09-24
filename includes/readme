@@ -1,3 +1,7 @@
+* 3.0.3 *
+= release: 2020-09-
+ - Made fixes to the way that email forwarders are managed
+
 * 3.0.2 *
 = release: 2020-09-22 =
  - Fixed Skel editor 
