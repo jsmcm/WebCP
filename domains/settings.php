@@ -318,7 +318,9 @@ if (isset($domainSettings["php_version"]["value"])) {
 								<div class="col-sm-8">
 									<span class="input-icon">
 									<select name="phpVersion" id="form-field-11" class="form-control">
+									<option value="7.4" <?php if($sslRedirect == "7.4") print " selected "; ?>>7.4</option>
 									<option value="7.2" <?php if($sslRedirect == "7.2") print " selected "; ?>>7.2</option>
+									<option value="7.1" <?php if($sslRedirect == "7.1") print " selected "; ?>>7.1</option>
 									<option value="5.6" <?php if($phpVersion == "5.6") print " selected "; ?>>5.6</option>
 									</select>
 									</span>
