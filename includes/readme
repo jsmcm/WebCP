@@ -1,3 +1,7 @@
+* 3.0.5 *
+= releaes: 2020-09-28
+ - Uppdated letsencrpyt to use snapd certbot installation
+
 * 3.0.4 *
 = release: 2020-09-25
  - Updated settings in domain settings to include all available php versions in drop down
