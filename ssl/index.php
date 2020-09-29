@@ -71,8 +71,7 @@ if($ClientID < 1)
 		<script language="javascript">		
 		function ConfirmDelete(DomainName)
 		{
-			if(confirm("Really delete SSL for " + DomainName + "?\nThis will permanently delete the domain's certificate"))
-			{
+			if(confirm("Really delete SSL for " + DomainName + "?\nThis will permanently delete the domain's certificate")) {
 				return true;
 			}
 			return false;
@@ -171,22 +170,19 @@ if($ClientID < 1)
 							$NoteType = $_REQUEST["NoteType"];
 						}
 						
-						if(strtolower($NoteType) == "error")
-						{
+						if(strtolower($NoteType) == "error") {
 							print "<div class=\"alert alert-danger\">";
 								print "<button data-dismiss=\"alert\" class=\"close\">";
 									print "&times;";
 								print "</button>";
 								print "<i class=\"fa fa-times-circle\"></i>";
 						
-						}
-						else
-						{
+						} else {
 							print "<div class=\"alert alert-success\">";
-								print "<button data-dismiss=\"alert\" class=\"close\">";
-									print "&times;";
-								print "</button>";
-								print "<i class=\"fa fa-check-circle\"></i>";
+							print "<button data-dismiss=\"alert\" class=\"close\">";
+							print "&times;";
+							print "</button>";
+							print "<i class=\"fa fa-check-circle\"></i>";
 						}
 					
 							print $_REQUEST["Notes"];

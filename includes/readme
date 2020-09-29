@@ -1,6 +1,11 @@
+* 3.0.6 *
+= release: 2020-09-29
+ - Fixed bought SSL installation process
+ - Fixed country code lookups
+
 * 3.0.5 *
 = releaes: 2020-09-28
- - Uppdated letsencrpyt to use snapd certbot installation
+ - Updated letsencrpyt to use snapd certbot installation
 
 * 3.0.4 *
 = release: 2020-09-25

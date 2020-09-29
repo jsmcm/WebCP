@@ -25,10 +25,9 @@ if($ClientID < 1)
 $DomainID = filter_input(INPUT_GET, "DomainID", FILTER_SANITIZE_NUMBER_INT);
 $Domain = filter_input(INPUT_GET, "Domain", FILTER_SANITIZE_STRING);
 
-if($oDomain->DomainExists($Domain) != $DomainID)
-{
-        header("Location: index.php?NoteType=error&Notes=There was a problem with your request, please try again (id:cscid!id)");
-        exit();
+if($oDomain->DomainExists($Domain) != $DomainID) {
+	header("Location: index.php?NoteType=error&Notes=There was a problem with your request, please try again (id:cscid!id)");
+	exit();
 }
 
 
@@ -236,9 +235,9 @@ if($oDomain->DomainExists($Domain) != $DomainID)
                                                                                                 <span class="input-icon">
 												<?php
 												$CSR = "";
-												if(file_exists("/etc/httpd/conf/ssl/".$Domain.".csr"))
+												if(file_exists("/etc/nginx/ssl/".$Domain.".csr"))
 												{
-													$CSR = file_get_contents("/etc/httpd/conf/ssl/".$Domain.".csr");
+													$CSR = file_get_contents("/etc/nginx/ssl/".$Domain.".csr");
 												}
 												?>
                                                                                                 <textarea name="CSR" readonly style="width:650px; height: 500px; " id="form-field-11" class="form-control"><?php print $CSR; ?></textarea>
@@ -254,9 +253,9 @@ if($oDomain->DomainExists($Domain) != $DomainID)
                                                                                                 <span class="input-icon">
 												<?php
 												$CRT = "";
-												if(file_exists("/etc/httpd/conf/ssl/".$Domain.".crt"))
+												if(file_exists("/etc/nginx/ssl/".$Domain.".crt"))
 												{
-													$CRT = file_get_contents("/etc/httpd/conf/ssl/".$Domain.".crt");
+													$CRT = file_get_contents("/etc/nginx/ssl/".$Domain.".crt");
 												}
 												?>
                                                                                                 <textarea name="Certificate" style="width: 650px; height: 500px; "  id="form-field-11" class="form-control"><?php print $CRT; ?></textarea>
