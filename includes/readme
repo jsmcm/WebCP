@@ -1,3 +1,7 @@
+* 3.0.7 *
+= release: 2020-10-20
+ - Fixed links to webcp license validation
+
 * 3.0.6 *
 = release: 2020-09-29
  - Fixed bought SSL installation process
