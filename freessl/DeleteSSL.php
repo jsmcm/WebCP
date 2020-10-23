@@ -33,9 +33,20 @@ if($oDomain->DomainExists($Domain) != $DomainID)
 	exit();
 }
 
-$oDomain->deleteDomainSetting($DomainID, "letsencrypt");
+
+
+    $oSimpleNonce = new SimpleNonce();
+    $nonceArray = [
+            $oUser->Role,
+            $oUser->ClientID,
+	    $DomainID,
+	    "letsencrypt"
+    ];
+    $nonce = $oSimpleNonce->GenerateNonce("deleteDomainSetting", $nonceArray);
+
+$oDomain->deleteDomainSetting($DomainID, "letsencrypt", $nonce);
 
 file_put_contents($_SERVER["DOCUMENT_ROOT"]."/nm/".$Domain.".deletefreessl", $PrimaryDomainID);
-sleep(6);
+sleep(2);
 header("Location: index.php?NoteType=success&Notes=SSL scheduled for deletion, it could take a few minutes. Refresh the page in a short while if the domain still appears in the list.");
 
