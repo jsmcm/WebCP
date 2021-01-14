@@ -3,6 +3,14 @@
  - User passwords now use password_hash (bcrypted)
  - FTP passwords now use sha512
 
+* 3.0.8 *
+= release: 2020-10-23
+ - Added nonce to the deleteDomainSeeting call in freessl/DeleteSSL.php
+
+* 3.0.7 *
+= release: 2020-10-20
+ - Fixed links to webcp license validation
+
 * 3.0.6 *
 = release: 2020-09-29
  - Fixed bought SSL installation process
