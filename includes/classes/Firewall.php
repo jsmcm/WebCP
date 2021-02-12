@@ -259,10 +259,10 @@ class Firewall
 							//print "CountryData: ".print_r($CountryData, true)."<p>";
 
 							$CountryCode = $oUtils->GetCountryCode($result["ip"]);
-							print "CountryCode: ".print_r($CountryCode, true)."<p>";
+							//print "CountryCode: ".print_r($CountryCode, true)."<p>";
 
 							$CountryName = $oUtils->GetCountryName($CountryCode);
-							print "CountryName: ".print_r($CountryName, true)."<p>";
+							//print "CountryName: ".print_r($CountryName, true)."<p>";
 
 							$BanArray[$ArrayCount]["CountryCode"] = $CountryCode;
 							$this->EditInfo($BanArray[$ArrayCount]["ID"], $CountryCode, "country_code");

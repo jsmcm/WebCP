@@ -8,6 +8,11 @@ $nonceArray = [
 
 $nonce = $oSimpleNonce->GenerateNonce("tableExists", $nonceArray);
 
+//print "userRole: ".$oUser->Role."<p>";
+//print "clientId: ".$ClientID."<p>";
+//print "soa<p>";
+//print "dns_db: ".print_r($nonce,true)."<p>";
+
 if($oDatabase->TableExists("soa", $nonce) == false) {
 	$TableName = "soa";
 
