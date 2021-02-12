@@ -1,3 +1,8 @@
+* 3.1.1 *
+= release: 2021-02-12
+ - Removed debug output from Firewall
+ - Removed jquery file uploader plugin vulnerability
+
 * 3.1.0 *
 = release: 2021-01-14
  - User passwords now use password_hash (bcrypted)
