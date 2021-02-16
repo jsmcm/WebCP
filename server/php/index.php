@@ -1,45 +1,29 @@
 <?php
-session_start();
 
+session_start();
 include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
-$oDomain = new Domain();
+
+require_once $_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php";
+
+
 $oUser = new User();
 $oSettings = new Settings();
+$oPHP = new PHP();
 $oSimpleNonce = new SimpleNonce();
-
-require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 
 $ClientID = $oUser->getClientId();
 if($ClientID < 1) {
-	$oLog->WriteLog("DEBUG", "/domains/index.php -> client_id not set, redirecting to /index.php");
 	header("Location: /index.php");
 	exit();
 }
-	
-if($oUser->Role == "client") {
-	header("Location: ./index.php?NoteType=Error&Notes=No Permissions");
+
+if($oUser->Role != "admin") {
+	header("location: /domains/index.php?Notes=You don't have permission to be there&NoteType=error");
 	exit();
 }
 
 
-
-if(!isset($_REQUEST["DomainID"])) {
-	header("Location: index.php?NoteType=Error&Notes=Error changing package");
-	exit();
-}
-
-$DomainID = intVal($_REQUEST["DomainID"]);
-
-$random = random_int(1, 100000);
-$nonceArray = [
-	$oUser->Role,
-	$oUser->ClientID,
-	$DomainID,
-	$random
-];
-
-$nonce = $oSimpleNonce->GenerateNonce("getDomainOwner", $nonceArray);
-$DomainOwnerID = $oDomain->GetDomainOwner($DomainID, $random, $nonce);
+$phpVersions = $oPHP->getPhpVersions();
 
 ?>
 
@@ -51,7 +35,7 @@ $DomainOwnerID = $oDomain->GetDomainOwner($DomainID, $random, $nonce);
 	<!--<![endif]-->
 	<!-- start: HEAD -->
 	<head>
-		<title>Change User | <?php print $oSettings->GetWebCPTitle(); ?></title>
+		<title>PHP Selector | <?php print $oSettings->GetWebCPTitle(); ?></title>
 		<!-- start: META -->
 		<meta charset="utf-8" />
 		<!--[if IE]><meta http-equiv='X-UA-Compatible' content="IE=edge,IE=9,IE=8,chrome=1" /><![endif]-->
@@ -78,29 +62,19 @@ $DomainOwnerID = $oDomain->GetDomainOwner($DomainID, $random, $nonce);
 		<!-- start: CSS REQUIRED FOR THIS PAGE ONLY -->
 		<link rel="stylesheet" type="text/css" href="/assets/plugins/select2/select2.css" />
 		<link rel="stylesheet" href="/assets/plugins/DataTables/media/css/DT_bootstrap.css" />
+		<link rel="stylesheet" href="assets/plugins/ladda-bootstrap/dist/ladda-themeless.min.css">
+
+		<link rel="stylesheet" href="/assets/plugins/bootstrap-switch/static/stylesheets/bootstrap-switch.css">
+
+		<link rel="stylesheet" href="/assets/plugins/bootstrap-social-buttons/social-buttons-3.css">
+
+		<link href="/assets/plugins/bootstrap-modal/css/bootstrap-modal-bs3patch.css" rel="stylesheet" type="text/css"/>
+
+		<link href="/assets/plugins/bootstrap-modal/css/bootstrap-modal.css" rel="stylesheet" type="text/css"/>
+
 		<!-- end: CSS REQUIRED FOR THIS PAGE ONLY -->
 		<link rel="shortcut icon" href="/favicon.ico" />
 		
-		
-		<script language="javascript">
-
-function ValidateForm()
-{
-
-	if(document.EditUser.UserID.value == "")
-	{
-		alert("ERROR!!!\r\nPlease select the user....");
-		document.EditUser.UserID.focus();
-		return false;
-	}
-
-	return true;
-}
-
-
-		</script>
-		
-	
 
 	</head>
 	<!-- end: HEAD -->
@@ -166,22 +140,21 @@ function ValidateForm()
 							<!-- start: PAGE TITLE & BREADCRUMB -->
 							<ol class="breadcrumb">
 								<li>
-							
-									<a href="/domains/index.php">
-										Domains
+									<a href="/server/">
+										Server
+									</a>
+								</li>
+								<li>
+									<i class="active"></i>
+									<a href="/server/php/index.php">
+										PHP Versions
 									</a>
 								</li>
 					
-								<li>
-									<i class="active"></i>
-									<a href="/domains/EditUser.php">
-										Change User
-									</a>
-								</li>
 					
 							</ol>
 							<div class="page-header">
-								<h1>Change User <small> select new user for this domain</small></h1>
+								<h1>PHP Selector</h1>
 							</div>
 							<!-- end: PAGE TITLE & BREADCRUMB -->
 						</div>
@@ -227,74 +200,37 @@ function ValidateForm()
 					
 
 
-						<div class="col-md-12">
-						
-						
-							<!-- start: DYNAMIC TABLE PANEL -->
-							<div class="panel panel-default">
-									
-								<div class="panel-body">
-					
+					<div class="col-md-12">
 
-								<form name="EditUser" method="post" action="DoEditUser.php" class="form-horizontal">
-									
-										<input type="hidden" name="DomainID" value="<?php print $DomainID; ?>">
-
-										<div class="form-group">
-											<label class="col-sm-2 control-label">
-												New User:
-											</label>										
-											<div class="col-sm-4">
-												<span class="input-icon">
-												<select id="form-field-select-1" class="form-control" name="UserID" style="padding-left:20px;">
-													<option value="">select...</option>
-													<?php
-													$oUser->GetUserList($Array, $ArrayCount, $oUser->ClientID, $oUser->Role);
-
-													for($x = 0; $x < $ArrayCount; $x++)
-													{
-														print "<option value=\"".$Array[$x]["id"]."\"";
-
-														if($Array[$x]["id"] == $DomainOwnerID)
-														{
-															print " selected ";
-														}
-
-														print ">".$Array[$x]["first_name"]." ".$Array[$x]["surname"]." - ".$Array[$x]["username"]."</option>";
-													}
-
-													?>
-												</select>
-												<i class="fa clip-list-4"></i>
-												</span>										
-											</div>
-										</div>
-									
+                
+                        <h1>Select PHP Version</h1>
+                        <p>Use the buttons below to select the version of PHP you want to edit the config files for:</p>
 
 
+                        <?php
+                        foreach ($phpVersions as $version) {
+                        
+                            $nonceArray = [	
+                                $oUser->Role,
+                                $oUser->ClientID,
+                                $version
+                            ];
+                            $nonce = $oSimpleNonce->GenerateNonce("editPHPConfig", $nonceArray);
+                        
+                            print "<p>";
+                            print "<a class=\"btn btn-green btn-lg btn-block\" href=\"settings.php?version=".$version."&nonce=".$nonce["Nonce"]."&timeStamp=".$nonce["TimeStamp"]."\">";
+                            print "Edit Version: PHP ".$version." <i class=\"fa fa-arrow-circle-right\"></i>";
+                            print "</a>";
+                            print "</p>";
+                            
+                        }
+                        ?>
 
-
-							
-										<div class="form-group">										
-											<div class="col-sm-4">
-												<input type="submit" value="Switch User" data-style="zoom-in" class="btn btn-info ladda-button" onclick="return ValidateForm(); return false;">
-													<span class="ladda-spinner"></span>
-													<span class="ladda-progress" style="width: 0px;"></span>
-												</input>
-											</div>
-										</div>
-
-
-
-								</form>
-
-
-										
-								</div>
-							</div>
-							<!-- end: DYNAMIC TABLE PANEL -->
-						</div>
+                    
+                
 					</div>
+
+
 					<!-- end: PAGE CONTENT-->
 				</div>
 			</div>
@@ -311,6 +247,8 @@ function ValidateForm()
 			</div>
 		</div>
 		<!-- end: FOOTER -->
+
+
 		<!-- start: MAIN JAVASCRIPTS -->
 		<!--[if lt IE 9]>
 		<script src="/assets/plugins/respond.min.js"></script>
@@ -334,10 +272,25 @@ function ValidateForm()
 		<script type="text/javascript" src="/assets/plugins/DataTables/media/js/DT_bootstrap.js"></script>
 		<script src="/assets/js/table-data.js"></script>
 		<!-- end: JAVASCRIPTS REQUIRED FOR THIS PAGE ONLY -->
+		<script src="/assets/plugins/bootstrap-modal/js/bootstrap-modal.js"></script>
+
+		<script src="/assets/plugins/bootstrap-modal/js/bootstrap-modalmanager.js"></script>
+
+		<script src="/assets/js/ui-modals.js"></script>
+
+		<script src="/assets/plugins/ladda-bootstrap/dist/spin.min.js"></script>
+
+		<script src="/assets/plugins/ladda-bootstrap/dist/ladda.min.js"></script>
+
+		<script src="/assets/plugins/bootstrap-switch/static/js/bootstrap-switch.min.js"></script>
+
+		<script src="/assets/js/ui-buttons.js"></script>
+
+
 		<script>
 			jQuery(document).ready(function() {
 				Main.init();
-				TableData.init();
+				UIButtons.init();
 			});
 		</script>
 	</body>

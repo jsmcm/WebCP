@@ -23,6 +23,26 @@ class Domain
 		}
 	}
 
+
+	function deleteDomainSettingsByPrefix($domainId, $prefix)
+	{
+
+		try {
+			$query = $this->DatabaseConnection->prepare("UPDATE domain_settings SET deleted = 1 WHERE domain_id = :domain_id AND setting_name like '".$prefix."%'");
+
+			$query->bindParam(":domain_id", $domainId);
+
+			$query->execute();
+
+		} catch(PDOException $e) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Domain.php -> deleteDomainSettingsByPrefix(); Error = ".$e);
+		}
+
+	}
+
+
+
 	function deleteDomainSettings($domainId)
     {
 
@@ -770,21 +790,18 @@ class Domain
 	function DomainExists($DomainName) 
 	{
 
-		try
-		{
+		try {
 			$query = $this->DatabaseConnection->prepare("SELECT id FROM domains WHERE fqdn = :domain_name AND deleted = 0");
 
 			$query->bindParam(":domain_name", $DomainName);
 
 			$query->execute();
 
-			if($result = $query->fetch(PDO::FETCH_ASSOC))
-			{
+			if($result = $query->fetch(PDO::FETCH_ASSOC)) {
 				return $result["id"];
 			}
-		}
-		catch(PDOException $e)
-		{
+
+		} catch(PDOException $e) {
 			$oLog = new Log();
 			$oLog->WriteLog("error", "/class.Domain.php -> DomainExists(); Error = ".$e);
 		}

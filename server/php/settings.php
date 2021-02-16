@@ -2,44 +2,113 @@
 session_start();
 
 include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
-$oDomain = new Domain();
+
 $oUser = new User();
 $oSettings = new Settings();
+$oUtils = new Utils();
 $oSimpleNonce = new SimpleNonce();
+$oDomain = new Domain();
 
 require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 
 $ClientID = $oUser->getClientId();
 if($ClientID < 1) {
-	$oLog->WriteLog("DEBUG", "/domains/index.php -> client_id not set, redirecting to /index.php");
 	header("Location: /index.php");
 	exit();
 }
-	
-if($oUser->Role == "client") {
-	header("Location: ./index.php?NoteType=Error&Notes=No Permissions");
-	exit();
+
+
+
+
+$domainName = "";
+$domainId = 0;
+$domainSettings = [];
+
+if (isset($_GET["domain"])) {
+    $domainName = filter_var($_GET["domain"], FILTER_SANITIZE_STRING);
+    $domainId = $oDomain->DomainExists($domainName);
+    $domainSettings = $oDomain->getDomainSettings($domainId);    
 }
 
 
-
-if(!isset($_REQUEST["DomainID"])) {
-	header("Location: index.php?NoteType=Error&Notes=Error changing package");
-	exit();
-}
-
-$DomainID = intVal($_REQUEST["DomainID"]);
-
-$random = random_int(1, 100000);
-$nonceArray = [
+$nonceMeta = [
 	$oUser->Role,
-	$oUser->ClientID,
-	$DomainID,
-	$random
+	$ClientID,
+	$domainName
 ];
 
-$nonce = $oSimpleNonce->GenerateNonce("getDomainOwner", $nonceArray);
-$DomainOwnerID = $oDomain->GetDomainOwner($DomainID, $random, $nonce);
+$nonce = $oSimpleNonce->GenerateNonce("getDomainOwnerFromDomainName", $nonceMeta);
+
+$domainOwner = $oDomain->GetDomainOwnerFromDomainName($domainName, $nonce);
+
+if( ($domainOwner != $ClientID) && ($oUser->Role != "admin") ) {
+
+	header("location: /domains/index.php?Notes=You don't have permission to be there&NoteType=error");
+	exit();
+
+}
+
+
+$version = filter_var($_GET["version"], FILTER_SANITIZE_STRING);
+$nonce = filter_var($_GET["nonce"], FILTER_SANITIZE_STRING);
+$timeStamp = filter_var($_GET["timeStamp"], FILTER_SANITIZE_STRING);
+
+    
+/*
+$nonceArray = [	
+    $oUser->Role,
+    $oUser->ClientID,
+    $version
+];
+
+$nonceResult = $oSimpleNonce->VerifyNonce(
+    $nonce, 
+    "editPHPConfig", 
+    $timeStamp, 
+    $nonceArray
+);
+
+
+if ($nonceResult === false) {
+    
+    //header("location: index.php?Notes=Something went wrong, please try again.&noteType=error");
+    //exit();
+    
+}
+*/
+
+//print "<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>".print_r($domainSettings, true)."</p>";
+
+$settings = file_get_contents("/etc/php/".$version."/fpm/php.ini");
+$settingsArray = explode("\n", $settings);
+
+$phpSettings = [];
+
+foreach ($settingsArray as $setting) {
+
+    if (strstr($setting, "=")) {
+    
+        $key = trim(substr($setting, 0, strpos($setting, "=")));
+        $value = trim(substr($setting, strpos($setting, "=") + 1));
+
+        $phpSettings[$key] = $value;
+
+        if (isset($domainSettings["php_".$version."_".$key])) {
+            $phpSettings[$key] = $domainSettings["php_".$version."_".$key]["value"];
+        }
+
+    }
+
+}
+
+                        
+$nonceArray = [	
+    $oUser->Role,
+    $oUser->ClientID,
+    $version
+];
+$nonce = $oSimpleNonce->GenerateNonce("savePHPConfig", $nonceArray);
+
 
 ?>
 
@@ -51,7 +120,7 @@ $DomainOwnerID = $oDomain->GetDomainOwner($DomainID, $random, $nonce);
 	<!--<![endif]-->
 	<!-- start: HEAD -->
 	<head>
-		<title>Change User | <?php print $oSettings->GetWebCPTitle(); ?></title>
+		<title>PHP Configuration | <?php print $oSettings->GetWebCPTitle(); ?></title>
 		<!-- start: META -->
 		<meta charset="utf-8" />
 		<!--[if IE]><meta http-equiv='X-UA-Compatible' content="IE=edge,IE=9,IE=8,chrome=1" /><![endif]-->
@@ -78,29 +147,31 @@ $DomainOwnerID = $oDomain->GetDomainOwner($DomainID, $random, $nonce);
 		<!-- start: CSS REQUIRED FOR THIS PAGE ONLY -->
 		<link rel="stylesheet" type="text/css" href="/assets/plugins/select2/select2.css" />
 		<link rel="stylesheet" href="/assets/plugins/DataTables/media/css/DT_bootstrap.css" />
+		<link rel="stylesheet" href="assets/plugins/ladda-bootstrap/dist/ladda-themeless.min.css">
+
+		<link rel="stylesheet" href="/assets/plugins/bootstrap-switch/static/stylesheets/bootstrap-switch.css">
+
+		<link rel="stylesheet" href="/assets/plugins/bootstrap-social-buttons/social-buttons-3.css">
+
+		<link href="/assets/plugins/bootstrap-modal/css/bootstrap-modal-bs3patch.css" rel="stylesheet" type="text/css"/>
+
+		<link href="/assets/plugins/bootstrap-modal/css/bootstrap-modal.css" rel="stylesheet" type="text/css"/>
+
 		<!-- end: CSS REQUIRED FOR THIS PAGE ONLY -->
 		<link rel="shortcut icon" href="/favicon.ico" />
 		
 		
 		<script language="javascript">
 
-function ValidateForm()
-{
-
-	if(document.EditUser.UserID.value == "")
-	{
-		alert("ERROR!!!\r\nPlease select the user....");
-		document.EditUser.UserID.focus();
-		return false;
-	}
-
-	return true;
-}
-
+		function ValidateForm()
+		{
+			return true;
+		}
 
 		</script>
 		
-	
+		
+
 
 	</head>
 	<!-- end: HEAD -->
@@ -166,22 +237,33 @@ function ValidateForm()
 							<!-- start: PAGE TITLE & BREADCRUMB -->
 							<ol class="breadcrumb">
 								<li>
-							
-									<a href="/domains/index.php">
-										Domains
+									<a href="/server/">
+										Server
+									</a>
+								</li>
+								<li>
+									<a href="/server/php/">
+										PHP Settings
+									</a>
+								</li>
+								<li>
+									<i class="active"></i>
+									<a href="/server/php/settings.php?version=<?php print $version; ?>">
+										<?php print $version; ?>
 									</a>
 								</li>
 					
-								<li>
-									<i class="active"></i>
-									<a href="/domains/EditUser.php">
-										Change User
-									</a>
-								</li>
 					
 							</ol>
 							<div class="page-header">
-								<h1>Change User <small> select new user for this domain</small></h1>
+								<h1>PHP <?php print $version; ?> Config
+                                
+                                <?php 
+                                if ($domainName != "") {
+                                    print " - ".$domainName;
+                                }
+                                ?>
+                                </h1>
 							</div>
 							<!-- end: PAGE TITLE & BREADCRUMB -->
 						</div>
@@ -227,72 +309,123 @@ function ValidateForm()
 					
 
 
-						<div class="col-md-12">
-						
-						
-							<!-- start: DYNAMIC TABLE PANEL -->
-							<div class="panel panel-default">
-									
-								<div class="panel-body">
+					<form name="SystemSettings" action="SavePHPSettings.php" method="post">
 					
+                    <input type="hidden" name="version" value="<?php print $version; ?>">
+                    
+                    <input type="hidden" name="nonce" value="<?php print $nonce["Nonce"]; ?>">
+                    <input type="hidden" name="timeStamp" value="<?php print $nonce["TimeStamp"]; ?>">
+                                   
+                    <input type="hidden" name="domainId" value="<?php print $domainId; ?>">
+                    <input type="hidden" name="domainName" value="<?php print $domainName; ?>">
+                    
+					<div class="col-md-12">
 
-								<form name="EditUser" method="post" action="DoEditUser.php" class="form-horizontal">
-									
-										<input type="hidden" name="DomainID" value="<?php print $DomainID; ?>">
-
-										<div class="form-group">
-											<label class="col-sm-2 control-label">
-												New User:
-											</label>										
-											<div class="col-sm-4">
-												<span class="input-icon">
-												<select id="form-field-select-1" class="form-control" name="UserID" style="padding-left:20px;">
-													<option value="">select...</option>
-													<?php
-													$oUser->GetUserList($Array, $ArrayCount, $oUser->ClientID, $oUser->Role);
-
-													for($x = 0; $x < $ArrayCount; $x++)
-													{
-														print "<option value=\"".$Array[$x]["id"]."\"";
-
-														if($Array[$x]["id"] == $DomainOwnerID)
-														{
-															print " selected ";
-														}
-
-														print ">".$Array[$x]["first_name"]." ".$Array[$x]["surname"]." - ".$Array[$x]["username"]."</option>";
-													}
-
-													?>
-												</select>
-												<i class="fa clip-list-4"></i>
-												</span>										
-											</div>
-										</div>
-									
-
-
-
+						<div class="panel panel-default">
 
 							
-										<div class="form-group">										
-											<div class="col-sm-4">
-												<input type="submit" value="Switch User" data-style="zoom-in" class="btn btn-info ladda-button" onclick="return ValidateForm(); return false;">
-													<span class="ladda-spinner"></span>
-													<span class="ladda-progress" style="width: 0px;"></span>
-												</input>
-											</div>
-										</div>
 
+                                <?php 
+                                foreach ($phpSettings as $key => $value) {
 
+                                
+                                    if ($key == "zend_extension" || $key == "engine") {
+                                       
+                                        print "<input type=\"hidden\" name=\"".$key."\" value=\"".$value."\">";
+                                        
+                                        continue;
 
-								</form>
+                                    }
 
+                                ?>
+                                <div class="panel-body" style="border-bottom: 1px solid lightgrey;">
 
-										
-								</div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label" style="margin-top: 10px;">
+                                    <b><?php print $key; ?></b>:
+                                    </label>
+                                    <div class="col-sm-8">
+                                        
+                                        <?php
+                                        $key = str_replace(".", "-", $key);
+                                        ?>
+
+                                        <input name="<?php print $key; ?>" value="<?php print $value; ?>" type="text" class="form-control">
+                                  
+                                    </div>
+                                </div>
+
+                            
+                                </div>
+                                <?php
+                                }
+                                ?>
+                            
+						</div>
+					</div>
+	
+
+				    <?php
+					$colWidth = 12;
+
+					if ($domainId > 0) {
+						$colWidth = 4;
+					}
+					?>
+
+					<div class="col-md-<?php print $colWidth; ?>">
+
+							<div class="form-group" style="padding-bottom: 50px;">
+
+								<input type="submit" value="Save Configuration File" data-style="zoom-in" class="btn btn-info ladda-button" onclick="return ValidateForm(); return false;">
+
+								<span class="ladda-spinner"></span>
+								<span class="ladda-progress" style="width: 0px;"></span>
+								</input>
 							</div>
-							<!-- end: DYNAMIC TABLE PANEL -->
+
+					</div>
+
+					<?php
+                    if ($domainId > 0) {
+					?>
+					
+					<div class="col-md-8">
+
+							<div class="form-group" style="padding-bottom: 50px;">
+
+								<input type="submit" name="submitButton" value="Restore Default Configuration File" data-style="zoom-in" class="btn btn-warning ladda-button">
+
+								<span class="ladda-spinner"></span>
+								<span class="ladda-progress" style="width: 0px;"></span>
+								</input>
+							</div>
+
+					</div>
+
+					<?php
+                    }
+					?>
+                    
+                    </form>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 						</div>
 					</div>
 					<!-- end: PAGE CONTENT-->
@@ -311,6 +444,8 @@ function ValidateForm()
 			</div>
 		</div>
 		<!-- end: FOOTER -->
+
+
 		<!-- start: MAIN JAVASCRIPTS -->
 		<!--[if lt IE 9]>
 		<script src="/assets/plugins/respond.min.js"></script>
@@ -334,10 +469,25 @@ function ValidateForm()
 		<script type="text/javascript" src="/assets/plugins/DataTables/media/js/DT_bootstrap.js"></script>
 		<script src="/assets/js/table-data.js"></script>
 		<!-- end: JAVASCRIPTS REQUIRED FOR THIS PAGE ONLY -->
+		<script src="/assets/plugins/bootstrap-modal/js/bootstrap-modal.js"></script>
+
+		<script src="/assets/plugins/bootstrap-modal/js/bootstrap-modalmanager.js"></script>
+
+		<script src="/assets/js/ui-modals.js"></script>
+
+		<script src="/assets/plugins/ladda-bootstrap/dist/spin.min.js"></script>
+
+		<script src="/assets/plugins/ladda-bootstrap/dist/ladda.min.js"></script>
+
+		<script src="/assets/plugins/bootstrap-switch/static/js/bootstrap-switch.min.js"></script>
+
+		<script src="/assets/js/ui-buttons.js"></script>
+
+
 		<script>
 			jQuery(document).ready(function() {
 				Main.init();
-				TableData.init();
+				UIButtons.init();
 			});
 		</script>
 	</body>

@@ -1,3 +1,8 @@
+* 3.1.2 *
+= release: 2021-02-16
+ - Added php config screen
+ - added back in assets/plugins/jquery-cookie
+
 * 3.1.1 *
 = release: 2021-02-12
  - Removed debug output from Firewall
