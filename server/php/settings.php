@@ -23,23 +23,37 @@ if($ClientID < 1) {
 $domainName = "";
 $domainId = 0;
 $domainSettings = [];
+$pmSettings = [];
 
 if (isset($_GET["domain"])) {
-    $domainName = filter_var($_GET["domain"], FILTER_SANITIZE_STRING);
+	
+	$domainName = filter_var($_GET["domain"], FILTER_SANITIZE_STRING);
     $domainId = $oDomain->DomainExists($domainName);
-    $domainSettings = $oDomain->getDomainSettings($domainId);    
+	$domainSettings = $oDomain->getDomainSettings($domainId); 
+			
+	$pmSettings["max_children"] = "25";
+	$pmSettings["start_servers"] = "3";
+	$pmSettings["min_spare_servers"] = "2";
+	$pmSettings["max_spare_servers"] = "5";
+	$pmSettings["max_requests"] = "1000";
+	
 }
 
 
-$nonceMeta = [
-	$oUser->Role,
-	$ClientID,
-	$domainName
-];
+$domainOwner = 0;
+if ($domainName != "") {
 
-$nonce = $oSimpleNonce->GenerateNonce("getDomainOwnerFromDomainName", $nonceMeta);
+    $nonceMeta = [
+		$oUser->Role,
+		$ClientID,
+		$domainName
+	];
 
-$domainOwner = $oDomain->GetDomainOwnerFromDomainName($domainName, $nonce);
+    $nonce = $oSimpleNonce->GenerateNonce("getDomainOwnerFromDomainName", $nonceMeta);
+
+    $domainOwner = $oDomain->GetDomainOwnerFromDomainName($domainName, $nonce);
+
+}
 
 if( ($domainOwner != $ClientID) && ($oUser->Role != "admin") ) {
 
@@ -84,6 +98,7 @@ $settingsArray = explode("\n", $settings);
 
 $phpSettings = [];
 
+// get the settings from the current php.ini file
 foreach ($settingsArray as $setting) {
 
     if (strstr($setting, "=")) {
@@ -93,6 +108,7 @@ foreach ($settingsArray as $setting) {
 
         $phpSettings[$key] = $value;
 
+		// override custom values from the domain settings
         if (isset($domainSettings["php_".$version."_".$key])) {
             $phpSettings[$key] = $domainSettings["php_".$version."_".$key]["value"];
         }
@@ -101,7 +117,60 @@ foreach ($settingsArray as $setting) {
 
 }
 
-                        
+
+if (!empty($domainSettings)) {
+
+	foreach ($domainSettings as $key => $values) {
+
+		if (substr($key, 0, strlen("php_".$version."_")) == "php_".$version."_") {
+
+            if (! isset($phpSettings[substr($key, strlen("php_".$version."_"))])) {
+
+				$phpSettings[substr($key, strlen("php_".$version."_"))] = $values["value"];    
+
+			} 
+
+		} else if (substr($key, 0, strlen("php_pm_".$version."_")) == "php_pm_".$version."_") {
+			
+            if (! isset($phpSettings[substr($key, strlen("php_pm_".$version."_"))])) {
+
+				$pmSettings[substr($key, strlen("php_pm_".$version."_"))] = $values["value"];    
+
+			} 
+
+		}
+
+	}
+
+}
+
+
+// some basic pm validation
+if (!empty($pmSettings)) {
+    $validation = true;
+
+	if (intVal($pmSettings["start_servers"]) < intVal($pmSettings["min_spare_servers"])) {
+        $validation = false;
+	}
+	
+	if (intVal($pmSettings["max_spare_servers"]) < intVal($pmSettings["min_spare_servers"])) {
+        $validation = false;
+    }
+
+
+	if ($validation === false) {
+		
+		$pmSettings["max_children"] = "25";
+		$pmSettings["start_servers"] = "3";
+		$pmSettings["min_spare_servers"] = "2";
+		$pmSettings["max_spare_servers"] = "5";
+		$pmSettings["max_requests"] = "1000";
+
+	}
+
+}
+
+
 $nonceArray = [	
     $oUser->Role,
     $oUser->ClientID,
@@ -363,34 +432,132 @@ $nonce = $oSimpleNonce->GenerateNonce("savePHPConfig", $nonceArray);
                             
 						</div>
 					</div>
-	
+
+
+					<?php
+                    if ($domainId > 0 && $oUser->Role == "admin") {	
+					?>
+
+				
+					<div class="col-sm-12" style="margin-top:3em;">
+						<div class="page-header">
+							<h1>PHP <?php print $version; ?> Process Manager</h1>
+						</div>
+					</div>
+			
+				
+					<div class="col-md-12">
+
+						<div class="panel panel-default">
+
+		
+							<div class="panel-body" style="border-bottom: 1px solid lightgrey;">
+
+								<div class="form-group">
+                                    <label class="col-sm-4 control-label" style="margin-top: 10px;">
+                                    <b>pm.max_children</b>:
+                                    </label>
+                                    <div class="col-sm-8">
+                                    
+                                        <input name="pm-max_children" value="<?php print $pmSettings["max_children"]; ?>" type="text" class="form-control">
+                                  
+                                    </div>
+                                </div>
+
+                            </div>
+
+							<div class="panel-body" style="border-bottom: 1px solid lightgrey;">
+
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label" style="margin-top: 10px;">
+                                    <b>pm.start_servers</b>:
+                                    </label>
+                                    <div class="col-sm-8">
+                                    
+                                        <input name="pm-start_servers" value="<?php print $pmSettings["start_servers"]; ?>" type="text" class="form-control">
+                                  
+                                    </div>
+                                </div>
+
+
+
+							</div>
+
+							<div class="panel-body" style="border-bottom: 1px solid lightgrey;">
+
+
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label" style="margin-top: 10px;">
+                                    <b>pm.min_spare_servers</b>:
+                                    </label>
+                                    <div class="col-sm-8">
+                                    
+                                        <input name="pm-min_spare_servers" value="<?php print $pmSettings["min_spare_servers"]; ?>" type="text" class="form-control">
+                                  
+                                    </div>
+                                </div>
+
+
+							</div>
+
+							<div class="panel-body" style="border-bottom: 1px solid lightgrey;">
+
+
+
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label" style="margin-top: 10px;">
+                                    <b>pm.max_spare_servers</b>:
+                                    </label>
+                                    <div class="col-sm-8">
+                                    
+                                        <input name="pm-max_spare_servers" value="<?php print $pmSettings["max_spare_servers"]; ?>" type="text" class="form-control">
+                                  
+                                    </div>
+                                </div>
+
+
+							</div>
+
+							<div class="panel-body" style="border-bottom: 1px solid lightgrey;">
+
+
+
+
+
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label" style="margin-top: 10px;">
+                                    <b>pm.max_requests</b>:
+                                    </label>
+                                    <div class="col-sm-8">
+                                    
+                                        <input name="pm-max_requests" value="<?php print $pmSettings["max_requests"]; ?>" type="text" class="form-control">
+                                  
+                                    </div>
+                                </div>
+
+                            
+							</div>
+                            
+						</div>
+					</div>
+					<?php
+					}
+					?>
 
 				    <?php
 					$colWidth = 12;
 
 					if ($domainId > 0) {
-						$colWidth = 4;
+						$colWidth = 8;
 					}
 					?>
 
-					<div class="col-md-<?php print $colWidth; ?>">
-
-							<div class="form-group" style="padding-bottom: 50px;">
-
-								<input type="submit" value="Save Configuration File" data-style="zoom-in" class="btn btn-info ladda-button" onclick="return ValidateForm(); return false;">
-
-								<span class="ladda-spinner"></span>
-								<span class="ladda-progress" style="width: 0px;"></span>
-								</input>
-							</div>
-
-					</div>
 
 					<?php
                     if ($domainId > 0) {
 					?>
 					
-					<div class="col-md-8">
+					<div class="col-md-4">
 
 							<div class="form-group" style="padding-bottom: 50px;">
 
@@ -406,6 +573,20 @@ $nonce = $oSimpleNonce->GenerateNonce("savePHPConfig", $nonceArray);
 					<?php
                     }
 					?>
+
+					<div class="col-md-<?php print $colWidth; ?>">
+
+							<div class="form-group" style="padding-bottom: 50px;">
+
+								<input type="submit" value="Save Configuration File" data-style="zoom-in" class="btn btn-info ladda-button" onclick="return ValidateForm(); return false;">
+
+								<span class="ladda-spinner"></span>
+								<span class="ladda-progress" style="width: 0px;"></span>
+								</input>
+							</div>
+
+					</div>
+
                     
                     </form>
 

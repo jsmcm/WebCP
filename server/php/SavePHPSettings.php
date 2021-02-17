@@ -11,6 +11,7 @@ $oSettings = new Settings();
 $oDomain = new Domain();
 
 
+
 $ClientID = $oUser->getClientId();
 if($ClientID < 1) {
 	header("Location: /index.php?1");
@@ -72,7 +73,36 @@ $opCacheTagged = false;
 
 if ($domainId > 0) {
 	$oDomain->deleteDomainSettingsByPrefix($domainId, "php_".$version."_");
+	$oDomain->deleteDomainSettingsByPrefix($domainId, "php_pm_".$version."_");
 }
+
+
+// some basic pm validation
+if (isset($_POST["pm-min_spare_servers"])) {
+	
+    $validation = true;
+
+	if (intVal($_POST["pm-start_servers"]) < intVal($_POST["pm-min_spare_servers"])) {
+        $validation = false;
+	}
+	
+	if (intVal($_POST["pm-max_spare_servers"]) < intVal($_POST["pm-min_spare_servers"])) {
+        $validation = false;
+    }
+
+
+	if ($validation === false) {
+		
+		$_POST["pm-max_children"] = "25";
+		$_POST["pm-start_servers"] = "3";
+		$_POST["pm-min_spare_servers"] = "2";
+		$_POST["pm-max_spare_servers"] = "5";
+		$_POST["pm-max_requests"] = "1000";
+
+	}
+
+}
+
 
 foreach ($_POST as $key => $value) {
 
@@ -90,17 +120,35 @@ foreach ($_POST as $key => $value) {
 
 		if ( ($domainId > 0) && ($deleteSettingsOnly === false) ) {
 
-			$nonceArray = [
-				$oUser->Role,
-				$ClientID,
-				$domainId,
-				"php_".$version."_".$key,
-				$value
-			];
+			if (substr($key, 0, 3) == "pm.") {
 			
-			$nonce = $oSimpleNonce->GenerateNonce("saveDomainSetting", $nonceArray);
-			$oDomain->saveDomainSetting($domainId, "php_".$version."_".$key, $value, "", "", $nonce);
+				$key = substr($key, 3);
+
+				$nonceArray = [
+					$oUser->Role,
+					$ClientID,
+					$domainId,
+					"php_pm_".$version."_".$key,
+					$value
+				];
+				
+				$nonce = $oSimpleNonce->GenerateNonce("saveDomainSetting", $nonceArray);
+				$oDomain->saveDomainSetting($domainId, "php_pm_".$version."_".$key, $value, "", "", $nonce);
 			
+			} else {
+
+				$nonceArray = [
+					$oUser->Role,
+					$ClientID,
+					$domainId,
+					"php_".$version."_".$key,
+					$value
+				];
+				
+				$nonce = $oSimpleNonce->GenerateNonce("saveDomainSetting", $nonceArray);
+				$oDomain->saveDomainSetting($domainId, "php_".$version."_".$key, $value, "", "", $nonce);
+				
+			}
 
 		}
 		
