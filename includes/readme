@@ -1,3 +1,7 @@
+* 3.2.0 *
+= release: 2021-02-17
+ - Added PM settings to php config screens
+
 * 3.1.2 *
 = release: 2021-02-16
  - Added php config screen
