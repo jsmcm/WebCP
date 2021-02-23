@@ -1,3 +1,7 @@
+* 3.2.1 *
+= release: 2021-02-23
+ - Added backups to AWS S3
+
 * 3.2.0 *
 = release: 2021-02-17
  - Added PM settings to php config screens
