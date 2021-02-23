@@ -6,6 +6,18 @@ class Utils
 {
 
 
+
+	function __construct()
+	{
+
+		if ( ! file_exists("/tmp/webcp/") ) {
+			mkdir("/tmp/webcp");
+		}
+
+	}
+
+
+
 	function slugify($string)
 	{
         return strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $string), '-'));
@@ -631,6 +643,21 @@ class Utils
 		$Countries = $this->GetCountryCodeArray();
 		return $Countries[strtoupper($CountryCode)];
 	}
+	
+
+
+    function generateRandomString($length = 10)
+    {
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $charactersLength = strlen($characters);
+        $randomString = '';
+        for ($i = 0; $i < $length; $i++) {
+            $randomString .= $characters[rand(0, $charactersLength - 1)];
+        }
+        return $randomString;
+    }
+
+
 	
 
 	function GetCountryCodeArray()
