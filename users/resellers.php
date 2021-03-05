@@ -1,22 +1,12 @@
 <?php
 session_start();
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 $oUser = new User();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
 $oDomain = new Domain();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Reseller.php");
 $oReseller = new Reseller();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Settings.php");
 $oSettings = new Settings();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Package.php");
 $oPackage = new Package();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Utils.php");
 $oUtils = new Utils();
 
 $UserID = $oUser->getClientId();
@@ -308,6 +298,16 @@ $oReseller->deleteOldResellers();
 									
 									</table>
 							
+									<?php
+									
+									if(($oUser->Role == "admin") || ($oUser->Role == "reseller") ) {
+									?>
+										<a class="btn btn-primary" href="AddUser.php?r"><i class="fa fa-plus"></i>
+										Add new Reseller</a>
+									<?php
+									}
+									?>
+									
 								</div>
 							</div>
 							<!-- end: DYNAMIC TABLE PANEL -->

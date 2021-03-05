@@ -3,14 +3,14 @@ session_start();
 
 $somecontent = "";
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
+
 $oUser = new User();
 $TempPassword = $oUser->ResetPassword($_POST["email"]);
 $UserName = $oUser->GetUserName($oUser->UserExistsByEmail($_POST["email"]));
 
 if($UserName != "")
 {
-	require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Settings.php");
 	$oSettings = new Settings();
 	$BCC = $oSettings->GetForwardSystemEmailsTo();
 
@@ -49,5 +49,5 @@ if($UserName != "")
      	$mail->Send();
     
 }
+
 header("Location: index.php?Notes=Password reset mail sent...");    
-?>

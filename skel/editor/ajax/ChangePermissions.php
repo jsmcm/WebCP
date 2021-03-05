@@ -10,4 +10,3 @@ if(file_exists($FileName))
 }
 
 print substr(sprintf('%o', fileperms($FileName)), -4);
-?>

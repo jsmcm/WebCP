@@ -1,13 +1,10 @@
 <?php
 session_start();
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
+
 $oUser = new User();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Settings.php");
 $oSettings = new Settings();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
 $oDomain = new Domain();
 
 require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
@@ -172,28 +169,25 @@ function DomainInArray($LookInArray, $Domain)
 
 <?php
 $PublicKey = "";
-if( file_exists("/etc/exim4/dkim.public.key") )
-{
+if( file_exists("/etc/exim4/dkim.public.key") ) {
 	$PublicKey = file_get_contents("/etc/exim4/dkim.public.key");
 
 	$x = strpos($PublicKey, "-----BEGIN PUBLIC KEY-----");
 
-	if( $x !== false)
-	{
+	if( $x !== false) {
 		$PublicKey = trim(substr($PublicKey, $x + strlen("-----BEGIN PUBLIC KEY-----")));
 	}
 
-	
 	$x = strpos($PublicKey, "--");
 		
-	if( $x !== false)
-	{
+	if( $x !== false) {
 		$PublicKey = trim(substr($PublicKey, 0, $x));
 	}
 
-}
-else
-{
+	$PublicKey = str_replace("\r\n", "", $PublicKey);
+	$PublicKey = str_replace("\n", "", $PublicKey);
+
+} else {
 	print "<h2>Dkim keys not yet set up. This could take up to 24 hours. If you've waited more than 24 hours, please contact WebCP.pw support</h2>";
 	exit();
 }
@@ -201,18 +195,18 @@ else
 					<div class="row">
 					
 						<div class="col-md-12">
-							<b>Note: </b> You cannot simply turn DKIM on. You MUST create the DNS record with your DNS provivider (if you're using WebCP's built in DNS its automatic and then you can just turn it on here!)
+							<b>Note: </b> You cannot simply turn DKIM on. You MUST create the DNS record with your DNS provider (if you're using WebCP's built in DNS its automatic and then you can just turn it on here!)
 
 <p>&nbsp;<br>
 Once you've turned DKIM on here you must create a <b>txt</b> record for: 
-<p>&nbsp;<p><b>x._domainkey.<i>YOUR_DOMAIN</i></b> with a value of:<p>&nbsp;<p>
-v=DKIM1; k=rsa; p=<?php print $PublicKey; ?></p>
+<p>&nbsp;<p><b>x._domainkey.<i>YOUR_DOMAIN</i></b> with a value of:<p>&nbsp;
+<p style="-ms-word-break: break-all; word-break: break-all; word-break: break-word;">v=DKIM1; k=rsa; p=<?php print $PublicKey; ?></p>
 
 <p>&nbsp;<br>
 <b>NOTE:</b> Switch <i>YOUR_DOMAIN</i> for your actual domain, eg, x._domainkey.example.com
 
 <p>&nbsp;<br>
-See our post about <a href="https://webcp.pw/spf-dkim-dmarc" target="_blank">SPF, DKIM and DMARC</a> for more info.
+See our post about <a href="https://webcp.io/spf-dkim-dmarc" target="_blank">SPF, DKIM and DMARC</a> for more info.
 </p>
 						</div>
 					</div>

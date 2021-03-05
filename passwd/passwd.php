@@ -1,44 +1,31 @@
 <?php
 session_start();
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 $oUser = new User();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Package.php");
 $oPackage = new Package();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Log.php");
 $oLog = new Log();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
 $oDomain = new Domain();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Settings.php");
 $oSettings = new Settings(); 
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Reseller.php");
 $oReseller = new Reseller();
 
 require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 
 $ClientID = $oUser->getClientId();
-if($ClientID < 1)
-{
-        header("Location: /passwd/");
-        exit();
+if($ClientID < 1) {
+	header("Location: /passwd/");
+	exit();
 }
 
 
 
 $URL = $_REQUEST["URL"];
 
-if(isset($_REQUEST["Path"]))
-{
+if(isset($_REQUEST["Path"])) {
 	$Path = $_REQUEST["Path"];
 }
 
-if(substr($Path, strlen($Path) - 1) != "/")
-{
+if(substr($Path, strlen($Path) - 1) != "/") {
 	$Path = $Path."/";
 }
 
@@ -52,25 +39,27 @@ print "client_id: ".$ClientID."<br>";
 exit();
 */
 
-	
-$DomainOwnerID = $oDomain->GetDomainOwnerFromDomainName($URL);  
+$nonceArray = [
+	$oUser->Role,
+	$oUser->ClientID,
+	$URL
+];
+
+$oSimpleNonce = new SimpleNonce();
+$nonce = $oSimpleNonce->GenerateNonce("getDomainOwnerFromDomainName", $nonceArray);
+$DomainOwnerID = $oDomain->GetDomainOwnerFromDomainName($URL, $nonce);  
   
-if($oUser->Role == "client")  
-{  
-        if($DomainOwnerID != $ClientID)  
-        {  
+if($oUser->Role == "client")   {  
+	if($DomainOwnerID != $ClientID)   {  
 		header("location: index.php?Notes=You do not have permission to access this sites detail");
-                exit();  
-        }  
-}  
-else if($oUser->Role == "reseller")  
-{  
+		exit();  
+	}  
+} else if($oUser->Role == "reseller")   {  
         $ResellerID = $oReseller->GetDomainResellerID($URL);  
   
-        if( ($DomainOwnerID != $ClientID) && ($ResellerID != $ClientID) )  
-        {  
-		header("location: index.php?Notes=You do not have permission to access this sites detail");
-                exit();  
+        if( ($DomainOwnerID != $ClientID) && ($ResellerID != $ClientID) ) {  
+			header("location: index.php?Notes=You do not have permission to access this sites detail");
+            exit();  
         }  
 }  
 

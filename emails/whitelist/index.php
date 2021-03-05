@@ -1,16 +1,10 @@
 <?php
 session_start();
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 $oUser = new User();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
 $oDomains = new Domain();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Settings.php");
 $oSettings = new Settings();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Email.php");
 $oEmail = new Email();
 
 require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");

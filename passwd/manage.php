@@ -1,39 +1,27 @@
 <?php
 session_start();
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 $oUser = new User();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Package.php");
 $oPackage = new Package();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Log.php");
 $oLog = new Log();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
 $oDomain = new Domain();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Settings.php");
 $oSettings = new Settings();
 
 $ClientID = $oUser->getClientId();
-if($ClientID < 1)
-{
-        header("Location: /passwd/");
-        exit();
+if($ClientID < 1) {
+	header("Location: /passwd/");
+	exit();
 }
 
 
 
 $URL = $_REQUEST["URL"];
-
-if(isset($_REQUEST["Path"]))
-{
-	$Path = $_REQUEST["Path"];
+if(isset($_REQUEST["Path"])) {
+	$Path = filter_var($_REQUEST["Path"], FILTER_SANITIZE_STRING);
 }
 
-if(substr($Path, strlen($Path) - 1) != "/")
-{
+if(substr($Path, strlen($Path) - 1) != "/") {
 	$Path = $Path."/";
 }
 
@@ -47,8 +35,15 @@ print "client_id: ".$ClientID."<br>";
 exit();
 */
 
-if( ($oDomain->GetDomainOwnerFromDomainName($URL) != $ClientID) && ($oUser->Role != "admin") )
-{
+$nonceArray = [
+	$oUser->Role,
+	$oUser->ClientID,
+	$URL
+];
+
+$oSimpleNonce = new SimpleNonce();
+$nonce = $oSimpleNonce->GenerateNonce("getDomainOwnerFromDomainName", $nonceArray);
+if( ($oDomain->GetDomainOwnerFromDomainName($URL, $nonce) != $ClientID) && ($oUser->Role != "admin") ) {
 	header("location: index.php?Notes=You do not have permission to access this sites detail");
 	exit();
 }
@@ -77,8 +72,7 @@ $UserArray = array();
 $Title = "";
 $PasswordFileFromHTAccess = "";
 
-if($ResultString != "")
-{
+if($ResultString != "") {
 	//print "<p>HTACCESS<p>";
 	//print $ResultString;
 	//print "<p>";
@@ -86,22 +80,18 @@ if($ResultString != "")
 	// Header
 	// PasswordFileFromHTAccess
 
-	if(strstr($ResultString, "AuthType Basic"))
-	{
+	if(strstr($ResultString, "AuthType Basic")) {
 		$DirectoryProtected = true;
 	}
 
 	$Title = trim(substr($ResultString, strpos($ResultString, "AuthName") + 8));
-
 	$Title = trim(substr($Title,0, strpos($Title, "\n")));
 
-	if(substr($Title, 0, 1) == "\"")
-	{
+	if(substr($Title, 0, 1) == "\"") {
 		$Title = substr($Title, 1);
 	}
 
-	if(substr($Title, strlen($Title) - 1) == "\"")
-	{
+	if(substr($Title, strlen($Title) - 1) == "\"") {
 		$Title = substr($Title, 0, strlen($Title) - 1);
 	}
 

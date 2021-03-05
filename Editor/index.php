@@ -228,8 +228,12 @@ if($ClientID < 1)
                                                                                         if($Array[$x]["type"] == 'primary')
                                                                                         {
                                                                                                 print "<tr>";
-
-                                                                                                print "<td><a target=\"_blank\" href=\"http://".$Array[$x]["domain_name"].":20010/login.php?Nonce=".$NonceValues["Nonce"]."&TimeStamp=".$NonceValues["TimeStamp"]."\" style=\"background:transparent; color:#4D81CC; border: 0;\">".$Array[$x]["domain_name"]."</a></td>\r\n";
+														
+												if ( file_exists("/etc/letsencrypt/renewal/".$Array[$x]["domain_name"].".conf") ) {
+													print "<td><a target=\"_blank\" href=\"https://".$Array[$x]["domain_name"].":2053/login.php?Nonce=".$NonceValues["Nonce"]."&TimeStamp=".$NonceValues["TimeStamp"]."\" style=\"background:transparent; color:#4D81CC; border: 0;\">".$Array[$x]["domain_name"]."</a></td>\r\n";
+												} else {
+													print "<td><a target=\"_blank\" href=\"http://".$Array[$x]["domain_name"].":2052/login.php?Nonce=".$NonceValues["Nonce"]."&TimeStamp=".$NonceValues["TimeStamp"]."\" style=\"background:transparent; color:#4D81CC; border: 0;\">".$Array[$x]["domain_name"]."</a></td>\r\n";
+												}
                                                                                                 print "</tr>";
                                                                                         }
 										}

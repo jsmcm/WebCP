@@ -1,90 +1,115 @@
 <?php
 session_start();
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 $oUser = new User();
-
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.SimpleNonce.php");
 $oSimpleNonce = new SimpleNonce();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Settings.php");
 $oSettings = new Settings();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Reseller.php");
 $oReseller = new Reseller();
 
 require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
 $oDomain = new Domain();
 
 $ClientID = $oUser->getClientId();
-if($ClientID < 1)
-{
-        header("Location: /domains/");
-        exit();
+if($ClientID < 1) {
+	header("Location: /domains/");
+	exit();
 }
 
 
 
 $URL = "";
-if(isset($_REQUEST["URL"]))
-{
+if(isset($_REQUEST["URL"])) {
 	$URL = $_REQUEST["URL"];
-}
-else
-{
+} else {
 	header("location: index.php?Notes=URL not set");
 	exit();
 }
-$DomainOwnerID = $oDomain->GetDomainOwnerFromDomainName($URL);
 
-if($oUser->Role == "client")
-{
-	if($DomainOwnerID != $ClientID)
-	{
+
+$nonceArray = [
+	$oUser->Role,
+	$oUser->ClientID,
+	$URL
+];
+
+$oSimpleNonce = new SimpleNonce();
+$nonce = $oSimpleNonce->GenerateNonce("getDomainOwnerFromDomainName", $nonceArray);
+$DomainOwnerID = $oDomain->GetDomainOwnerFromDomainName($URL, $nonce);  
+  
+if($oUser->Role == "client") {
+	if($DomainOwnerID != $ClientID) {
 		header("location: index.php?Notes=permission not set");
-	        exit();
+		exit();
 	}
-}
-else if($oUser->Role == "reseller")
-{
+} else if($oUser->Role == "reseller") {
 	$ResellerID = $oReseller->GetDomainResellerID($URL);
 
-	if( ($DomainOwnerID != $ClientID) && ($ResellerID != $ClientID) )
-	{
+	if( ($DomainOwnerID != $ClientID) && ($ResellerID != $ClientID) ) {
 		header("location: index.php?Notes=permission not set");
-	        exit();
+		exit();
 	}
 }
 
 $MaxJobs = 10;
-if(file_exists($_SERVER["DOCUMENT_ROOT"]."/cron/max_jobs.dat"))
-{
+if(file_exists($_SERVER["DOCUMENT_ROOT"]."/cron/max_jobs.dat")) {
 	$MaxJobs = (int)file_get_contents($_SERVER["DOCUMENT_ROOT"]."/cron/max_jobs.dat");
 }
 
 $Action = "getUserCron";
 $Meta = array();
-array_push($Meta, $_SERVER["SERVER_ADDR"]);
+array_push($Meta, $URL);
 
 $NonceValues = $oSimpleNonce->GenerateNonce($Action, $Meta);
 
-
 $c = curl_init();
 curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
-curl_setopt($c, CURLOPT_URL, "http://".$URL.":20020/read.php?Nonce=".$NonceValues["Nonce"]."&TimeStamp=".$NonceValues["TimeStamp"]);
+if ( file_exists("/etc/letsencrypt/renewal/".$URL.".conf") ) {
+	curl_setopt($c, CURLOPT_URL, "https://".$URL.":2083/read.php?Nonce=".$NonceValues["Nonce"]."&TimeStamp=".$NonceValues["TimeStamp"]);
+	curl_setopt($c, CURLOPT_SSL_VERIFYPEER, false);
+} else {
+	curl_setopt($c, CURLOPT_URL, "http://".$URL.":2082/read.php?Nonce=".$NonceValues["Nonce"]."&TimeStamp=".$NonceValues["TimeStamp"]);
+}
+
+
+
+
 $ResultString = trim(curl_exec($c));
 curl_close($c);
 
 
-if(trim($ResultString) != "")
-{
+if(trim($ResultString) != "") {
 	$CronArray = explode("\n", $ResultString);
-}
-else
-{
+
+	if (!empty($CronArray)) {
+
+
+		$domainId = $oDomain->GetDomainIDFromDomainName($URL);
+	
+		$random = random_int(1, 1000000);
+		
+		$nonceArray = [	
+			$oUser->Role,
+			$oUser->ClientID,
+			$domainId,
+			$random
+		];
+		$nonce = $oSimpleNonce->GenerateNonce("getDomainInfo", $nonceArray);
+		
+		$DomainInfoArray = array();
+		$oDomain->GetDomainInfo($domainId, $random, $DomainInfoArray, $nonce);
+
+		// rename user directories to user friendly version (to "overcome" jailed dirs)
+		for($x = 0; $x < count($CronArray); $x++) {
+
+			$CronArray[$x] = str_replace("/home/".$DomainInfoArray["UserName"]."/home/".$DomainInfoArray["UserName"], "/home/".$DomainInfoArray["UserName"], $CronArray[$x]);
+		
+		}
+		
+	}	
+
+} else {
 	$CronArray = array();
 }
 

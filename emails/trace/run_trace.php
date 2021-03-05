@@ -1,7 +1,6 @@
 <?php
 
-include_once("/var/www/html/webcp/includes/classes/class.Database.php");
-include_once("/var/www/html/webcp/includes/classes/class.Log.php");
+include_once "/var/www/html/webcp/vendor/autoload.php";
 
 $serverName = gethostname();
 
@@ -973,8 +972,8 @@ while (false !== ($line = fgets(STDIN)))
 
 
                         file_put_contents("/tmp/mailbandnsbl", "ToDomain: ".$ToDomain."; FromDomain: ".$FromDomain.";  IPAddress: ".$IPAddress."\r\n", FILE_APPEND);
-                        if($ToDomain = $FromDomain)
-                        {
+                        //if($ToDomain = $FromDomain)
+                        //{
                                 if($IPAddress != "")
                                 {
                                         $FileName = "/var/www/html/webcp/fail2ban/tmp/add.ban";
@@ -984,7 +983,7 @@ while (false !== ($line = fgets(STDIN)))
                                         fclose($fh);
 
                                 }
-                        } 
+                        //} 
 						 
 		}
 
@@ -1183,8 +1182,8 @@ while (false !== ($line = fgets(STDIN)))
 			$FromDomain = substr($From, strpos($From, "@") + 1);
 
 			//file_put_contents("/tmp/mailban", "ToDomain: ".$ToDomain."; FromDomain: ".$FromDomain.";  IPAddress: ".$IPAddress."\r\n", FILE_APPEND);
-			if($ToDomain = $FromDomain)
-			{
+			//if($ToDomain = $FromDomain)
+			//{
 				if($IPAddress != "")
 				{
 			                $FileName = "/var/www/html/webcp/fail2ban/tmp/add.ban";
@@ -1194,7 +1193,7 @@ while (false !== ($line = fgets(STDIN)))
 			                fclose($fh);
 
 				}
-			}	
+			//}	
 				
 			InsertEmailTrace("", $ToUser, $FromUser, $Date, $Time, $RemoteHost, "", "", 0, "", $From, $For, $Confirmation);
 			 
@@ -1214,4 +1213,3 @@ unlink($LockFile);
 //print "\r\nArray: \r\n";
 //print_r($UserNameArray);
 
-?>

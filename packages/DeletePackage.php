@@ -1,10 +1,9 @@
 <?php
 session_start();
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Package.php");
-$oPackage = new Package();
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
+$oPackage = new Package();
 $oUser = new User();
 
 if($oUser->Role == "client")
@@ -13,18 +12,13 @@ if($oUser->Role == "client")
         exit();
 }
 
-	if($oPackage->DeletePackage($_REQUEST["PackageID"], $oUser->Role, $oUser->ClientID) == 1)
-	{
-		$Notes="Package Deleted";
-	}
-	else
-	{	
-		$Notes="Package cannot be deleted";
-	}
+if($oPackage->DeletePackage($_REQUEST["PackageID"], $oUser->Role, $oUser->ClientID) == 1)
+{
+	$Notes="Package Deleted";
+}
+else
+{	
+	$Notes="Package cannot be deleted";
+}
 
-	header("location: index.php?Notes=".$Notes);	
-
-exit();
-
-?>
-
+header("location: index.php?Notes=".$Notes);	

@@ -1,7 +1,9 @@
 <?php
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 $oUser = new User();
+
+require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 
 $ClientID = $oUser->getClientId();
 if($ClientID < 1)
@@ -16,7 +18,6 @@ if(isset($_GET["EmailTraceID"]))
 	$ID = $_GET["EmailTraceID"];
 }
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Email.php");
 $oEmail = new Email();
 
 

@@ -29,11 +29,11 @@ class Settings
      	} catch (Exception $e) {
 
 	    if ($e->getMessage() == "class.Database->getConnection Matomo\Ini not found") {
-		print "<h1>Missing dependencies</h1><p>I'm going to try and install them. This might take several minutes. Please wait 30 minutes then try again</p><p>If you've already waited 30 minutes and still see this please contact support@webcp.pw for support</p>";
+		print "<h1>Missing dependencies</h1><p>I'm going to try and install them. This might take several minutes. Please wait 30 minutes then try again</p><p>If you've already waited 30 minutes and still see this please contact support@webcp.io for support</p>";
 
                 touch($_SERVER["DOCUMENT_ROOT"]."/nm/composer_install");
             } else {
-                print "<h1>Unknown Error</h1><p>Something bad happened and I can't continue. Please contact support@webcp.pw for support</p>";
+                print "<h1>Unknown Error</h1><p>Something bad happened and I can't continue. Please contact support@webcp.io for support</p>";
             }
 
             exit();   		    
@@ -112,7 +112,7 @@ class Settings
 
 		if($ReturnValue == "")
 		{
-			$ReturnValue = "<a href=\"http://webcp.pw\" target=\"_new\">Web <i class=\"clip-globe\"></i> CP</a>";
+			$ReturnValue = "<a href=\"https://webcp.io\" target=\"_new\">Web <i class=\"clip-globe\"></i> CP</a>";
 		}
 
 		return $ReturnValue;
@@ -384,161 +384,244 @@ class Settings
 		return $this->AddSettings($SettingsArray);
 	}
 
-     function GetFTPBackupSettings(&$FTPSettingsArray)
-     {
-          $FTPSettingsArray = array();
 
-          try
-          {
-               $query = $this->DatabaseConnection->prepare("SELECT setting, value FROM server_settings WHERE deleted = 0 AND setting IN ('FTPRemotePath', 'FTPHost', 'FTPUserName', 'FTPPassword');");
-               $query->execute();
+	
+	function GetFTPBackupSettings(&$FTPSettingsArray)
+	{
+		$FTPSettingsArray = array();
 
-               while($result = $query->fetch(PDO::FETCH_ASSOC))
-               {
-                    $FTPSettingsArray[trim($result["setting"])] = trim($result["value"]);
-               }
-          }
-          catch(PDOException $e)
-          {
-               $oLog = new Log();
-               $oLog->WriteLog("error", "/class.Settings.php -> GetFTPBackupSettings(); Error = ".$e);
-          }
-     }
+		try {
+			$query = $this->DatabaseConnection->prepare("SELECT setting, value FROM server_settings WHERE deleted = 0 AND setting IN ('FTPRemotePath', 'FTPHost', 'FTPUserName', 'FTPPassword');");
+			$query->execute();
 
+			while($result = $query->fetch(PDO::FETCH_ASSOC)) {
+				$FTPSettingsArray[trim($result["setting"])] = trim($result["value"]);
+			}
 
+		}
+		catch(PDOException $e) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Settings.php -> GetFTPBackupSettings(); Error = ".$e);
+		}
+	}
 
 
-     function GetBackupSettings($Frequency, &$BackupSettingsArray)
-     {
-          $BackupSettingsArray = array();
-
-          try
-          {
-               $query = $this->DatabaseConnection->prepare("SELECT setting, value FROM server_settings WHERE deleted = 0 AND extra1 = :frequency AND setting IN ('BackupStatus', 'BackupWhat', 'BackupUseFTP', 'BackupFTPCount');");     
-		$query->bindParam(":frequency", $Frequency);
-		  
-               $query->execute();
-
-               while($result = $query->fetch(PDO::FETCH_ASSOC))
-               {
-                    $BackupSettingsArray[trim($result["setting"])] = trim($result["value"]);
-               }
-          }
-          catch(PDOException $e)
-          {
-               $oLog = new Log();
-               $oLog->WriteLog("error", "/class.Settings.php -> GetBackupSettings(); Error = ".$e);
-          }
-     }
 
 
-     function DeleteFTPBackupSettings()
-     {
+	
+	function getAWSBackupSettings()
+	{
+		$awsSettingsArray = array();
 
-          try
-          {
-               $query = $this->DatabaseConnection->prepare("UPDATE server_settings SET deleted = 1 WHERE setting IN ('FTPRemotePath', 'FTPHost', 'FTPUserName', 'FTPPassword');");
-               $query->execute();
-          }
-          catch(PDOException $e)
-          {
-               $oLog = new Log();
-               $oLog->WriteLog("error", "/class.Settings.php -> DeleteFTPBackupSettings(); Error = ".$e);
-          }
-     }
-     
-     
-     function SaveBackupFTPSettings($FTPHost, $FTPRemotePath, $FTPUserName, $FTPPassword)
-     {
+		try {
 
-	  $this->DeleteFTPBackupSettings();
-	     
-          try
-          {
+			$query = $this->DatabaseConnection->prepare("SELECT setting, value FROM server_settings WHERE deleted = 0 AND setting IN ('AWSBackupBucket', 'AWSBackupRegion', 'AWSBackupKeyId', 'AWSBackupSecretKey');");
+			$query->execute();
+
+			while($result = $query->fetch(PDO::FETCH_ASSOC)) {
+				$awsSettingsArray[trim($result["setting"])] = trim($result["value"]);
+			}
+
+		} catch(PDOException $e) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Settings.php -> getAWSBackupSettings(); Error = ".$e);
+		}
+
+		if (empty($awsSettingsArray)) {
+			return false;
+		}
+
+		return $awsSettingsArray;
+
+	}
+
+
+
+
+	function GetBackupSettings($Frequency, &$BackupSettingsArray)
+	{
+		$BackupSettingsArray = array();
+
+		try {
+			$query = $this->DatabaseConnection->prepare("SELECT setting, value FROM server_settings WHERE deleted = 0 AND extra1 = :frequency AND setting IN ('BackupStatus', 'BackupWhat', 'BackupUseFTP', 'BackupUseAWS', 'BackupFTPCount');");     
+			$query->bindParam(":frequency", $Frequency);
 		
-               $query = $this->DatabaseConnection->prepare("INSERT INTO server_settings VALUES (0, 'FTPHost', :ftp_host, '', '', 0);");
-               $query->bindParam(":ftp_host", $FTPHost);
-	       $query->execute();
-		  
-               $query = $this->DatabaseConnection->prepare("INSERT INTO server_settings VALUES (0, 'FTPRemotePath', :ftp_remote_path, '', '', 0);");
-               $query->bindParam(":ftp_remote_path", $FTPRemotePath);
-	       $query->execute();		  
-		  
-               $query = $this->DatabaseConnection->prepare("INSERT INTO server_settings VALUES (0, 'FTPUserName', :ftp_user_name, '', '', 0);");
-               $query->bindParam(":ftp_user_name", $FTPUserName);
-	       $query->execute();
+			$query->execute();
 
-               $query = $this->DatabaseConnection->prepare("INSERT INTO server_settings VALUES (0, 'FTPPassword', :ftp_password, '', '', 0);");
-               $query->bindParam(":ftp_password", $FTPPassword);
-	       $query->execute();		  
-  
+			while($result = $query->fetch(PDO::FETCH_ASSOC)) {
+				$BackupSettingsArray[trim($result["setting"])] = trim($result["value"]);
+			}
+		} catch(PDOException $e) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Settings.php -> GetBackupSettings(); Error = ".$e);
+		}
+
+	}
+
+
+	function DeleteFTPBackupSettings()
+	{
+
+		try {
+			$query = $this->DatabaseConnection->prepare("UPDATE server_settings SET deleted = 1 WHERE setting IN ('FTPRemotePath', 'FTPHost', 'FTPUserName', 'FTPPassword');");
+			$query->execute();
+		} catch(PDOException $e) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Settings.php -> DeleteFTPBackupSettings(); Error = ".$e);
+		}
+
+	}
+
+
+	function SaveBackupFTPSettings($FTPHost, $FTPRemotePath, $FTPUserName, $FTPPassword)
+	{
+
+		$this->DeleteFTPBackupSettings();
 		
-          }
-          catch(PDOException $e)
-          {
-               $oLog = new Log();
-               $oLog->WriteLog("error", "/class.Settings.php -> SaveBackupFTPSettings(); Error = ".$e);
-          }
-     }
+		try {
+	
+			$query = $this->DatabaseConnection->prepare("INSERT INTO server_settings VALUES (0, 'FTPHost', :ftp_host, '', '', 0);");
+			$query->bindParam(":ftp_host", $FTPHost);
+			$query->execute();
+		
+			$query = $this->DatabaseConnection->prepare("INSERT INTO server_settings VALUES (0, 'FTPRemotePath', :ftp_remote_path, '', '', 0);");
+			$query->bindParam(":ftp_remote_path", $FTPRemotePath);
+			$query->execute();		  
+		
+			$query = $this->DatabaseConnection->prepare("INSERT INTO server_settings VALUES (0, 'FTPUserName', :ftp_user_name, '', '', 0);");
+			$query->bindParam(":ftp_user_name", $FTPUserName);
+			$query->execute();
 
-     
-     
-     
-     
-     
-     function DeleteBackupSettings($Frequency)
-     {
+			$query = $this->DatabaseConnection->prepare("INSERT INTO server_settings VALUES (0, 'FTPPassword', :ftp_password, '', '', 0);");
+			$query->bindParam(":ftp_password", $FTPPassword);
+			$query->execute();		  
 
-          try
-          {
-               $query = $this->DatabaseConnection->prepare("UPDATE server_settings SET deleted = 1 WHERE extra1 = :frequency AND setting IN ('BackupStatus', 'BackupWhat', 'BackupUseFTP', 'BackupFTPCount');");
-	       $query->bindParam(":frequency", $Frequency);
-               $query->execute();
-          }
-          catch(PDOException $e)
-          {
-               $oLog = new Log();
-               $oLog->WriteLog("error", "/class.Settings.php -> DeleteBackupSettings(); Error = ".$e);
-          }
-     }
+	
+		} catch(PDOException $e) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Settings.php -> SaveBackupFTPSettings(); Error = ".$e);
+		}
+
+	}
+
+	
+
+
+	function deleteAwsBackupSettings()
+	{
+
+		try {
+
+			$query = $this->DatabaseConnection->prepare("UPDATE server_settings SET deleted = 1 WHERE setting IN ('AWSBackupBucket', 'AWSBackupRegion', 'AWSBackupKeyId', 'AWSBackupSecretKey');");
+			$query->execute();
+
+		} catch(PDOException $e) {
+			
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Settings.php -> deleteAwsBackupSettings(); Error = ".$e);
+		
+		}
+
+	}
+
+
+	
+	function saveBackupAwsSettings($awsBucketName, $awsRegion, $awsKeyId, $awsSecretKey)
+	{
+
+		$this->deleteAwsBackupSettings();
+		
+		try {
+
+			$query = $this->DatabaseConnection->prepare("INSERT INTO server_settings VALUES (0, 'AWSBackupBucket', :bucket_name, '', '', 0);");
+			$query->bindParam(":bucket_name", $awsBucketName);
+			$query->execute();
+		
+			$query = $this->DatabaseConnection->prepare("INSERT INTO server_settings VALUES (0, 'AWSBackupRegion', :region, '', '', 0);");
+			$query->bindParam(":region", $awsRegion);
+			$query->execute();		  
+		
+			$query = $this->DatabaseConnection->prepare("INSERT INTO server_settings VALUES (0, 'AWSBackupKeyId', :key_id, '', '', 0);");
+			$query->bindParam(":key_id", $awsKeyId);
+			$query->execute();
+
+			$query = $this->DatabaseConnection->prepare("INSERT INTO server_settings VALUES (0, 'AWSBackupSecretKey', :secret_key, '', '', 0);");
+			$query->bindParam(":secret_key", $awsSecretKey);
+			$query->execute();		  
+
+	
+		} catch(PDOException $e) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Settings.php -> saveBackupAwsSettings(); Error = ".$e);
+		}
+
+	}
+
+	
+     
+
+	
+     
+	
+	function DeleteBackupSettings($Frequency)
+	{
+
+		try
+		{
+			$query = $this->DatabaseConnection->prepare("UPDATE server_settings SET deleted = 1 WHERE extra1 = :frequency AND setting IN ('BackupStatus', 'BackupWhat', 'BackupUseFTP', 'BackupUseAWS', 'BackupFTPCount');");
+			$query->bindParam(":frequency", $Frequency);
+
+
+			$query->execute();
+		}
+		catch(PDOException $e)
+		{
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Settings.php -> DeleteBackupSettings(); Error = ".$e);
+		}
+	}
      
  
-     function SaveBackupSettings($Frequency, $BackupStatus, $BackupWhat, $BackupUseFTP, $BackupFTPCount)
-     {
-
-	  $this->DeleteBackupSettings($Frequency);
-	     
-          try
-          {
+	function SaveBackupSettings($Frequency, $BackupStatus, $BackupWhat, $BackupUseFTP, $BackupUseAWS, $BackupFTPCount)
+	{
 		
-               $query = $this->DatabaseConnection->prepare("INSERT INTO server_settings VALUES (0, 'BackupStatus', :backup_status, :frequency, '', 0);");
-               $query->bindParam(":backup_status", $BackupStatus);
-	       $query->bindParam(":frequency", $Frequency);
-	       $query->execute();
-		  
-               $query = $this->DatabaseConnection->prepare("INSERT INTO server_settings VALUES (0, 'BackupWhat', :backup_what, :frequency, '', 0);");
-               $query->bindParam(":backup_what", $BackupWhat);
-	       $query->bindParam(":frequency", $Frequency);
-	       $query->execute();		  
-		  
-               $query = $this->DatabaseConnection->prepare("INSERT INTO server_settings VALUES (0, 'BackupUseFTP', :backup_use_ftp, :frequency, '', 0);");
-               $query->bindParam(":backup_use_ftp", $BackupUseFTP);
-	       $query->bindParam(":frequency", $Frequency);
-	       $query->execute();
-
-               $query = $this->DatabaseConnection->prepare("INSERT INTO server_settings VALUES (0, 'BackupFTPCount', :backup_ftp_count, :frequency, '', 0);");
-               $query->bindParam(":backup_ftp_count", $BackupFTPCount);
-	       $query->bindParam(":frequency", $Frequency);
-	       $query->execute();		  
-  
+		$this->DeleteBackupSettings($Frequency);
 		
-          }
-          catch(PDOException $e)
-          {
-               $oLog = new Log();
-               $oLog->WriteLog("error", "/class.Settings.php -> SaveBackupSettings(); Error = ".$e);
-          }
-     }
+		try {
+	
+			$query = $this->DatabaseConnection->prepare("INSERT INTO server_settings VALUES (0, 'BackupStatus', :backup_status, :frequency, '', 0);");
+			$query->bindParam(":backup_status", $BackupStatus);
+			$query->bindParam(":frequency", $Frequency);
+			$query->execute();
+		
+			$query = $this->DatabaseConnection->prepare("INSERT INTO server_settings VALUES (0, 'BackupWhat', :backup_what, :frequency, '', 0);");
+			$query->bindParam(":backup_what", $BackupWhat);
+			$query->bindParam(":frequency", $Frequency);
+			$query->execute();		  
+			
+			$query = $this->DatabaseConnection->prepare("INSERT INTO server_settings VALUES (0, 'BackupUseFTP', :backup_use_ftp, :frequency, '', 0);");
+			$query->bindParam(":backup_use_ftp", $BackupUseFTP);
+			$query->bindParam(":frequency", $Frequency);
+			$query->execute(); 
+			
+			
+			$query = $this->DatabaseConnection->prepare("INSERT INTO server_settings VALUES (0, 'BackupUseAWS', :backup_use_aws, :frequency, '', 0);");
+			$query->bindParam(":backup_use_aws", $BackupUseAWS);
+			$query->bindParam(":frequency", $Frequency);
+			$query->execute();
+			
+			$query = $this->DatabaseConnection->prepare("INSERT INTO server_settings VALUES (0, 'BackupFTPCount', :backup_ftp_count, :frequency, '', 0);");
+			$query->bindParam(":backup_ftp_count", $BackupFTPCount);
+			$query->bindParam(":frequency", $Frequency);
+			$query->execute();		  
+
+	
+		} catch(PDOException $e) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Settings.php -> SaveBackupSettings(); Error = ".$e);
+		}
+		
+	}
 
      
 

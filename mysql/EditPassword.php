@@ -1,13 +1,9 @@
 <?php
 session_start();
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Reseller.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 $oReseller = new Reseller();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
 $oUser = new User();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Settings.php");
 $oSettings = new Settings();
 
 require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
@@ -20,7 +16,6 @@ if($ClientID < 1)
 }
 
 $id = $_REQUEST["id"];
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.MySQL.php");
 $oMySQL = new MySQL();
 
 $MySQLUserName = "";
@@ -30,16 +25,27 @@ $oMySQL->GetMySQLInfo($id, $MySQLUserName, $UserDatabaseName);
 
 
 $ResellerPermission = false;
-if($oUser->Role == "reseller")
-{
-        if($oReseller->GetClientResellerID($oMySQL->GetMySQLOwner($id)) == $ClientID)
-        {
-                $ResellerPermission = true;
-        }
+if($oUser->Role == "reseller") {
+
+	$random = random_int(1, 100000);
+	$nonceArray = [
+		$oUser->Role,
+		$ClientID,
+		$oMySQL->GetMySQLOwner($id),
+		$random
+	];
+
+	$oSimpleNonce = new SimpleNonce();
+
+	$nonce = $oSimpleNonce->GenerateNonce("getClientResellerID", $nonceArray);
+	$ResellerID = $oReseller->GetClientResellerID($oMySQL->GetMySQLOwner($id), $random, $nonce);
+
+	if($ResellerID == $ClientID) {
+		$ResellerPermission = true;
+	}
 }
 
-if( ($oMySQL->GetMySQLOwner($id) != $ClientID) && ($oUser->Role != "admin") && ($ResellerPermission == false) )
-{
+if( ($oMySQL->GetMySQLOwner($id) != $ClientID) && ($oUser->Role != "admin") && ($ResellerPermission == false) ) {
 	header("location: index.php?NoteType=Error&Notes=You do not have permission to do that!");
 	exit();
 }

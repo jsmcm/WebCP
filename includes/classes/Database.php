@@ -99,61 +99,122 @@ class Database
           
      }
 
-        function CreateTableFromArray($TableName, $TableInfoArray)  
-        {  
-                $ColumnInfo = "";  
+     function CreateTableFromArray($TableName, $TableInfoArray, $nonceArray)  
+     {  
+          if ( $TableName == "" ) {
+               $oLog = new Log();
+               $oLog->WriteLog("error", "/class.Database.php -> CreateTableFromArray(); Table name cannot be blank in Database::TableExists");
+               throw new Exception("<p><b>Table name cannot be blank in Database::CreateTableFromArray</b><p>");
+          }
 
-                $query = "CREATE TABLE ".$TableName." (";  
-  
-                for($x = 0; $x < count($TableInfoArray); $x++)  
-                {  
-                        $ColumnInfo = $ColumnInfo.$TableInfoArray[$x]["name"]." ".$TableInfoArray[$x]["type"]." ";  
-  
-                        if($TableInfoArray[$x]["key"] != "")  
-                        {  
-                                $ColumnInfo = $ColumnInfo." ".$TableInfoArray[$x]["key"];  
-                        }  
-  
-                        if( (isset($TableInfoArray[$x]["default"])) && ($TableInfoArray[$x]["default"] != "") )  
-                        {  
-                                $ColumnInfo = $ColumnInfo." default ".$TableInfoArray[$x]["default"];  
-                        }  
-  
-                        if($x < count($TableInfoArray) - 1)  
-                        {  
-                                $ColumnInfo = $ColumnInfo.", ";  
-                        }
-                }
+          if ( ! (is_array($nonceArray) && !empty($nonceArray) ) ) {
+               $oLog = new Log();
+               $oLog->WriteLog("error", "/class.Database.php -> CreateTableFromArray(); Nonce not set");
+               throw new Exception("<p><b>Nonce not set in Database::CreateTableFromArray</b><p>");
+          }
+          
+          $oUser = new User();
+          $ClientID = $oUser->getClientId();
 
-                $query = $query.$ColumnInfo.");";
+          $nonceMeta = [
+               $oUser->Role,
+               $ClientID,
+               $TableName
+          ];
 
-                $this->DoSQL($query);
-        }
+          $oSimpleNonce = new SimpleNonce();
+          $nonceResult = $oSimpleNonce->VerifyNonce($nonceArray["Nonce"], "createTableFromArray", $nonceArray["TimeStamp"], $nonceMeta);
 
-     function TableExists($TableName)
+          if ( ! $nonceResult ) {
+               $oLog = new Log();
+               $oLog->WriteLog("error", "/class.Database.php -> CreateTableFromArray(); Nonce failed");
+               throw new Exception("<p><b>Nonce failed in Database::CreateTableFromArray</b></p>");
+          }
+
+          $ColumnInfo = "";  
+
+          $query = "CREATE TABLE ".$TableName." (";  
+
+          for($x = 0; $x < count($TableInfoArray); $x++) {  
+               $ColumnInfo = $ColumnInfo.$TableInfoArray[$x]["name"]." ".$TableInfoArray[$x]["type"]." ";  
+
+               if($TableInfoArray[$x]["key"] != "") {  
+                    $ColumnInfo = $ColumnInfo." ".$TableInfoArray[$x]["key"];  
+               }  
+
+               if( (isset($TableInfoArray[$x]["default"])) && ($TableInfoArray[$x]["default"] != "") ) {  
+                    $ColumnInfo = $ColumnInfo." default ".$TableInfoArray[$x]["default"];  
+               }  
+
+               if($x < count($TableInfoArray) - 1) {  
+                    $ColumnInfo = $ColumnInfo.", ";  
+               }
+          }
+
+          $query = $query.$ColumnInfo.");";
+
+          $this->DoSQL($query);
+     }
+
+     function TableExists($TableName, $nonceArray)
      {
-          try
-          {
+          if ( $TableName == "" ) {
+               $oLog = new Log();
+               $oLog->WriteLog("error", "/class.Database.php -> TableExists(); Table name cannot be blank in Database::TableExists");
+               throw new Exception("<p><b>Table name cannot be blank in Database::TableExists</b><p>");
+          }
+
+          if ( ! (is_array($nonceArray) && !empty($nonceArray) ) ) {
+               $oLog = new Log();
+               $oLog->WriteLog("error", "/class.Database.php -> TableExists(); Nonce not set");
+               throw new Exception("<p><b>Nonce not set in Database::TableExists</b><p>");
+          }
+          
+          $oUser = new User();
+          $ClientID = $oUser->getClientId();
+
+          $nonceMeta = [
+               $oUser->Role,
+               $ClientID,
+               $TableName
+          ];
+
+          //print "in class<p>";
+          //print "role: ".$oUser->Role."<p>";
+          //print "ClientID: ".$ClientID."<p>";
+          //print "Table: ".$TableName."<p>";
+
+          $oSimpleNonce = new SimpleNonce();
+          $nonceResult = $oSimpleNonce->VerifyNonce($nonceArray["Nonce"], "tableExists", $nonceArray["TimeStamp"], $nonceMeta);
+
+          //print "nonceArray: ".print_r($nonceArray, true)."<p>";
+
+          if ( ! $nonceResult ) {
+               $oLog = new Log();
+               $oLog->WriteLog("error", "/class.Database.php -> TableExists(); Nonce failed");
+               throw new Exception("<p><b>Nonce failed in Database::TableExists (".$TableName.")</b><p>");
+          }
+
+
+          try {
+          
                $DBConnection = $this->GetConnection();
 
                $query = $DBConnection->prepare("SELECT TABLE_SCHEMA, TABLE_NAME FROM information_schema.tables WHERE table_name = :table_name;");
-               //print "prepared query<p>";
                $query->bindParam(":table_name", $TableName);
-               //print "Binded<p>";
+               
                $query->execute();
-               if($result = $query->fetch(PDO::FETCH_ASSOC))     
-               {
-                    //print "In if<p>";
+               if($result = $query->fetch(PDO::FETCH_ASSOC)) {
                     return true;
                }
-               //print "skipped if<p>";
+               
+          } catch(PDOException $e) {
+          
+               $oLog = new Log();
+               $oLog->WriteLog("error", "/class.Database.php -> TableExists(); Error = ".$e);
+          
           }
-                catch(PDOException $e)
-                {
-               //print "In catch<p>";
-                        $oLog = new Log();
-                        $oLog->WriteLog("error", "/class.Database.php -> TableExists(); Error = ".$e);
-                }
+          
           return false;
      }
 
@@ -164,12 +225,9 @@ class Database
      function DoSQL($SQLCommand)
      {
                
-          if( (strstr(strtolower($SQLCommand), "insert into")) || (strstr(strtolower($SQLCommand), "create ")) || (strstr(strtolower($SQLCommand), "alter")) || (strstr(strtolower($SQLCommand), "update")) || (strstr(strtolower($SQLCommand), "delete")) || (strstr(strtolower($SQLCommand), "drop")) )
-          {
+          if( (strstr(strtolower($SQLCommand), "insert into")) || (strstr(strtolower($SQLCommand), "create ")) || (strstr(strtolower($SQLCommand), "alter")) || (strstr(strtolower($SQLCommand), "update")) || (strstr(strtolower($SQLCommand), "delete")) || (strstr(strtolower($SQLCommand), "drop")) ) {
                return $this->InsertUpdateStatement($SQLCommand);
-          }
-          else if( (strstr(strtolower($SQLCommand), "select ")) )
-          {
+          } else if( (strstr(strtolower($SQLCommand), "select ")) ) {
                return "error, Sorry, not yet implemented<p>";
           }
      }
@@ -181,13 +239,10 @@ class Database
      
           $result = true;
           
-          try
-          {
+          try {
                $query = $DatabaseConnection->prepare($Statement);
                $query->execute();
-          }
-          catch(PDOException $e)
-          {
+          } catch(PDOException $e) {
                $result = false;
                $oLog = new Log();
                $oLog->WriteLog("error", "class.Database.php -> InsertUpdateStatement(); Error = ".$e);

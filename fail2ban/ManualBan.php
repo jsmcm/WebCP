@@ -1,24 +1,14 @@
 <?php
 session_start();
 
-function validateIP($ip){
-    return inet_pton($ip) !== false;
-}
-
 include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
        
 $oUser = new User();
 $oFirewall = new Firewall();
 $oReseller = new Reseller();
 
-if(! file_exists($_SERVER["DOCUMENT_ROOT"]."/fail2ban/tmp"))
-{
-	mkdir($_SERVER["DOCUMENT_ROOT"]."/fail2ban/tmp", 0755);
-}
-
 $ClientID = $oUser->getClientId();
-if($ClientID < 1)
-{
+if($ClientID < 1) {
         header("Location: /index.php");
         exit();
 }
@@ -27,15 +17,12 @@ $IP = $_POST["IP"];
 
 $Role = $oUser->Role;
 
-if($oUser->Role != "admin")
-{
+if($oUser->Role != "admin") {
         $FirewallControl = "";
-        if($oUser->Role == "reseller")
-        {
+        if($oUser->Role == "reseller") {
                 $FirewallControl = $oReseller->GetResellerSetting($oUser->ClientID, "FirewallControl");
         }
-        if($FirewallControl != "on")
-        {
+        if($FirewallControl != "on") {
                 header("Location: /index.php");
                 exit();
         }
@@ -43,29 +30,12 @@ if($oUser->Role != "admin")
 
 
 
-if( validateIP($IP) == false )
-{
-	header("Location: index.php?Notes=Invalid%20IP%20address%20given.%20Use%20IPv4%20or%20IPv6%20format");
-	exit();
-}
+	$IP = str_replace( "/", "_", $IP );
 
-
-
-
-	$oFirewall->ManualBan($IP);
+	file_put_contents(dirname(__DIR__)."/nm/".$IP.".ban", "");
 
         $x = 0;
-        while(file_exists($_SERVER["DOCUMENT_ROOT"]."/fail2ban/tmp/add.ban"))
-        {
-                if($x++ > 20)
-                        break;
-
-                sleep(3);
-        }
-
-        $x = 0;
-        while(file_exists($_SERVER["DOCUMENT_ROOT"]."/fail2ban/tmp/add.working"))
-        {
+        while(file_exists(dirname(__DIR__)."/nm/".$IP.".ban")) {
                 if($x++ > 20)
                         break;
 
@@ -73,7 +43,4 @@ if( validateIP($IP) == false )
         }
 
 header("Location: index.php?Notes=Check%20in%202%20mins%20to%20make%20sure%20its%20been%20added%20to%20this%20list");
-
-?>
-
 

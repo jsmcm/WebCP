@@ -1,6 +1,6 @@
 <?php
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Utils.php");
+require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 $oUtils = new Utils();
 
 $oUtils->GetTrafficStats($TotalTraffic, $TotalUsed, $TotalAvailable, $PercentageUsed);
@@ -16,5 +16,3 @@ print "TotalDiskSpace: ".$TotalDiskSpace."<br>";
 print "TotalUsed: ".$TotalUsed."<br>";
 print "TotalAvailable: ".$TotalAvailable."<br>";
 print "PercentageUsed: ".$PercentageUsed."<br>";
-
-?>

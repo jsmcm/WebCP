@@ -1,24 +1,17 @@
 <?php
 session_start();
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 $oUser = new User();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Reseller.php");
 $oReseller = new Reseller();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
 $oDomain = new Domain();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.MySQL.php");
 $oMySQL = new MySQL();
 
 $ClientID = $oUser->getClientId();
 $Role = $oUser->Role;
-if($ClientID < 1)
-{
-        header("Location: /index.php");
-        exit();
+if($ClientID < 1) {
+	header("Location: /index.php");
+	exit();
 }
 
 
@@ -26,8 +19,7 @@ $MySQLID = $_POST["MySQLID"];
 $MySQLDatabaseName = $_POST["MySQLDatabaseName"];
 $MySQLUserName = trim($_POST["MySQLUserName"]);
 
-if(strlen($MySQLUserName) > 7)
-{
+if(strlen($MySQLUserName) > 7) {
 	header("location: AddMySQL.php?NoteType=Error&Notes=The user name cannot exceed 7 characters");
 	exit();
 }
@@ -39,7 +31,19 @@ $Action = $_POST["Action"];
 $DomainID = $_POST["DomainID"];
 
 $DomainInfoArray = array();
-$oDomain->GetDomainInfo($DomainID, $DomainInfoArray);
+
+$random = random_int(1, 1000000);
+$nonceArray = [	
+	$oUser->Role,
+	$oUser->ClientID,
+	$DomainID,
+	$random
+];
+$oSimpleNonce = new SimpleNonce();
+$nonce = $oSimpleNonce->GenerateNonce("getDomainInfo", $nonceArray);
+
+$oDomain->GetDomainInfo($DomainID, $random, $DomainInfoArray, $nonce);
+
 
 $PackageID = $DomainInfoArray["PackageID"];
 $DomainOwnerClientID = $DomainInfoArray["ClientID"];
@@ -64,30 +68,39 @@ print "PackageID:  ".$PackageID."<p>";
 */
 
 $ResellerPermission = false;
-if($oUser->Role == "reseller")
-{
-        if($oReseller->GetClientResellerID($DomainOwnerID) == $ClientID)
-        {
-                $ResellerPermission = true;
-        }
+if($oUser->Role == "reseller") {
+
+
+	$random = random_int(1, 100000);
+	$nonceArray = [
+		$oUser->Role,
+		$oUser->getClientId(),
+		$DomainOwnerID,
+		$random
+	];
+	
+	$oSimpleNonce = new SimpleNonce();
+	
+	$nonce = $oSimpleNonce->GenerateNonce("getClientResellerID", $nonceArray);
+	$ResellerID = $oReseller->GetClientResellerID($DomainOwnerID, $random, $nonce);
+	
+	if($ResellerID == $ClientID) {
+		$ResellerPermission = true;
+	}
 }
 
-if( ($ClientID != $DomainOwnerClientID) && ($Role != "admin"))
-{
-	if($ResellerPermission == false)
-	{
+if( ($ClientID != $DomainOwnerClientID) && ($Role != "admin")) {
+	if($ResellerPermission == false) {
 		header("location: index.php?Notes=No%20permission!");
 		exit();
 	}
 }
 
 
-if($Action == 'add')
-{
+if($Action == 'add') {
 	//print "<p>10<p>";
 
-	if($oMySQL->MySQLExists($MySQLDatabaseName) > 0)
-	{
+	if($oMySQL->MySQLExists($MySQLDatabaseName) > 0) {
 		header("location: index.php?Notes=The database already exists");
 		exit();
 	}
@@ -106,12 +119,10 @@ if($Action == 'add')
 
 	//print "<p>30<p>";
 	
-	if($x < 1)
-	{ 
+	if($x < 1) { 
 		$Message = "Cannot add MySQL database";
 		
-		if($x == -1)
-		{
+		if($x == -1) {
 			$Message = "You do not have any more MySQL databases on your current hosting plan";
 		}
 
@@ -120,18 +131,11 @@ if($Action == 'add')
 	}
 	//exit();
 	header("location: index.php?Notes=MySQL database added");
-}
-else
-{
-	if($oMySQL->EditUser($cpDatabaseName, $DatabaseUsername, $Password, $MySQLID, $ClientID) < 1)
-	{
+} else {
+	if($oMySQL->EditUser($cpDatabaseName, $DatabaseUsername, $Password, $MySQLID, $ClientID) < 1) {
 		header("location: index.php?Notes=Cannot edit the database");
 		exit();
 	}
 	exit();
 	header("location: index.php?Notes=MySQL updated");
 }
-
-?>
-
-

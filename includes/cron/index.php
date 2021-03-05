@@ -1,5 +1,5 @@
 <?php
-//d$Debug = true;
+//$Debug = true;
 $Debug = false;
 
 if(!file_exists($_SERVER["DOCUMENT_ROOT"]."/includes/cron/tmp/"))
@@ -7,10 +7,8 @@ if(!file_exists($_SERVER["DOCUMENT_ROOT"]."/includes/cron/tmp/"))
         mkdir($_SERVER["DOCUMENT_ROOT"]."/includes/cron/tmp/", 0755);
 }
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Settings.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 $oSettings = new Settings();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.DNS.php");
 $oDNS = new DNS();
 
 if($oDNS->IPExists($_SERVER["REMOTE_ADDR"]) == false)
@@ -28,7 +26,6 @@ if($oDNS->IPExists($_SERVER["REMOTE_ADDR"]) == false)
 	}
 }
 
-require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 
 function LoopDirectory($DirBase, $InSub = 0, $Debug=false)
 {
@@ -38,11 +35,12 @@ function LoopDirectory($DirBase, $InSub = 0, $Debug=false)
 
 	$ServerName = filter_var($_SERVER["SERVER_NAME"], FILTER_SANITIZE_STRING);
 
-	$Port = "10025";
+	$Port = "8880";
 	$HTTP = "http";
 	if( (isset($_SERVER["HTTPS"])) && ($_SERVER["HTTPS"] == "on"))
 	{
 		$HTTP = "https";
+		$Port = "8443";
 	}
 
 	if($Debug == true)
@@ -101,5 +99,3 @@ function LoopDirectory($DirBase, $InSub = 0, $Debug=false)
 
 LoopDirectory("./", $InSub = 0, $Debug);
 print "cron_ok";
-exit();
-?>

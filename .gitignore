@@ -21,3 +21,17 @@ backups/weekly/*
 emails/trace/run_trace_lock
 installer/wordpress/WP.zip
 installer/wordpress/current_version.txt
+restore/tmp/
+restore/tmp/*
+emails/trace/bw_log.txt
+fail2ban/perm.dat
+API/2.0.0/log.log
+API/conf/server_list.txt
+fail2ban/tmp/*
+modules/
+modules/*
+.bash_history
+includes/PageParts/WebCPLink.inc
+includes/PageParts/WebCPName.inc
+includes/PageParts/WebCPTitle.inc
+skel/public_html/

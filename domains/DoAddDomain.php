@@ -1,14 +1,25 @@
 <?php
 session_start();
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Log.php");
-
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 
 $oUser = new User();
+$oEmail = new Email();
 $oDomain = new Domain();
 $oLog = new Log();
+
+require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
+
+$serverAccountsCreated = $oDomain->GetAccountsCreatedCount();
+$serverAccountsAllowed = $validationArray["allowed"];
+$serverLicenseType = $validationArray["type"];
+
+
+if ( $serverLicenseType == "free" && ($serverAccountsCreated >= $serverAccountsAllowed) ) {
+        header("Location: index.php?Notes=".htmlentities("You are on a free license. Please upgrade to add more accounts")."&NoteType=error");
+        exit();
+}
+
 
 $ClientID = $oUser->getClientId();
 if($ClientID < 1)
@@ -75,16 +86,42 @@ $Error = "";
 
 $oLog->WriteLog("DEBUG", "In /domains/DoAddDomain.php - > AddDomain('".$DomainName."', '".$_POST["DomainType"]."',".$PackageID.",".$ClientID_requesting_domain.")");
 
-if($oDomain->AddDomain($DomainName, $_POST["DomainType"], $PackageID, $ClientID_requesting_domain, $Error) < 1)
-{
+$domainId = $oDomain->AddDomain($DomainName, $_POST["DomainType"], $PackageID, $ClientID_requesting_domain, $Error);
+
+if ($domainId < 1 ) {
 	header("location: index.php?NoteType=Error&Notes=Cannot add domain");
 	exit();
+}
+
+$infoArray = array();
+
+
+$random = random_int(1, 1000000);
+$oUser = new User();
+$oSimpleNonce = new SimpleNonce();
+$nonceArray = [	
+	$oUser->Role,
+	$oUser->ClientID,
+	$domainId,
+	$random
+];
+$nonce = $oSimpleNonce->GenerateNonce("getDomainInfo", $nonceArray);
+$oDomain->GetDomainInfo($domainId, $random, $infoArray, $nonce);
+
+file_put_contents(dirname(__DIR__)."/nm/".$DomainName.".freessl_tmp", "PrimaryDomainID=".$domainId."\nType=".$_POST["DomainType"]."\nPath=".$infoArray["Path"]."\nDomainID=".$domainId."\nDomainName=".$DomainName."\nDomainUserName=".$infoArray["UserName"]."\nEmailAddress=".$oUser->EmailAddress."\n");
+
+$transactionalSettings = $oEmail->getTransactionalEmailSettings();
+$transactionalDefault = "";
+
+if (isset($transactionalSettings["default"])) {
+        $transactionalDefault = trim($transactionalSettings["default"]);
+	if ( $transactionalDefault == "checked" ) {
+		$oEmail->makeTransactionalEximSettings();
+	}
 }
 
 $oLog->WriteLog("DEBUG", "AddDomain Succeeded");
 
 header("location: index.php?NoteType=Message&Notes=Domain added<br><b>Please wait 1 minute before adding email or FTP accounts for this domains!</b>".$Error);
-
-?>
 
 

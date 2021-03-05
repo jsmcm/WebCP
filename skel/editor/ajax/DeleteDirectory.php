@@ -22,5 +22,3 @@ else
 {
 	print "Unknown error while deleting folder!";
 }
-
-?>

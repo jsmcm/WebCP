@@ -6,8 +6,7 @@ if(!isset($_SESSION))
      session_start();
 }
 
-include_once(dirname(__FILE__)."/class.Log.php");
-include_once(dirname(__FILE__)."/class.Database.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 
 
 
@@ -386,16 +385,17 @@ class FTP
 		
 	}
 
-	function EditFTPPassword($ID, $Password)
+	function EditFTPPassword($ID, $password)
 	{
 
 		try
 		{
 			$query = $this->DatabaseConnection->prepare("UPDATE ftpd SET Password = :password WHERE id = :id;");
 			
-			$Password = md5($Password);
-			
-			$query->bindParam(":password", $Password);
+			$salt = substr(str_shuffle("./ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"), 0, 8);
+			$password = crypt($password, '$6$'.$salt);
+
+			$query->bindParam(":password", $password);
 			$query->bindParam(":id", $ID);
 			
 			$query->execute();
@@ -418,87 +418,78 @@ class FTP
 	}
 
 
-	function AddFTP($UserName, $DomainID, $Password, $Quota, $ClientID)
+	function AddFTP($UserName, $DomainID, $password, $Quota, $ClientID)
 	{
-		//print "AddFTP<p>";
-
-		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
-		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
-		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Package.php");
-
-
-                $oUser = new User();
-                $oDomain = new Domain();
-                $oPackage = new Package();
 		
+		$oUser = new User();
+		$oDomain = new Domain();
+		$oPackage = new Package();
 
-	        $DomainInfoArray = array();
-        	$oDomain->GetDomainInfo($DomainID, $DomainInfoArray);
-				
-		//print "1<p>";
+
+		$DomainInfoArray = array();
+	
+		$random = random_int(1, 1000000);
+		$oUser = new User();
+		$oSimpleNonce = new SimpleNonce();
+
+		$nonceArray = [	
+			$oUser->Role,
+			$oUser->ClientID,
+			$DomainID,
+			$random
+		];
+		$nonce = $oSimpleNonce->GenerateNonce("getDomainInfo", $nonceArray);
+		$oDomain->GetDomainInfo($DomainID, $random, $DomainInfoArray, $nonce);
+	
+		
 
 		$PackageID = $DomainInfoArray["PackageID"];
 
-	        $DomainUserName = $DomainInfoArray["UserName"];
+		$DomainUserName = $DomainInfoArray["UserName"];
 
-		//print "<p>10<p>";
+		$FTPAllowance = $oPackage->GetPackageAllowance("FTP", $DomainInfoArray["PackageID"]);
 
-	        $FTPAllowance = $oPackage->GetPackageAllowance("FTP", $DomainInfoArray["PackageID"]);
 
-		//print "<p>15<p>";
+		$FTPUsage = $oPackage->GetFTPUsage($DomainID);	
 
-        	$FTPUsage = $oPackage->GetFTPUsage($DomainID);	
+		$FTPUsage = $oPackage->GetFTPUsage($ClientID);
+		$FTPAllowance = $oPackage->GetPackageAllowance("FTP", $PackageID);
 
-		//print "<p>20<p>";
-	
-                $FTPUsage = $oPackage->GetFTPUsage($ClientID);
-                $FTPAllowance = $oPackage->GetPackageAllowance("FTP", $PackageID);
-
-		//print "<p>In class->AddFTP<p>";
-		//print "PackageID: ".$PackageID."<br>";
-		//print "FTPUsage: ".$FTPUsage."<br>";
-		//print "FTPAllowance: ".$FTPAllowance."<br>";
-
-		if( (($FTPAllowance - $FTPUsage) < 1) && ($oUser->Role != "admin") )
-                {
-                        // No More Mails Left
-                        return -1;
-                }
+		if( (($FTPAllowance - $FTPUsage) < 1) && ($oUser->Role != "admin") ) {
+			// No More Mails Left
+			return -1;
+        }
 
 		$this->GetDomainInfo($DomainUserName, $DomainID, $Uid);
 
 		
-		include_once(dirname(__FILE__)."/class.Utils.php");
 		$oUtils = new Utils();
 		$Quota = $oUtils->ConvertToScale($Quota, 'b', 'm');
 		
-		try
-		{
+		try {
 			$query = $this->DatabaseConnection->prepare("INSERT INTO ftpd VALUES (0, :domain_user, :domain_id, :client_id, '1', :password, :uid, :uid1, :path, 0, 0, '', '*', :quota, 0);");
 		
 	
 			$DomainUser = $DomainUserName."_".$UserName;
-			$Path = "/home/".$DomainUserName."/public_html";
-			$Password = md5($Password);
+			$Path = "/home/".$DomainUserName."/home/".$DomainUserName."/public_html";
+			$salt = substr(str_shuffle("./ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"), 0, 8);
+			$password = crypt($password, '$6$'.$salt);
 			
 			$query->bindParam(":domain_user", $DomainUser);
 			$query->bindParam(":domain_id", $DomainID);
 			$query->bindParam(":client_id", $ClientID);
-			$query->bindParam(":password", $Password);
+			$query->bindParam(":password", $password);
 			$query->bindParam(":uid", $Uid);
 			$query->bindParam(":uid1", $Uid);
 			$query->bindParam(":path", $Path);
 			$query->bindParam(":quota", $Quota);
 
 
-			
 			$query->execute();
 	
 			return $this->DatabaseConnection->lastInsertId();
 	
-		}
-		catch(PDOException $e)
-		{
+		} catch(PDOException $e) {
 			$oLog = new Log();
 			$oLog->WriteLog("error", "/class.FTP.php -> AddFTP(); Error = ".$e);
 		}
@@ -542,19 +533,27 @@ class FTP
 		//print "ftp_id: ".$ftp_id."<p>";
 	
 		$DeleteOK = 0;
-		if($Role == 'admin')
-		{
+		if($Role == 'admin') {
 			$DeleteOK = 1;
-		}
-		else if($Role == "reseller")
-		{
-			include_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Reseller.php");
+		} else if($Role == "reseller") {
 			$oReseller = new Reseller();
 
 			$FTPOwnerID = $this->GetFTPOwner($ftp_id);
 
-        		if($oReseller->GetClientResellerID($FTPOwnerID) == $ClientID)
-			{			
+			$random = random_int(1, 100000);
+			$nonceArray = [
+				$oUser->Role,
+				$ClientID,
+				$FTPOwnerID,
+				$random
+			];
+			
+			$oSimpleNonce = new SimpleNonce();
+			
+			$nonce = $oSimpleNonce->GenerateNonce("getClientResellerID", $nonceArray);
+			$ResellerID = $oReseller->GetClientResellerID($FTPOwnerID, $random, $nonce);
+
+        	if($ResellerID == $ClientID) {			
 				$DeleteOK = 1;
 			}
 		}

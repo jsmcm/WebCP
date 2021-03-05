@@ -1,7 +1,6 @@
 <?php
 
-include("/var/www/html/webcp/includes/classes/class.Database.php");
-include("/var/www/html/webcp/includes/classes/class.Log.php");
+include_once("/var/www/html/webcp/vendor/autoload.php");
 	
 $LockFile = "/var/www/html/webcp/emails/trace/bw_trace_lock";
 if(file_exists($LockFile))

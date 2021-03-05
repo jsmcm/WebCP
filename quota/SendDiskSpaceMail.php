@@ -4,9 +4,7 @@ $DomainUserName = $_REQUEST["DomainUserName"];
 $Percentage = $_REQUEST["Percentage"];
 $HostName = $_REQUEST["HostName"];
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Settings.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 
 $oDomain = new Domain();
 $oSettings = new Settings();
@@ -23,7 +21,17 @@ $AdminEmail = $oSettings->GetForwardSystemEmailsTo();
  
 $DomainName = $oDomain->GetDomainName($DomainUserName);
 $DomainID = $oDomain->GetDomainIDFromDomainName($DomainName);
-$UserID = $oDomain->GetDomainOwner($DomainID);
+
+$random = random_int(1, 100000);
+$nonceArray = [
+	$oUser->Role,
+	$oUser->ClientID,
+  $DomainID,
+  $random
+];
+
+$nonce = $oSimpleNonce->GenerateNonce("getDomainOwner", $nonceArray);
+$UserID = $oDomain->GetDomainOwner($DomainID, $random, $nonce);
 
 $Username = "";
 $EmailAddress = "";

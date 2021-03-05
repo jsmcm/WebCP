@@ -1,16 +1,11 @@
 <?php
 session_start();
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 $oUser = new User();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Package.php");
 $oPackage = new Package();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Settings.php");
 $oSettings = new Settings();
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.MySQL.php");
 require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 
 $ClientID = $oUser->getClientId();
@@ -246,7 +241,11 @@ if($ClientID < 1)
 											print "<tr>";
 											print "<td>".$Array[$x]["cpDatabaseName"]."</td>\r\n";	
 											print "<td>".$Array[$x]["DatabaseUsername"]."</td>\r\n";	
-											print "<td class=\"hidden-xs\"><a href=\"http://".$_SERVER["SERVER_NAME"].":10035\" target=\"_new\">phpMyAdmin</a></td>\r\n";
+											if ( file_exists("/etc/letsencrypt/renewal/".$_SERVER["SERVER_NAME"].".conf") ) {
+												print "<td class=\"hidden-xs\"><a href=\"https://".$_SERVER["SERVER_NAME"].":2096\" target=\"_new\">phpMyAdmin</a></td>\r\n";
+											} else {
+												print "<td class=\"hidden-xs\"><a href=\"http://".$_SERVER["SERVER_NAME"].":2095\" target=\"_new\">phpMyAdmin</a></td>\r\n";
+											}
 
 													print "<td class=\"center\">";
 													print "<div class=\"visible-md visible-lg hidden-sm hidden-xs\">";

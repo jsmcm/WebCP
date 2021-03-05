@@ -13,7 +13,7 @@ Version: 1.0.0
 **********************************************************************/
 class SimpleNonce 
 {
-    protected $NonceSalt = "YourSaltHere";
+    protected $NonceSalt = "YourSaltHered";
     protected $NonceExpiryTime = 600; // In seconds. 3600 = 1 hour
     protected $Path;
     function __construct() 
@@ -77,15 +77,13 @@ class SimpleNonce
     {
         $expires = $TimeStamp + $this->NonceExpiryTime;
         $now = time();
-        if($expires - $now < 0)
-        {
+        if($expires - $now < 0) {
             return false;
         }
+
         $NonceSeedString = $Action;
-        if( is_array($MetaDataArray) && $MetaDataArray != null)
-        {
-            foreach($MetaDataArray as $Meta)
-            {
+        if( is_array($MetaDataArray) && $MetaDataArray != null) {
+            foreach($MetaDataArray as $Meta) {
                 $NonceSeedString = $NonceSeedString.$Meta;
             }
         }
@@ -93,26 +91,24 @@ class SimpleNonce
         $NonceSeedString = $NonceSeedString.$this->NonceSalt;
         $nonce = md5($NonceSeedString);
         	
-	if($nonce != $InputNonce)
-        {
+	    if($nonce != $InputNonce) {
             return false;
         }
         
-	$ActionBuffer = $Action;
-        for($x = 0; $x < strlen($Action); $x++)
-        {
-            if( ! ctype_alnum(substr($Action, $x, 1)) )
-            {
+	    $ActionBuffer = $Action;
+        for($x = 0; $x < strlen($Action); $x++) {
+            if( ! ctype_alnum(substr($Action, $x, 1)) ) {
                 $ActionBuffer = substr($Action, 0, $x);
                 $ActionBuffer = $ActionBuffer."_";
                 $ActionBuffer = $ActionBuffer.substr($Action, $x + 1);
                 $Action = $ActionBuffer;
             }
         }
-        if( file_exists($this->Path."/".$Action.$nonce) )
-        {
+
+        if( file_exists($this->Path."/".$Action.$nonce) ) {
             return false;
         }
+
         touch($this->Path."/".$Action.$nonce);
         return true;
     }

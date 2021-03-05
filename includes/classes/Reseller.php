@@ -232,24 +232,59 @@ class Reseller
           	}
      	}
 
-	function GetClientResellerID($ClientID)
+	function GetClientResellerID($ClientID, $random, $nonceArray)
 	{
-          	try
-          	{
-               		$query = $this->DatabaseConnection->prepare("SELECT reseller_id FROM reseller_relationships WHERE deleted = 0 AND client_id = :client_id;");
-			$query->bindParam(":client_id", $ClientID);
-               		$query->execute();
 
-               		if($result = $query->fetch(PDO::FETCH_ASSOC))
-               		{
+		$oSimpleNonce = new SimpleNonce();
+		$oUser = new User();
+
+		if ( intVal($ClientID) < 1 ) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Domain.php -> GetClientResellerID(); ClientID invalid");
+			throw new Exception("<p><b>ClientID invalid in Reseller::GetClientResellerID</b></p>");
+		}
+
+
+		if ( $random == "" ) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Domain.php -> GetDomainOwner(); random cannot be blank in Domain::GetDomainOwner");
+			throw new Exception("<p><b>random cannot be blank in Domain::GetDomainOwner</b><p>");
+		}
+
+
+		if ( ! ( is_array($nonceArray) && !empty($nonceArray)) ) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Reseller.php -> GetClientResellerID(); No nonce given");
+			throw new Exception("<p><b>No nonce given in Reseller::getGetClientResellerID</b></p>");
+		}
+
+		$nonceMeta = [
+			$oUser->Role,
+			$oUser->getClientId(),
+			$ClientID,
+			$random
+		];
+		
+		$nonceResult = $oSimpleNonce->VerifyNonce($nonceArray["Nonce"], "getClientResellerID", $nonceArray["TimeStamp"], $nonceMeta);
+
+		if ( ! $nonceResult ) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Reseller.php -> GetClientResellerID(); Nonce failed");
+			throw new Exception("<p><b>Nonce failed in Reseller::GetClientResellerID()</b></p>");
+		}
+
+		try {
+			$query = $this->DatabaseConnection->prepare("SELECT reseller_id FROM reseller_relationships WHERE deleted = 0 AND client_id = :client_id;");
+			$query->bindParam(":client_id", $ClientID);
+			$query->execute();
+
+			if($result = $query->fetch(PDO::FETCH_ASSOC)) {
 				return $result["reseller_id"];
-               		}
-          	}
-          	catch(PDOException $e)
-          	{
-               		$oLog = new Log();
-               		$oLog->WriteLog("error", "/class.Reseller.php -> GetClientResellerID(); Error = ".$e);
-          	}
+			}
+		} catch(PDOException $e) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.Reseller.php -> GetClientResellerID(); Error = ".$e);
+		}
 
 		return 0;
 	}

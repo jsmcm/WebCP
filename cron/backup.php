@@ -1,10 +1,8 @@
 <?php
 session_start();
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 $oUser = new User();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
 $oDomain = new Domain();
 
 $ClientID = $oUser->getClientId();
@@ -17,8 +15,16 @@ if($ClientID < 1)
 $URL = "nodecp.rsa.pw";
 $PostData = "Server=WebCP";
 
-$DomainOwnerID = $oDomain->GetDomainOwnerFromDomainName($URL);
+$nonceArray = [
+	$oUser->Role,
+	$oUser->ClientID,
+	$URL
+];
 
+$oSimpleNonce = new SimpleNonce();
+$nonce = $oSimpleNonce->GenerateNonce("getDomainOwnerFromDomainName", $nonceArray);
+$DomainOwnerID = $oDomain->GetDomainOwnerFromDomainName($URL, $nonce);  
+  
 print "URL: ".$URL."<br>";
 print "ClientID: ".$ClientID."<br>";
 print "DomainOwnerID: ".$DomainOwnerID."<br>";
@@ -39,7 +45,14 @@ $c = curl_init();
 curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
 curl_setopt($c, CURLOPT_POSTFIELDS,  $PostData);
 curl_setopt($c, CURLOPT_POST, 1);
-curl_setopt($c, CURLOPT_URL, "http://".$URL.":20020/read.php");
+
+
+if ( file_exists("/etc/letsencrypt/renewal/".$_POST["URL"].".conf") ) {
+        curl_setopt($c, CURLOPT_URL, "https://".$_POST["URL"].":2083/read.php");
+        curl_setopt($c, CURLOPT_SSL_VERIFYPEER, false);  
+} else {
+        curl_setopt($c, CURLOPT_URL, "http://".$_POST["URL"].":2082/read.php");
+}
 
 $ResultString = trim(curl_exec($c));
 curl_close($c);

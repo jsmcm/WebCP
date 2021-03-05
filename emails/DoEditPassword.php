@@ -1,28 +1,24 @@
 <?php
 session_start();
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.SimpleNonce.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 $oSimpleNonce = new SimpleNonce();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
 $oUser = new User();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Email.php");
 $oEmail = new Email();
+
+require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 
 $ClientID = $oUser->GetClientID();
 $loggedInId = $ClientID;
 
 $email_ClientID = $oEmail->getLoggedInEmailId();
 
-if($ClientID < 1)
-{
-        if( $email_ClientID < 1 )
-        {
-                header("Location: /index.php");
-                exit();
-        }
-        $loggedInId = $email_ClientID;
+if($ClientID < 1) {
+    if( $email_ClientID < 1 )   {
+        header("Location: /index.php");
+        exit();
+    }
+    $loggedInId = $email_ClientID;
 }
 
 
@@ -36,8 +32,7 @@ $Nonce = filter_var($_POST["Nonce"], FILTER_SANITIZE_STRING);
 $TimeStamp = filter_var($_POST["TimeStamp"], FILTER_SANITIZE_STRING);
 
 $MetaData = array("id"=>$ID, "emailAddress"=>$emailAddress, "loggedInID"=>$loggedInId);
-if( ! $oSimpleNonce->VerifyNonce($Nonce, "doEditEmailAddress", $TimeStamp, $MetaData) )
-{
+if( ! $oSimpleNonce->VerifyNonce($Nonce, "doEditEmailAddress", $TimeStamp, $MetaData) ) {
 	header("Location: index.php");
 	exit();
 }
@@ -68,24 +63,21 @@ $sp = new StupidPass(40, $Environmental, null, $CustomLanguage, $Options);
 
 $bool = $sp->validate($Password);
 
-if( ! $bool)
-{
-        $PasswordFailedMessage = "Password verification failed!<p>";
+if( ! $bool) {
+    $PasswordFailedMessage = "Password verification failed!<p>";
 
-        foreach($sp->GetErrors() as $e)
-        {
-                $PasswordFailedMessage = $PasswordFailedMessage."<font color=\"red\">";
-                $PasswordFailedMessage = $PasswordFailedMessage.$e."<br />";
-                $PasswordFailedMessage = $PasswordFailedMessage."</font>";
-        }
+    foreach($sp->GetErrors() as $e) {
+        $PasswordFailedMessage = $PasswordFailedMessage."<font color=\"red\">";
+        $PasswordFailedMessage = $PasswordFailedMessage.$e."<br />";
+        $PasswordFailedMessage = $PasswordFailedMessage."</font>";
+    }
 
-        header("location: index.php?NoteType=error&Notes=".$PasswordFailedMessage);
-        exit();
+    header("location: index.php?NoteType=error&Notes=".$PasswordFailedMessage);
+    exit();
 }
 
 
-if($oEmail->EditEmailPassword($ID, $Password) < 1)
-{
+if($oEmail->EditEmailPassword($ID, $Password) < 1) {
 	header("location: index.php?NoteType=Error&Notes=Cannot change password");
 	exit();
 }
@@ -93,7 +85,4 @@ if($oEmail->EditEmailPassword($ID, $Password) < 1)
 touch(dirname(__DIR__)."/nm/".$UserName.".mailpassword");
 
 header("location: index.php?NoteType=Success&Notes=Password changed");
-
-?>
-
 

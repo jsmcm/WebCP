@@ -1,7 +1,4 @@
-<?
-
-
-
+<?php
   
 function CheckForVariablesFile() 
 {
@@ -36,7 +33,3 @@ function CheckForVariablesFile()
     return 0;
 
 }
-
-
-
-?>

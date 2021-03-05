@@ -18,18 +18,19 @@ $Surname = "";
 $EmailAddress = "";
 $Username = "";
 $UserRole = "";
+if ( isset( $_GET["r"] ) ) {
+	$UserRole = "reseller";
+}
 
-if(isset($_REQUEST["UserID"]))
-{
-        $UserID = $_REQUEST["UserID"];
-        $Action = "update";
+if(isset($_REQUEST["UserID"])) {
+	$UserID = $_REQUEST["UserID"];
+	$Action = "update";
 
-        $oUser->GetUserDetails($UserID, $FirstName, $Surname, $EmailAddress, $Username, $UserRole);
+	$oUser->GetUserDetails($UserID, $FirstName, $Surname, $EmailAddress, $Username, $UserRole);
 
 }
 
-if( ($UserID == "") && ($oUser->Role == "client") )
-{
+if( ($UserID == "") && ($oUser->Role == "client") ) {
 	header("Location: ./index.php?Notes=You don't have permission to be there&NoteType=error");
 	exit();
 }

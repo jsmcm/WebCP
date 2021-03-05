@@ -1,30 +1,26 @@
 <?php
 
 
-//$Debug = true;
-$Debug = false;
+$Debug = true;
+//$Debug = false;
 
-if(!file_exists($_SERVER["DOCUMENT_ROOT"]."/includes/cron/tmp/"))
-{
+if(!file_exists($_SERVER["DOCUMENT_ROOT"]."/includes/cron/tmp/")) {
         mkdir($_SERVER["DOCUMENT_ROOT"]."/includes/cron/tmp/", 0755);
 }
 
 
-if(file_exists($_SERVER["DOCUMENT_ROOT"]."/includes/cron/tmp/OutboundSpam.lock"))
-{
+if(file_exists($_SERVER["DOCUMENT_ROOT"]."/includes/cron/tmp/OutboundSpam.lock")) {
         // if its older than 10 minutes something's gone wrong, delete it.
         $datetime1 = new DateTime(date("Y-m-d H:i:s", filemtime($_SERVER["DOCUMENT_ROOT"]."/includes/cron/tmp/OutboundSpam.lock")));
         $datetime2 = new DateTime(date("Y-m-d H:i:s"));
         $interval = $datetime1->diff($datetime2);
 
-        if( (int)$interval->format('%i') > 10)
-        {
+        if( (int)$interval->format('%i') > 10) {
                 // The previous instance stalled...
                 unlink($_SERVER["DOCUMENT_ROOT"]."/includes/cron/tmp/OutboundSpam.lock");
         }
 
-        if($Debug == false)
-        {
+        if($Debug == false) {
                 exit();
         }
         print "Lock file exists, BUT in debug so continuing<p>";
@@ -32,12 +28,7 @@ if(file_exists($_SERVER["DOCUMENT_ROOT"]."/includes/cron/tmp/OutboundSpam.lock")
 
 touch($_SERVER["DOCUMENT_ROOT"]."/includes/cron/tmp/OutboundSpam.lock");
 
-include($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Email.php");
-include($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Utils.php");
-include($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Firewall.php");
-include($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
-include($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.SendMail.php");
-include($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Settings.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 
 $oSendMail = new SendMail();
 $oSettings = new Settings();
@@ -45,6 +36,7 @@ $oUser = new User();
 $oEmail = new Email();
 $oUtils = new Utils();
 $oFirewall = new Firewall();
+$oDomain = new Domain();
 
 $TempFirewallArray = array();
 $TemplBlockEmailArray = array();
@@ -123,29 +115,50 @@ if($Debug == true)
 	print "<p>";
 }
 
-if($SpamAction == "block")
-{
-	foreach($FirewallArray as $IP)
-	{
-		$oFirewall->ManualBan($IP);
+if($SpamAction == "block") {
+	foreach($FirewallArray as $IP) {
+		//touch( dirname(__FILE__)."/../../nm/".$IP, 0755 );
 	}
 }
 
 $BlockEmailArray = $oUtils->FixEmailFromEximAuthDataArray($BlockEmailArray);
 
-if($Debug == true)
-{
+if($Debug == true) {
 	print "Converted BE: <br>";
 	print_r($BlockEmailArray);
 	print "<p>";
 }
 
+print "Spamaction = ".$SpamAction."<p>";
+
 if($SpamAction == "block")
 {
 	$BlockEmailArray = $oEmail->RemoveAlreadySuspendedFromArray($BlockEmailArray);
+	
+	print_r($BlockEmailArray);
+	print "<p>";
 	foreach($BlockEmailArray as $EmailAddress)
 	{
 		$oEmail->SuspendEmail(-1, "admin", $EmailAddress);
+		$domainId = $oDomain->GetDomainIDFromDomainName(substr($EmailAddress, strpos($EmailAddress, "@") + 1));
+
+		if ( $domainId > -1 ) {
+
+	
+			$random = random_int(1, 1000000);
+			$nonceArray = [	
+					$oUser->Role,
+					$oUser->ClientID,
+					$DomainID,
+					$random
+			];
+			$oSimpleNonce = new SimpleNonce();
+			$nonce = $oSimpleNonce->GenerateNonce("getDomainInfo", $nonceArray);
+			$oDomain->GetDomainInfo($DomainID, $random, $infoArray, $nonce);
+
+			
+			touch ( dirname(__FILE__)."/../../nm/".$infoArray["UserName"].".mailpassword", 0755 );
+		}
 	}
 }
 
@@ -177,5 +190,3 @@ foreach($BlockEmailArray as $SpamAddress)
 }
 
 unlink($_SERVER["DOCUMENT_ROOT"]."/includes/cron/tmp/OutboundSpam.lock");
-exit()
-?>

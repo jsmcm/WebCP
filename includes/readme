@@ -1,0 +1,146 @@
+* 3.2.1 *
+= release: 2021-02-23
+ - Added backups to AWS S3
+
+* 3.2.0 *
+= release: 2021-02-17
+ - Added PM settings to php config screens
+
+* 3.1.2 *
+= release: 2021-02-16
+ - Added php config screen
+ - added back in assets/plugins/jquery-cookie
+
+* 3.1.1 *
+= release: 2021-02-12
+ - Removed debug output from Firewall
+ - Removed jquery file uploader plugin vulnerability
+
+* 3.1.0 *
+= release: 2021-01-14
+ - User passwords now use password_hash (bcrypted)
+ - FTP passwords now use sha512
+
+* 3.0.8 *
+= release: 2020-10-23
+ - Added nonce to the deleteDomainSeeting call in freessl/DeleteSSL.php
+
+* 3.0.7 *
+= release: 2020-10-20
+ - Fixed links to webcp license validation
+
+* 3.0.6 *
+= release: 2020-09-29
+ - Fixed bought SSL installation process
+ - Fixed country code lookups
+
+* 3.0.5 *
+= releaes: 2020-09-28
+ - Updated letsencrpyt to use snapd certbot installation
+
+* 3.0.4 *
+= release: 2020-09-25
+ - Updated settings in domain settings to include all available php versions in drop down
+
+* 3.0.3 *
+= release: 2020-09-24
+ - Made fixes to the way that email forwarders are managed
+
+* 3.0.2 *
+= release: 2020-09-22 =
+ - Fixed Skel editor 
+ - Cron editor replaces ~ with /home/username/home/username path
+
+* 3.0.1 *
+= release: 2020-09-17 =
+ - Fixed licensing to not require license for free version
+
+* 3.0.0 *
+= release: 2020-08-21 = 
+ - Sendgrid settings changed to transactional settings
+ - Adds transactional support for emails - not only sendgrid
+ - Changed paths to new jailed structure
+ - Fixed cron editor to use new jailed structure
+ - Edits to user directories (eg, /home/user/home/user/pub..) for new jailed structure
+ - Fixed MYSQL not updating allowed remote hosts
+ - Changes for chrooted dir structure
+ 
+* 2.2.2 *
+= release:  2019-09-14 =
+ - Added username column to ssh index screen
+ - Fixed installer / Wordpress script with type on oUser object (was called oClient)
+ - Added nonce to sendGridSettings
+ 
+* 2.2.1 *
+= release: 2019-08-20 =
+ - Changed logging of failed logins to file_put_contents to prevent non-existing file errors
+ - gitignore WebCPLink/Name/Title.inc page parts
+ - Fixed parked / sub domains to add DNS correctly based on SSL / non SSL
+ - Added missing nonces to ssh functions
+
+* 2.2.0 *
+= release: 2019-08-09 =
+ - Fixed user/group on exim dkim key files
+ - Added SSH main menu item
+ - Added SSH Management
+ - Introducing nonce into function calls for security
+ - Fixed bug which allowed clients to delete their own domains
+ - Fixed bug whereby email addresses login credentials were still active after deletion
+ - Fixed group by warning in email check 550 status
+ - Fixed call to GetDomainNameFromDomainID in GetDomainTree which caused an error and stalled backups
+
+* 2.1.2 *
+= release: 2019-07-23 =
+ - DNS connections now try ssl first and fall back to non ssl
+ - Fixed spelling mistake on dkim setup page
+ - DNS - Txt records check for enclosing ""
+ - DNS - Allow @ for hostname
+ - DNS - Fixed html special chars issue
+ - Removed Modules link from side nav (for now)
+ 
+ * 2.1.1 *
+= release: 2019-07-16 =
+ - Added script version into footer
+ - Moved backups one above webcp
+ - Moved logs one above webcp
+
+* 2.1.0 *
+= release: 2019-07-12 =
+ - Added nonces to certain pages (eg, suspend, delete domains)
+ - Added domain settings page
+ - Added php selector
+
+* 2.0.11 *
+= release: 2019-07-10 =
+ - Fixed auto reply
+ - Fixed spamguard
+ - Fixed email rate limiting
+ - Fixed SendGrid
+ - Fixed max recipients in email
+ 
+* 2.0.10 *
+= release: 2019-07-03 =
+ - Changed include vendor to hardcoded include path (rather than _SERVER) because of CLI PHP in mail trace
+
+* 2.0.9 *
+= release: 2019-06-26 = 
+ - Fixed output started bug in domains/DoEditPackage.php
+ - Fixed typo in mail screen, showed domain/mail instead of domain/webmail
+ - On license failed during login we delete the validation key cache to not cache errors
+ - Suspend account now works with web, mail, ftp and database
+ - Fixed fail2ban
+ - Changed mail settings modal to show mail host as naked domain (for SSL)
+ - Autocreate SSL after domain set up (if possible) 
+
+* 2.0.8 *
+= release: 2019-05-10 =
+ - Fixed cloudflare ports
+ - added ssl to service ports
+ - Changed cron to use servername for nonce instead of server ip
+
+* 2.0.7 *
+= released 2019-05-10 =
+ - Added this readme
+ - Changed server port number for cron manager and editor to work on cloudflare
+ - Removed license checks from webcron
+ - Fixed error on daily / monthly backup pages which didn't read the license file correctly

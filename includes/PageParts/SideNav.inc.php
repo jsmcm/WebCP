@@ -5,25 +5,19 @@
 	include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 	$oReseller = new Reseller();
 	
-	if( ! isset($oDNS))
-	{
+	if( ! isset($oDNS)) {
 		$oDNS = new DNS();
 	}
 
-	if( ($oUser->Role == "admin") || ($oUser->Role == "reseller") )
-	{
+	if( ($oUser->Role == "admin") || ($oUser->Role == "reseller") ) {
 
-		if(strstr($_SERVER["SCRIPT_FILENAME"], "/users/"))
-		{
+		if(strstr($_SERVER["SCRIPT_FILENAME"], "/users/")) {
 			print "<li class=\"active open\">";
-		}
-		else
-		{
+		} else {
 			print "<li>";
 		}
 
-		if($oUser->Role == "admin")
-		{
+		if($oUser->Role == "admin") {
 		?>
 			<a href="javascript:void(0)"><i class="clip-user-2"></i>
 				<span class="title"> Users </span><i class="icon-arrow"></i>
@@ -464,6 +458,38 @@
 				</a>
 			</li>
 
+			<?php
+				if(strstr($_SERVER["SCRIPT_FILENAME"], "/emails/transactional/index.php"))
+				{
+					print "<li class=\"active open\">";
+				}
+				else
+				{
+					print "<li>";
+				}
+				?>
+				<a href="/emails/transactional/index.php">
+					<span class="title">Transactional Email </span>
+				</a>
+
+					<?php
+					if(strstr($_SERVER["SCRIPT_FILENAME"], "/emails/transactional/transactional.php"))
+					{
+						print "<li class=\"active open\">";
+					}
+					else
+					{
+						print "<li>";
+					}
+					?>
+					<a href="/emails/transactional/transactional.php">
+						<span class="title"> > Transactional Domains </span>
+					</a>
+
+				</li>
+
+			</li>
+
 		<?php
 		}
 		?>
@@ -691,18 +717,22 @@
 				<?php
 				if(strstr($_SERVER["SCRIPT_FILENAME"], "/passwd/index.php"))
 				{
-					print "<li class=\"active open\">";
+					//print "<li class=\"active open\">";
 				}
 				else
 				{
-					print "<li>";
+					//print "<li>";
 				}
-				?>
+?>
+
+<?php
+	/*
 				<a href="/passwd/index.php">
 					<span class="title"> Password Protect Directories </span>
 				</a>
 			</li>
-
+	*/
+?>
 			<?php
 			$FirewallControl = "";
 			if($oUser->Role == "reseller")
@@ -728,6 +758,20 @@
 				?>
 				<a href="/fail2ban/index.php">
 					<span class="title"> Firewall </span>
+				</a>
+				</li>
+				
+				<?php
+				if(strstr($_SERVER["SCRIPT_FILENAME"], "/fail2ban/perm.php")) {
+					print "<li class=\"active open\">";
+				}
+				else
+				{
+					print "<li>";
+				}
+				?>
+				<a href="/fail2ban/perm.php">
+					<span class="title"> Perm Bans </span>
 				</a>
 				</li>
 
@@ -785,6 +829,40 @@
 					<span class="title"> View Quota Usage </span>
 				</a>
 			</li>
+				
+			<?php
+			if(strstr($_SERVER["SCRIPT_FILENAME"], "/server/stats/ram.php"))
+			{
+				print "<li class=\"active open\">";
+			}
+			else
+			{
+				print "<li>";
+			}
+			?>
+			<a href="/server/stats/ram.php">
+				<span class="title"> RAM Stats </span>
+			</a>
+			</li>
+
+				
+			<?php
+			if(strstr($_SERVER["SCRIPT_FILENAME"], "/server/stats/cpu.php"))
+			{
+				print "<li class=\"active open\">";
+			}
+			else
+			{
+				print "<li>";
+			}
+			?>
+			<a href="/server/stats/cpu.php">
+				<span class="title"> CPU Stats </span>
+			</a>
+			</li>
+
+
+
 
 			<?php
 			if($oUser->Role == "admin")
@@ -835,6 +913,23 @@
 				</li>
 
 
+				<?php
+				if(strstr($_SERVER["SCRIPT_FILENAME"], "/server/php/index.php"))
+				{
+					print "<li class=\"active open\">";
+				}
+				else
+				{
+						print "<li>";
+				}
+				?>
+				<a href="/server/php/index.php">
+					<span class="title"> PHP Config </span>
+				</a>
+				</li>
+
+
+
 			<?php
 			}
 			?>
@@ -862,7 +957,7 @@
 
 	<?php
 
-	if( (strstr($_SERVER["SCRIPT_FILENAME"], "/backups/")) || (strstr($_SERVER["SCRIPT_FILENAME"], "/restore/")) )
+	if( (strstr($_SERVER["SCRIPT_FILENAME"], "/../backups/")) || (strstr($_SERVER["SCRIPT_FILENAME"], "/restore/")) )
 	{
 		print "<li class=\"active\">";
 	}
@@ -1055,21 +1150,45 @@
 	</li>
 	<?php
 	}
-	?>
+	
 
 
 
 
+
+
+
+
+
+
+
+	if( $oUser->Role == "client" || $oUser->Role == "admin" || $oUser->Role == "reseller" ) {
+		if( (strstr($_SERVER["SCRIPT_FILENAME"], "/ssh/")) ) {
+			print "<li class=\"active\">";
+		} else {
+			print "<li>";
+		}
+		?>
+
+			<a href="/ssh"><i class="fa fa-terminal"></i>
+				<span class="title"> SSH </span><span class="selected"></span>
+			</a>
+
+		</li>
 	<?php
-	if($oUser->Role == "admin")
-	{
+	}
+
+
+
+
+	if($oUser->Role == "admin") {
 		if( strstr($_SERVER["SCRIPT_FILENAME"], "/modules/") )
 		{
-			print "<li class=\"active\">";
+			print "<!--li class=\"active\">";
 		}
 		else
 		{
-			print "<li>";
+			print "<!--li>";
 		}
 		?>
 			<a href="javascript:void(0)"><i class="clip-tree"></i>
@@ -1092,7 +1211,7 @@
 					</a>
 				</li>
 			</ul>
-		</li>
+		</li-->
 	<?php
 	}
 	?>	
@@ -1117,12 +1236,12 @@
 			</a>
 			<ul class="sub-menu">
 				<li>
-					<a href="http://bug.webcp.pw/bug_report_page.php" target="_new">
+					<a href="https://bug.webcp.io/bug_report_page.php" target="_new">
 						<span class="title"> Bug Report </span>
 					</a>
 				</li>
 				<li>
-					<a href="http://bug.webcp.pw/bug_report_page.php" target="_new">
+					<a href="https://bug.webcp.io/bug_report_page.php" target="_new">
 						<span class="title"> Feature Request </span>
 					</a>
 				</li>

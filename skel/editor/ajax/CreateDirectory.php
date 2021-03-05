@@ -19,5 +19,3 @@ else
 	chmod($DirectoryName, 0755);
 	print "created";
 }
-
-?>

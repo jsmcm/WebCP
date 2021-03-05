@@ -1,22 +1,12 @@
 <?php
 session_start();
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 $oUser = new User();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Email.php");
 $oEmail = new Email();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Package.php");
 $oPackage = new Package();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
 $oDomains = new Domain();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Settings.php");
 $oSettings = new Settings();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.SimpleNonce.php");
 $oSimpleNonce = new SimpleNonce();
 
 require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
@@ -91,7 +81,7 @@ if($ClientID < 1)
 		function MakeSettingsDivVisible(domain, email)
 		{
 			SettingsHeading = "Settings for " + email;
-			Settings ="Incoming Mail Server: <b>mail." + domain + "</b><br>Outgoing Mail Server: <b>mail." + domain + "</b><p>";
+			Settings ="Incoming Mail Server: <b>" + domain + "</b><br>Outgoing Mail Server: <b>" + domain + "</b><p>";
 			Settings = Settings + "User Name: <b>" + email + "</b> (full email address)<br>Password: <b>The password you selected</b><p>SMTP Port: <b>25 or 587</b><br>POP3 Port: <b>110</b><br>IMAP Port <b>143</b><p>";
 			Settings = Settings + "In your email program, you must select the option that outgoing mail requires authentication, then select to use the same username and password as the incoming mail server.";
 
@@ -297,7 +287,12 @@ if($ClientID < 1)
 											
 											print "<tr>";
 											print "<td>".$Array[$x]["local_part"]."@".$Array[$x]["fqdn"]."</td>\r\n";	
-											print "<td class=\"hidden-xs\"><a href=\"http://".$Array[$x]["fqdn"]."/mail\" target=\"_blank\">http://".$Array[$x]["fqdn"]."/mail</a></td>\r\n";	
+											if ( file_exists("/etc/letsencrypt/renewal/".$Array[$x]["fqdn"].".conf") ) {
+												print "<td class=\"hidden-xs\"><a href=\"https://".$Array[$x]["fqdn"].":2087\" target=\"_blank\">http://".$Array[$x]["fqdn"]."/webmail</a></td>\r\n";	
+											} else {
+												print "<td class=\"hidden-xs\"><a href=\"http://".$Array[$x]["fqdn"].":2086\" target=\"_blank\">http://".$Array[$x]["fqdn"]."/webmail</a></td>\r\n";	
+											}
+
 											print "<td class=\"hidden-xs\">   <a href=\"#full-width\" onclick=\"MakeSettingsDivVisible('".$Array[$x]["fqdn"]."', '".$Array[$x]["local_part"]."@".$Array[$x]["fqdn"]."');\" data-toggle=\"modal\" class=\"demo btn btn-blue\">View Settings</a></td>\r\n";
 												
 

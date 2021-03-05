@@ -2,13 +2,9 @@
 session_start();
 
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 $oUser = new User();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
 $oDomain = new Domain();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Settings.php");
 $oSettings = new Settings();
 
 require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
@@ -39,6 +35,3 @@ file_put_contents($_SERVER["DOCUMENT_ROOT"]."/nm/".$Domain.".deletessl", $Domain
 
 sleep(5);
 header("Location: index.php?NoteType=success&Notes=SSL scheduled for deletion, it could take a few minutes. Refresh the page in a short while if the domain still appears in the list.");
-
-?>
-

@@ -1,44 +1,34 @@
 <?php
 /*********************************************************************
 *********************************************************************/
-if(!isset($_SESSION)) 
-{
-     session_start();
+if(!isset($_SESSION)) {
+    session_start();
 }
 
 include_once("/var/www/html/webcp/vendor/autoload.php");
 
 class DNS
 {
-        var $oDatabase = null;
-        var $DatabaseConnection = null;
-
+	var $oDatabase = null;
+	var $DatabaseConnection = null;
 
 	function __construct()
-        {
-                $this->oDatabase = new Database();
-                $this->DatabaseConnection = $this->oDatabase->GetConnection();
+	{
+		$this->oDatabase = new Database();
+		$this->DatabaseConnection = $this->oDatabase->GetConnection();
 	}
 
-	function FillIPArray(&$IPArray, $IPType="ipv4")
+	function FillIPArray()
 	{
 			
-		$IPJson = `/usr/webcp/server_vars.sh`;
+		$ipJson = `/usr/webcp/server_vars.sh`;
 	
-		$IPArray = array();
-		if($IPJson != "")
-			{
-			$IPArray = json_decode($IPJson, true);
+		$ipArray = array();
+		if($ipJson != "") {
+			$ipArray = json_decode($ipJson, true);
 		}
-	
-		if($IPType == "ipv4")
-		{
-			$IPArray = $IPArray["ipv4"];
-			return;
-		}
-		
-		$IPArray = $IPArray["ipv6"];
-	
+
+		return $ipArray;
 	}
 		
 	function ManageIPAddresses()
@@ -48,7 +38,7 @@ class DNS
 		$oDomain = new Domain();
 
 		$IP = array();
-		$this->FillIPArray($IP, "ipv4");
+		$IP = $this->FillIPArray();
 	
 		$ServerIPAddressCount = $this->GetServerIPAddressCount();
 		$oLog->WriteLog("debug", "ServerIPAddressCount: ".$ServerIPAddressCount);
@@ -58,20 +48,28 @@ class DNS
 			// There are no IPs in the server (might be new)...
 			$oLog->WriteLog("debug", "count(\$IP): ".count($IP));
 	
-			if(count($IP) > 0)
+			if(count($IP["ipv4"]) > 0)
 			{
-				$oLog->WriteLog("debug", "AddIP(".$IP[0].", \"shared\"");
-				$this->AddIP($IP[0], "shared");
+				$oLog->WriteLog("debug", "AddIP(".$IP["ipv4"][0].", \"shared\"");
+				$this->AddIP($IP["ipv4"][0], "ipv4", "shared");
+	
+				$oDomain->RecreateVHostFiles();
+			}
+			
+			if(count($IP["ipv6"]) > 0)
+			{
+				$oLog->WriteLog("debug", "AddIP(".$IP["ipv6"][0].", \"shared\"");
+				$this->AddIP($IP["ipv6"][0], "ipv6", "shared");
 	
 				$oDomain->RecreateVHostFiles();
 			}
 		}
 		else
 		{
-			$oLog->WriteLog("debug", "count(\$IP): ".count($IP));
-			for($x = 0; $x < count($IP); $x++)
+			$oLog->WriteLog("debug", "count(\$IP['ipv4']): ".count($IP["ipv4"]));
+			for($x = 0; $x < count($IP["ipv4"]); $x++)
 			{
-				$IPAddress = trim($IP[$x]);
+				$IPAddress = trim($IP["ipv4"][$x]);
 	
 				if($IPAddress != "")
 				{
@@ -79,7 +77,7 @@ class DNS
 					if( ! $this->IPExists($IPAddress))
 					{
 						$oLog->WriteLog("debug", "Not, so adding it...");
-						$this->AddIP($IPAddress, "");
+						$this->AddIP($IPAddress, "ipv4",  "");
 					}
 					else
 					{
@@ -88,24 +86,59 @@ class DNS
 				}
 			}
 	
-			if($this->GetSharedIP() == "")
+			$oLog->WriteLog("debug", "count(\$IP['ipv6']): ".count($IP["ipv6"]));
+			for($x = 0; $x < count($IP["ipv6"]); $x++)
 			{
-				$oLog->WriteLog("debug", "Shared IP is blanks..");
+				$IPAddress = trim($IP["ipv6"][$x]);
+	
+				if($IPAddress != "")
+				{
+					$oLog->WriteLog("debug", "Checking if ".$IPAddress." exists...");
+					if( ! $this->IPExists($IPAddress))
+					{
+						$oLog->WriteLog("debug", "Not, so adding it...");
+						$this->AddIP($IPAddress, "ipv4", "");
+					}
+					else
+					{
+						$oLog->WriteLog("debug", "Does exists...");
+					}
+				}
+			}
+
+			if($this->GetSharedIP("ipv4") == "")
+			{
+				$oLog->WriteLog("debug", "Shared IPv4 is blanks..");
 
 				// for some reason the shared ip does not exists, add it now
-				$SharedIP = trim($this->GetUnusedIP());
+				$SharedIP = trim($this->GetUnusedIP("ipv4"));
 	
 				$oLog->WriteLog("debug", "Unused IP = ".$SharedIP);
 	
-				if($SharedIP == "")
-				{
+				if($SharedIP == "") {
 					// Problem!!! no IP available for sharing!
 					// alert should come here...
+				} else {
+					$oLog->WriteLog("debug", "makeIpShared(".$SharedIP.")");
+					$this->makeIpShared($SharedIP);
 				}
-				else
-				{
-					$oLog->WriteLog("debug", "AddIP(".$SharedIP.", \"shared\")");
-					$this->AddIP($SharedIP, "shared");
+			}
+			
+			if($this->GetSharedIP("ipv6") == "")
+			{
+				$oLog->WriteLog("debug", "Shared IPv6 is blanks..");
+
+				// for some reason the shared ip does not exists, add it now
+				$SharedIP = trim($this->GetUnusedIP("ipv6"));
+	
+				$oLog->WriteLog("debug", "Unused IP = ".$SharedIP);
+	
+				if($SharedIP == "") {
+					$oLog->WriteLog("debug", "Problem!!! no IPv6 available for sharing!");
+					// alert should come here...
+				} else {
+					$oLog->WriteLog("debug", "makeIpShared(".$SharedIP.")");
+					$this->makeIpShared($SharedIP);
 				}
 			}
 		}
@@ -213,19 +246,15 @@ class DNS
 
         function SetSlaveStatus($ID, $Status)
         {
-                try
-                {
-                        $query = $this->DatabaseConnection->prepare("UPDATE dns_slaves SET status = :status, status_date = '".date("Y-m-d H:i:s")."' WHERE id = :id;");
-                        $query->bindParam(":status", $Status);
-                        $query->bindParam(":id", $ID);
-                        $query->execute();
-
-                }
-                catch(PDOException $e)
-                {
-                        $oLog = new Log();
-                        $oLog->WriteLog("error", "/class.DNS.php -> SetSlaveStatus() Error = ".$e);
-                }
+			try {
+				$query = $this->DatabaseConnection->prepare("UPDATE dns_slaves SET status = :status, status_date = '".date("Y-m-d H:i:s")."' WHERE id = :id;");
+				$query->bindParam(":status", $Status);
+				$query->bindParam(":id", $ID);
+				$query->execute();
+			} catch(PDOException $e) {
+				$oLog = new Log();
+				$oLog->WriteLog("error", "/class.DNS.php -> SetSlaveStatus() Error = ".$e);
+			}
         }
 	
 	function GetSlaveData($ID, &$HostName, &$IPAddress, &$Password, &$PublicKey)
@@ -490,44 +519,38 @@ class DNS
 	function GetDomainIP($Domain)
 	{
 	   
-		try
-		{
+		try {
 			$query = $this->DatabaseConnection->prepare("SELECT option_value FROM dns_options WHERE option_name = 'ip' AND extra1 = :domain AND deleted = 0;");
 
 			$query->bindParam(":domain", $Domain);
 			$query->execute();
 
-			if($result = $query->fetch(PDO::FETCH_ASSOC))
-			{
+			if($result = $query->fetch(PDO::FETCH_ASSOC)) {
 				return $result["option_value"];
 			}
 
-		}
-		catch(PDOException $e)
-		{
+		} catch(PDOException $e) {
 			$oLog = new Log();
 			$oLog->WriteLog("error", "/class.DNS.php -> GetDomainIP(); Error = ".$e);
 		}
 
-		return $this->GetSharedIP();
+		return $this->GetSharedIP("ipv4");
 	}
 
-	function GetSharedIP()
+	function GetSharedIP($type="ipv4")
 	{
-		try
-		{
-			$query = $this->DatabaseConnection->prepare("SELECT option_value FROM dns_options WHERE option_name = 'ip' AND extra1 = 'shared' AND deleted = 0");
-			
+		try {
+			$query = $this->DatabaseConnection->prepare("SELECT option_value FROM dns_options WHERE option_name = 'ip' AND extra1 = 'shared' AND extra2 = :type AND deleted = 0");
+
+			$query->bindParam(":type", $type);
+
 			$query->execute();
 	
-			if($result = $query->fetch(PDO::FETCH_ASSOC))
-			{
+			if($result = $query->fetch(PDO::FETCH_ASSOC)) {
 				return $result["option_value"];
 			}
 	
-		}
-		catch(PDOException $e)
-		{
+		} catch(PDOException $e) {
 			$oLog = new Log();
 			$oLog->WriteLog("error", "/class.DNS.php -> GetSharedIP(); Error = ".$e);
 		}
@@ -536,13 +559,15 @@ class DNS
 		return "";
 	}
 
-	function GetUnusedIP()
+	function GetUnusedIP($type)
 	{
 	
 		try
 		{
-			$query = $this->DatabaseConnection->prepare("SELECT option_value FROM dns_options WHERE extra1 = '' AND deleted = 0 LIMIT 1");
-			
+			$query = $this->DatabaseConnection->prepare("SELECT option_value FROM dns_options WHERE extra1 = '' AND extra2 = :type AND deleted = 0 LIMIT 1");
+
+			$query->bindParam(":type", $type);
+
 			$query->execute();
 	
 			if($result = $query->fetch(PDO::FETCH_ASSOC))
@@ -585,14 +610,15 @@ class DNS
 		return "";
 	}
 
-	function AddIP($IP, $Domain)
+	function AddIP($IP, $type, $Domain)
 	{
 		try
 		{
-			$query = $this->DatabaseConnection->prepare("INSERT INTO dns_options VALUES (0, 'ip', :ip, :domain, '', 0)");
+			$query = $this->DatabaseConnection->prepare("INSERT INTO dns_options VALUES (0, 'ip', :ip, :domain, :type, 0)");
 			
 			$query->bindParam(":ip", $IP);
 			$query->bindParam(":domain", $Domain);
+			$query->bindParam(":type", $type);
 			
 			$query->execute();
 	
@@ -676,17 +702,44 @@ class DNS
 			'trace' => 1
 		);
 
+		$type = "ipv4";
+		if ( strstr($IP, ":") ) {
+			$type = "ipv6";
+		}
+
                	$client = new SoapClient(NULL, $options);
 
-               	$Result = $client->WebCP_UpdateARecords($Domain, $IP, $this->GetSharedIP(), $Hash);
+               	$Result = $client->WebCP_UpdateARecords($Domain, $IP, $this->GetSharedIP($type), $Hash);
 			
 		for($x = 0; $x < $ParkedDomainCount; $x++)
 		{
-               		$Result = $client->WebCP_UpdateARecords($ParkedDomainArray[$x]["ParkedDomain"], $IP, $this->GetSharedIP(), $Hash);
+               		$Result = $client->WebCP_UpdateARecords($ParkedDomainArray[$x]["ParkedDomain"], $IP, $this->GetSharedIP($type), $Hash);
 		}
 
 		return true;
 	}
+
+	function makeIpShared($ip)
+	{
+		try
+		{
+			$query = $this->DatabaseConnection->prepare("UPDATE dns_options SET extra1 = 'shared' WHERE option_name = 'ip' AND option_value = :ip AND deleted = 0");
+			
+			$query->bindParam(":ip", $ip);
+			
+			$query->execute();
+	
+		}
+		catch(PDOException $e)
+		{
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.DNS.php -> makeIpShared(); Error = ".$e);
+		}
+		
+		return true;
+	}
+
+
 
 	function AssignIP($IP, $Domain)
 	{
@@ -767,58 +820,48 @@ class DNS
 
 	function ValidateDomainName($DomainName, $FQDN=true)
 	{
-	        $DomainName = strtolower($DomainName);
-	
-	        // check for double period
-	        if(strstr($DomainName, ".."))
-	        {
-	                return -1;
-	        }
-	
-	        // First char must be alphanum
-	        if( (substr($DomainName, 0, 1) < 'a') || (substr($DomainName, 0, 1) > 'z') )
-	        {
-	                if( (substr($DomainName, 0, 1) < '0') || (substr($DomainName, 0, 1) > '9') )
-	                {
-	                        return -2;
-	                }
-	        }
+		if ( $DomainName == "@" ) {
+			return true;
+		}
+		$DomainName = strtolower($DomainName);
 
-	        for($x = 0; $x < strlen($DomainName); $x++)
-	        {
-	                if( (substr($DomainName, $x, 1) < 'a') || (substr($DomainName, $x, 1) > 'z') )
-	                {
-	                        if( (substr($DomainName, $x, 1) < '0') || (substr($DomainName, $x, 1) > '9') )
-	                        {
-	                                if( (substr($DomainName, $x, 1) != '-') && (substr($DomainName, $x, 1) != '.') && (substr($DomainName, $x, 1) != '_') )
-	                                {
-	                                        return -3;
-	                                }
-	                        }
-	                }
-	        }
-
-	        if(strlen($DomainName) > 100)
-	        {
-	                return -4;
-	        }
-
-		if($FQDN == true)
-		{
-		        if(strlen($DomainName) < 4)
-		        {
-		                return -5;
-		        }
-
-		        // must contain at least 1 .
-		        if(!strstr($DomainName, "."))
-	        	{       
-	         	       return -6;
-		        }
+		// check for double period
+		if(strstr($DomainName, "..")) {
+			return -1;
 		}
 
-	
-	        return 1;
+		// First char must be alphanum
+		if( (substr($DomainName, 0, 1) < 'a') || (substr($DomainName, 0, 1) > 'z') ) {
+			if( (substr($DomainName, 0, 1) < '0') || (substr($DomainName, 0, 1) > '9') ) {
+				return -2;
+			}
+		}
+
+		for($x = 0; $x < strlen($DomainName); $x++) {
+			if( (substr($DomainName, $x, 1) < 'a') || (substr($DomainName, $x, 1) > 'z') ) {
+				if( (substr($DomainName, $x, 1) < '0') || (substr($DomainName, $x, 1) > '9') ) {
+					if( (substr($DomainName, $x, 1) != '-') && (substr($DomainName, $x, 1) != '.') && (substr($DomainName, $x, 1) != '_') ) {
+						return -3;
+					}
+				}
+			}
+		}
+
+		if(strlen($DomainName) > 100) {
+			return -4;
+		}
+
+		if($FQDN == true) {
+			if(strlen($DomainName) < 4) {
+				return -5;
+			}
+
+			// must contain at least 1 .
+			if(!strstr($DomainName, ".")) {       
+				return -6;
+			}
+		}
+		return 1;
 	}
 
 
@@ -1398,106 +1441,230 @@ class DNS
 				
 	function CreateZoneOnSlaves($DomainName, $SlaveArray, $SlaveArrayCount)
 	{
-		for($x = 0; $x < $SlaveArrayCount; $x++)
-		{
-		        $options = array(
-		        'uri' => $SlaveArray[$x]["IPAddress"],
-		        'location' => 'http://'.$SlaveArray[$x]["HostName"].':10025/API/dns/DNS.php',
-		        'trace' => 1);
 
-		        $Message = json_encode(array("Password" => $SlaveArray[$x]["Password"], "Domain" => $DomainName));
-
-			$EncryptedMessage = "";
-		        openssl_public_encrypt($Message, $EncryptedMessage, $SlaveArray[$x]["PublicKey"]);
-
-		        $Message = base64_encode($EncryptedMessage);
-			try
-			{
-			        $client = new SoapClient(NULL, $options);
-			        $Result = $client->CreateZoneOnSlave($Message);
-
-				$SlaveStatus = "error";
-				if($Result > 0)
-				{
-					$SlaveStatus = "success";
-				}
-				$this->SetSlaveStatus($SlaveArray[$x]["ID"], $SlaveStatus);
-			}
-			catch (Exception $e)
-			{
+		for($x = 0; $x < $SlaveArrayCount; $x++) {
+			
+			$port = 8443;
+			$result = $this->createSlaveZone( $DomainName, $SlaveArray[$x]["IPAddress"], $SlaveArray[$x]["ID"], $SlaveArray[$x]["HostName"], $port, $SlaveArray[$x]["Password"], $SlaveArray[$x]["PublicKey"]);
+			
+			if ( $result == false && $port == 8443 ) {
+				//try without SSL
+				$port = 8880;
+				$result = $this->createSlaveZone( $DomainName, $SlaveArray[$x]["IPAddress"], $SlaveArray[$x]["ID"], $SlaveArray[$x]["HostName"], $port, $SlaveArray[$x]["Password"], $SlaveArray[$x]["PublicKey"]);
 			}
 		}
 	}
 
-	function AddZone($DomainName, $IPv4Address, $IPv6Address)
+	private function createSlaveZone($domainName, $ipAddress, $slaveId, $hostName, $port, $password, $publicKey)
 	{
-		
-	        $TTL = $this->GetSetting("ttl");
-	        if( (is_numeric($TTL) == false) || ($TTL < 0) )
-	        {
-	                $TTL = 7200;
-	        }
-	
-	        $NegativeTTL = $this->GetSetting("negative_ttl");
-	        if( (is_numeric($NegativeTTL) == false) || ($NegativeTTL < 0) )
-	        {
-	                $NegativeTTL = 7200;
-	        }
-	
-	        $Refresh = $this->GetSetting("refresh");
-	        if( (is_numeric($Refresh) == false) || ($Refresh < 0) )
-	        {
-	                $Refresh = 1800;
-	        }
-	
-	        $Retry = $this->GetSetting("retry");
-	        if( (is_numeric($Retry) == false) || ($Retry < 0) )
-	        {
-	                $Retry = 7200;
-		        }
-	
-	        $Expire = $this->GetSetting("expire");
-	        if( (is_numeric($Expire) == false) || ($Expire < 0) )
-	        {
-	                $Expire = 1209600;
-	        }
+		$options = array(
+		'uri' => $ipAddress,
+		'location' => 'http'.(($port=="8443")?'s':'').'://'.$hostName.':'.$port.'/API/dns/DNS.php',
+		'trace' => 1);
 
-	        $EmailAddress = $this->GetSetting("email_address");
-		if($EmailAddress == "")
-		{
+		$message = json_encode(array("Password" => $password, "Domain" => $domainName));
+
+		$encryptedMessage = "";
+		openssl_public_encrypt($message, $encryptedMessage, $publicKey);
+
+		$message = base64_encode($encryptedMessage);
+
+		try {
+			
+			$client = new SoapClient(NULL, $options);
+			$Result = $client->CreateZoneOnSlave($message);
+
+			$SlaveStatus = "error";
+			if($Result > 0) {
+				$SlaveStatus = "success";
+			}
+
+			$this->SetSlaveStatus($slaveId, $SlaveStatus);
+		} catch (Exception $e) {
+			return false;
+		}
+
+		return true;
+
+	}
+
+
+	public function createMasterZone($domainName, $ipAddress, $hostName, $port, $password, $publicKey)
+	{
+		$oLog = new Log();
+
+		$options = array(
+			'uri' => $ipAddress,
+			'location' => 'http'.(($port=="8443")?'s':'').'://'.$hostName.':'.$port.'/API/dns/DNS.php',
+			'trace' => 1
+		);
+
+		$dkimKey = "";
+		if( file_exists("/etc/exim4/dkim.public.key") ) {
+			$dkimKey = file_get_contents("/etc/exim4/dkim.public.key");
+
+			$x = strpos($dkimKey, "-----BEGIN PUBLIC KEY-----");
+
+			if( $x !== false) {
+				$dkimKey = trim(substr($dkimKey, $x + strlen("-----BEGIN PUBLIC KEY-----")));
+			}
+
+			$x = strpos($dkimKey, "--");
+				
+			if( $x !== false) {
+				$dkimKey = trim(substr($dkimKey, 0, $x));
+			}
+
+			$dkimKey = str_replace("\r\n", "", $dkimKey);
+			$dkimKey = str_replace("\n", "", $dkimKey);
+		
+		}
+
+		$message = json_encode(array("Password" => $password, "DomainName" => $domainName, "IPv4" => $this->GetDomainIP($domainName), "IPv6" => "", "dkimKey" => $dkimKey));
+				
+		$encryptedMessage = "";
+		openssl_public_encrypt($message, $encryptedMessage, $publicKey);
+
+		$message = base64_encode($encryptedMessage);
+
+		try {
+			
+			$client = new SoapClient(NULL, $options);
+			$Result = $client->AddZoneForSlave($message);
+			
+			if($Result < 1) {
+				$oLog->WriteLog("DEBUG", "Error registering DNS, return code: ".$Result);
+			}
+
+		} catch (Exception $e) {
+			return false;
+		}
+
+		return true;
+
+	}
+
+
+
+
+
+	public function createSubDomainInZone($subDomain, $parentDomainName, $ipAddress, $hostName, $port, $password, $publicKey)
+	{
+		$oLog = new Log();
+
+		$options = array(
+			'uri' => $ipAddress,
+			'location' => 'http'.(($port=="8443")?'s':'').'://'.$hostName.':'.$port.'/API/dns/DNS.php',
+			'trace' => 1
+		);
+
+		$dkimKey = "";
+		if( file_exists("/etc/exim4/dkim.public.key") ) {
+			$dkimKey = file_get_contents("/etc/exim4/dkim.public.key");
+
+			$x = strpos($dkimKey, "-----BEGIN PUBLIC KEY-----");
+
+			if( $x !== false) {
+				$dkimKey = trim(substr($dkimKey, $x + strlen("-----BEGIN PUBLIC KEY-----")));
+			}
+
+			$x = strpos($dkimKey, "--");
+				
+			if( $x !== false) {
+				$dkimKey = trim(substr($dkimKey, 0, $x));
+			}
+
+			$dkimKey = str_replace("\r\n", "", $dkimKey);
+			$dkimKey = str_replace("\n", "", $dkimKey);
+		
+		}
+
+		$message = json_encode(array("Password" => $password, "SubDomain" => $subDomain, "ParentDomainName" => $parentDomainName, "IPv4" => $this->GetDomainIP($parentDomainName), "IPv6" => ""));
+
+		$encryptedMessage = "";
+		openssl_public_encrypt($message, $encryptedMessage, $publicKey);
+
+		$message = base64_encode($encryptedMessage);
+
+		try {
+			
+			$client = new SoapClient(NULL, $options);
+			$Result = $client->AddSubDomainForSlave($message);
+			
+			if($Result < 1) {
+				$oLog->WriteLog("DEBUG", "Error registering DNS, return code: ".$Result);
+			}
+
+		} catch (Exception $e) {
+			return false;
+		}
+
+		return true;
+
+	}
+
+
+
+
+
+	function AddZone($DomainName, $IPv4Address, $IPv6Address, $dkimKey="")
+	{
+	
+		$TTL = $this->GetSetting("ttl");
+		if( (is_numeric($TTL) == false) || ($TTL < 0) ) {
+			$TTL = 7200;
+		}
+
+		$NegativeTTL = $this->GetSetting("negative_ttl");
+		if( (is_numeric($NegativeTTL) == false) || ($NegativeTTL < 0) ) {
+			$NegativeTTL = 7200;
+		}
+
+		$Refresh = $this->GetSetting("refresh");
+		if( (is_numeric($Refresh) == false) || ($Refresh < 0) ) {
+			$Refresh = 1800;
+		}
+
+		$Retry = $this->GetSetting("retry");
+		if( (is_numeric($Retry) == false) || ($Retry < 0) ) {
+			$Retry = 7200;
+		}
+
+		$Expire = $this->GetSetting("expire");
+		if( (is_numeric($Expire) == false) || ($Expire < 0) ) {
+			$Expire = 1209600;
+		}
+
+		$EmailAddress = $this->GetSetting("email_address");
+		if($EmailAddress == "") {
 			$EmailAddress = "dns@admin.email";
 		}
-		
+	
 		$EmailAddress = str_replace("@", ".", $EmailAddress);
-	        
+		
 		$PrimaryNameServer = $this->GetSetting("primary_name_server");
-		if($PrimaryNameServer == "")
-		{
+		if($PrimaryNameServer == "") {
 			$PrimaryNameServer = $_SERVER["SERVER_NAME"];
 		}
-		
+	
 
-		if($DomainName == "")
-		{
+		if($DomainName == "") {
 			return -3;
 		}
-		if( ($IPv4Address == "") && ($IPv6Address == "") )
-		{
+
+		if( ($IPv4Address == "") && ($IPv6Address == "") ) {
 			return -4;
 		}
 
 		$x = $this->ValidateDomainName($DomainName);
 
-		if($x < 1)
-		{
+		if($x < 1) {
 			return $x;
 		}
-		
+	
 		$DomainName = $DomainName.".";
 
-		if($this->DomainExists($DomainName) == -1)
-		{
-
+		if($this->DomainExists($DomainName) == -1) {
 
 			$SlaveArray = array();
 			$SlaveArrayCount = 0;
@@ -1508,17 +1675,34 @@ class DNS
 
 			$SerialNumber = date("Ymd")."01";
 			$SOAID = $this->__AddSOA(1, $DomainName, $TTL, $PrimaryNameServer.".", $EmailAddress, $SerialNumber, $Refresh, $Retry, $Expire, $NegativeTTL);
-			if($SOAID > 0)
-			{
-				if($IPv4Address != "")
-				{
+
+			if($SOAID > 0) {
+
+				$spf = "";
+
+				if($IPv4Address != "") {
 					$this->AddRRS($SOAID, $DomainName, "A", $IPv4Address, "", "", "", "", "", "", "", "", "", $TTL);
+
+					$spf = $spf."ip4:".$IPv4Address." ";
 				}
 
-				if($IPv6Address != "")
-				{
+	
+				if($IPv6Address != "") {
 					$this->AddRRS($SOAID, $DomainName, "AAAA", $IPv6Address);
+
+					$spf = $spf."ip6:".$IPv6Address." ";
 				}
+
+				if ( $spf != "" ) {
+					$this->AddRRS($SOAID, $DomainName, "TXT", "\"v=spf1 a mx ".$spf." -all\"", "", "", "", "", "", "", "", "", "", $TTL);
+					
+				}
+
+				
+				if ( $dkimKey != "" ) {
+					$this->AddRRS($SOAID, "x._domainkey.".$DomainName, "TXT", "\"v=DKIM1; k=rsa; p=".$dkimKey."\"", "", "", "", "", "", "", "", "", "", $TTL);
+				}
+
 
 				$this->AddRRS($SOAID, "www", "CNAME", $DomainName, "", "", "", "", "", "", "", "", "", $TTL);
 				$this->AddRRS($SOAID, "ftp", "CNAME", $DomainName, "", "", "", "", "", "", "", "", "", $TTL);
@@ -1532,26 +1716,18 @@ class DNS
 				$this->AddRRS($SOAID, $DomainName, "NS", $this->AddLastPeriod($PrimaryNameServer), "", "", "", "", "", "", "", "", "", $TTL);
 
 
-				if( (isset($SlaveArray[0]["HostName"])) && ($SlaveArray[0]["HostName"] != "") )
-				{
+				if( (isset($SlaveArray[0]["HostName"])) && ($SlaveArray[0]["HostName"] != "") ) {
 					$this->AddRRS($SOAID, $DomainName, "NS", $this->AddLastPeriod($SlaveArray[0]["HostName"]), "", "", "", "", "", "", "", "", "", $TTL);
 				}
 
 				$this->MakeZoneDataFile();
 				$this->MakeZoneFile($DomainName);
 
-			
-
-	
 				return 1;
-			}
-			else
-			{	
+			} else {	
 				return -1;
 			}
-		}
-		else
-		{
+		} else {
 			return -2;
 		}
 	}
@@ -1576,32 +1752,29 @@ class DNS
 	function AddRRS($SOAID, $Domain, $Type, $Value1, $Value2="", $Value3="", $Value4="", $Value5="", $Value6="", $Value7="", $Value8="", $Value9="", $Value10="", $TTL="", $Class="IN")
 	{
 		
-		if($TTL == "")
-		{
+		if($TTL == "") {
 			$TTL = $this->GetSetting("ttl");
 		}
 	        
-		if( (is_numeric($TTL) == false) || ($TTL < 0) )
-	        {
-	                $TTL = 7200;
-	        }
+		if( (is_numeric($TTL) == false) || ($TTL < 0) ) {
+			$TTL = 7200;
+		}
 	
 
-		try
-		{
+		try {
 			$query = $this->DatabaseConnection->prepare("INSERT INTO rrs VALUES (0, :soa_id, :domain, :ttl, :class, :type, :value1, :value2, :value3, :value4, :value5, :value6, :value7, :value8, :value9, :value10, 0)");
 			
-			$Value1 = html_entity_decode($Value1);
-			$Value2 = html_entity_decode($Value2);
-			$Value3 = html_entity_decode($Value3);
-			$Value4 = html_entity_decode($Value4);
-			$Value5 = html_entity_decode($Value5);
+			$Value1 = htmlspecialchars_decode($Value1);
+			$Value2 = htmlspecialchars_decode($Value2);
+			$Value3 = htmlspecialchars_decode($Value3);
+			$Value4 = htmlspecialchars_decode($Value4);
+			$Value5 = htmlspecialchars_decode($Value5);
 			
-			$Value6 = html_entity_decode($Value6);
-			$Value7 = html_entity_decode($Value7);
-			$Value8 = html_entity_decode($Value8);
-			$Value9 = html_entity_decode($Value9);
-			$Value10 = html_entity_decode($Value10);
+			$Value6 = htmlspecialchars_decode($Value6);
+			$Value7 = htmlspecialchars_decode($Value7);
+			$Value8 = htmlspecialchars_decode($Value8);
+			$Value9 = htmlspecialchars_decode($Value9);
+			$Value10 = htmlspecialchars_decode($Value10);
 			
 			$query->bindParam(":soa_id", $SOAID);
 			$query->bindParam(":domain", $Domain);
@@ -1623,33 +1796,30 @@ class DNS
 		
 			$query->execute();
 			return $this->DatabaseConnection->lastInsertId();
+		} catch(PDOException $e) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.DNS.php -> AddRRS(); Error = ".$e);
 		}
-                catch(PDOException $e)
-                {
-                        $oLog = new Log();
-                        $oLog->WriteLog("error", "/class.DNS.php -> AddRRS(); Error = ".$e);
-                }
 	
 		return 0;	
 	}
 
 	function EditRRS($ID, $Domain, $Type, $Value1, $Value2="", $Value3="", $Value4="", $Value5="", $Value6="", $Value7="", $Value8="", $Value9="", $Value10="", $TTL=7200, $Class="IN")
 	{
-		try
-		{
+		try {
 			$query = $this->DatabaseConnection->prepare("UPDATE rrs SET domain = :domain, ttl = :ttl, class = :class, type = :type, value1 = :value1, value2 = :value2, value3 = :value3, value4 = :value4, value5 = :value5, value6 = :value6, value7 = :value7, value8 = :value8, value9 = :value9, value10 = :value10 WHERE id = :id;");
 			
-			$Value1 = html_entity_decode($Value1);
-			$Value2 = html_entity_decode($Value2);
-			$Value3 = html_entity_decode($Value3);
-			$Value4 = html_entity_decode($Value4);
-			$Value5 = html_entity_decode($Value5);
+			$Value1 = htmlspecialchars_decode($Value1);
+			$Value2 = htmlspecialchars_decode($Value2);
+			$Value3 = htmlspecialchars_decode($Value3);
+			$Value4 = htmlspecialchars_decode($Value4);
+			$Value5 = htmlspecialchars_decode($Value5);
 			
-			$Value6 = html_entity_decode($Value6);
-			$Value7 = html_entity_decode($Value7);
-			$Value8 = html_entity_decode($Value8);
-			$Value9 = html_entity_decode($Value9);
-			$Value10 = html_entity_decode($Value10);
+			$Value6 = htmlspecialchars_decode($Value6);
+			$Value7 = htmlspecialchars_decode($Value7);
+			$Value8 = htmlspecialchars_decode($Value8);
+			$Value9 = htmlspecialchars_decode($Value9);
+			$Value10 = htmlspecialchars_decode($Value10);
 
 
 			$query->bindParam(":id", $ID);
@@ -1670,12 +1840,10 @@ class DNS
 			$query->bindParam(":value10", $Value10);
 			
 			$query->execute();
+		} catch(PDOException $e) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.DNS.php -> EditRRS(); Error = ".$e);
 		}
-                catch(PDOException $e)
-                {
-                        $oLog = new Log();
-                        $oLog->WriteLog("error", "/class.DNS.php -> EditRRS(); Error = ".$e);
-                }
 		
 	}
 
@@ -1950,39 +2118,53 @@ class DNS
 
 	function DeleteZoneOnSlaves($DomainName, $SlaveArray, $SlaveArrayCount)
 	{
-		for($x = 0; $x < $SlaveArrayCount; $x++)
-		{
-		        $options = array(
-				'uri' => $SlaveArray[$x]["IPAddress"],
-				'location' => 'http://'.$SlaveArray[$x]["HostName"].':10025/API/dns/DNS.php',
-				'trace' => 1
-			);
+		for($x = 0; $x < $SlaveArrayCount; $x++) {
 
-		        $Message = json_encode(array("Password" => $SlaveArray[$x]["Password"], "Domain" => $DomainName));
+			$port = 8443;
+			$result = $this->deleteSlaveZone( $DomainName, $SlaveArray[$x]["IPAddress"], $SlaveArray[$x]["ID"], $SlaveArray[$x]["HostName"], $port, $SlaveArray[$x]["Password"], $SlaveArray[$x]["PublicKey"]);
 
-			$EncryptedMessage = "";
-		        openssl_public_encrypt($Message, $EncryptedMessage, $SlaveArray[$x]["PublicKey"]);
+			if ( $result == false && $port == 8443 ) {
+				// retry without SSL
 
-		        $Message = base64_encode($EncryptedMessage);
-			try
-			{
-			        $client = new SoapClient(NULL, $options);
-			        $Result = $client->DeleteZoneOnSlave($Message);
-
-				$SlaveStatus = "error";
-				if($Result > 0)
-				{
-					$SlaveStatus = "success";
-				}
-				$this->SetSlaveStatus($SlaveArray[$x]["ID"], $SlaveStatus);
-			}
-			catch (Exception $e)
-			{
-					print_r($e);
+				$port = 8880;
+				$result = $this->deleteSlaveZone( $DomainName, $SlaveArray[$x]["IPAddress"], $SlaveArray[$x]["ID"], $SlaveArray[$x]["HostName"], $port, $SlaveArray[$x]["Password"], $SlaveArray[$x]["PublicKey"]);
 			}
 		}
 	}
 	
+	private function deleteSlaveZone( $domainName, $ipAddress, $slaveId, $hostName, $port, $password, $publicKey)
+	{
+		$options = array(
+			'uri' => $ipAddress,
+			'location' => 'http'.(($port=="8443")?'s':'').'://'.$hostName.':'.$port.'/API/dns/DNS.php',
+			'trace' => 1
+		);
+
+		$message = json_encode(array("Password" => $password, "Domain" => $domainName));
+
+		$encryptedMessage = "";
+		openssl_public_encrypt($message, $encryptedMessage, $publicKey);
+
+		$message = base64_encode($encryptedMessage);
+
+		try {
+			$client = new SoapClient(NULL, $options);
+			$Result = $client->DeleteZoneOnSlave($message);
+
+			$SlaveStatus = "error";
+			if($Result > 0) {
+				$SlaveStatus = "success";
+			}
+			$this->SetSlaveStatus($slaveId, $SlaveStatus);
+		} catch (Exception $e) {
+			//print_r($e);
+
+			return false;
+		}
+
+		return true;
+	}
+
 	function DeleteZone($DomainName)
 	{
 	

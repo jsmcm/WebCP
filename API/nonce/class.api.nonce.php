@@ -1,6 +1,6 @@
 <?php
 
-include_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.SimpleNonce.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 
 class API_Nonce
 { 
@@ -20,4 +20,3 @@ class API_Nonce
 	
 
 }
-?>

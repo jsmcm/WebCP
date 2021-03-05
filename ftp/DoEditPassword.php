@@ -6,6 +6,7 @@ include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 $oUser = new User();
 $oFTP = new FTP();
 $oReseller = new Reseller();
+$oSimpleNonce = new SimpleNonce();
 
 $ClientID = $oUser->getClientId();
 if($ClientID < 1)
@@ -24,7 +25,16 @@ $FTPOwnerID = $oFTP->GetFTPOwner($ID);
 $ResellerID = 0;
 if($oUser->Role == "reseller")
 {
-        $ResellerID = $oReseller->GetClientResellerID($FTPOwnerID);
+        $random = random_int(1, 100000);
+	$nonceArray = [
+		$oUser->Role,
+		$ClientID,
+		$FTPOwnerID,
+		$random
+	];
+
+	$nonce = $oSimpleNonce->GenerateNonce("getClientResellerID", $nonceArray);
+        $ResellerID = $oReseller->GetClientResellerID($FTPOwnerID, $random, $nonce);
 }
 
 if( ($FTPOwnerID != $ClientID) && ($ResellerID != $ClientID) && ($oUser->Role != "admin") )

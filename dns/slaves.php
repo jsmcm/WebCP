@@ -1,32 +1,23 @@
 <?php
 session_start();
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 $oUser = new User();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.DNS.php");
 $oDNS = new DNS();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Settings.php");
 $oSettings = new Settings();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Utils.php");
 $oUtils = new Utils();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Database.php");
 $oDatabase = new Database();
+$oSimpleNonce = new SimpleNonce();
 
 require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 
 $ClientID = $oUser->getClientId();
-if($ClientID < 1)
-{
+if($ClientID < 1) {
 	header("Location: /index.php");
 	exit();
 }
 
-if($oUser->Role != "admin")
-{
+if($oUser->Role != "admin") {
 	header("location: /domains/index.php?Notes=You don't have permission to be there&NoteType=error");
 	exit();
 }
@@ -34,57 +25,63 @@ if($oUser->Role != "admin")
 
 $oDNS->GenerateKeyFiles();
 
-if($oDatabase->TableExists("dns_slaves") == false)
-{
-        $TableName = "dns_slaves";
+$nonceArray = [
+	$oUser->Role,
+	$ClientID,
+	"dns_slaves"
+];
 
-        $TableInfoArray[0]["name"] = "id";
-        $TableInfoArray[0]["type"] = "int";
-        $TableInfoArray[0]["key"] = "primary key auto_increment";
-        $TableInfoArray[0]["default"] = "";
+$nonce = $oSimpleNonce->GenerateNonce("tableExists", $nonceArray);
 
-        $TableInfoArray[1]["name"] = "host_name";
-        $TableInfoArray[1]["type"] = "tinytext";
-        $TableInfoArray[1]["key"] = "";
-        $TableInfoArray[1]["default"] = "";
+if($oDatabase->TableExists("dns_slaves", $nonce) == false) {
+	$TableName = "dns_slaves";
 
-        $TableInfoArray[2]["name"] = "ip_address";
-        $TableInfoArray[2]["type"] = "tinytext";
-        $TableInfoArray[2]["key"] = "";
-        $TableInfoArray[2]["default"] = "";
+	$TableInfoArray[0]["name"] = "id";
+	$TableInfoArray[0]["type"] = "int";
+	$TableInfoArray[0]["key"] = "primary key auto_increment";
+	$TableInfoArray[0]["default"] = "";
 
-        $TableInfoArray[3]["name"] = "public_key";
-        $TableInfoArray[3]["type"] = "text";
-        $TableInfoArray[3]["key"] = "";
-        $TableInfoArray[3]["default"] = "";
+	$TableInfoArray[1]["name"] = "host_name";
+	$TableInfoArray[1]["type"] = "tinytext";
+	$TableInfoArray[1]["key"] = "";
+	$TableInfoArray[1]["default"] = "";
 
-        $TableInfoArray[4]["name"] = "password";
-        $TableInfoArray[4]["type"] = "tinytext";
-        $TableInfoArray[4]["key"] = "";
-        $TableInfoArray[4]["default"] = "";
+	$TableInfoArray[2]["name"] = "ip_address";
+	$TableInfoArray[2]["type"] = "tinytext";
+	$TableInfoArray[2]["key"] = "";
+	$TableInfoArray[2]["default"] = "";
 
-        $TableInfoArray[5]["name"] = "status";
-        $TableInfoArray[5]["type"] = "tinytext";
-        $TableInfoArray[5]["key"] = "";
-        $TableInfoArray[5]["default"] = "";
+	$TableInfoArray[3]["name"] = "public_key";
+	$TableInfoArray[3]["type"] = "text";
+	$TableInfoArray[3]["key"] = "";
+	$TableInfoArray[3]["default"] = "";
 
-        $TableInfoArray[6]["name"] = "status_date";
-        $TableInfoArray[6]["type"] = "datetime";
-        $TableInfoArray[6]["key"] = "";
-        $TableInfoArray[6]["default"] = "";
+	$TableInfoArray[4]["name"] = "password";
+	$TableInfoArray[4]["type"] = "tinytext";
+	$TableInfoArray[4]["key"] = "";
+	$TableInfoArray[4]["default"] = "";
 
-        $TableInfoArray[7]["name"] = "deleted";
-        $TableInfoArray[7]["type"] = "int";
-        $TableInfoArray[7]["key"] = "";
-        $TableInfoArray[7]["default"] = "0";
+	$TableInfoArray[5]["name"] = "status";
+	$TableInfoArray[5]["type"] = "tinytext";
+	$TableInfoArray[5]["key"] = "";
+	$TableInfoArray[5]["default"] = "";
 
-        $oDatabase->CreateTableFromArray($TableName, $TableInfoArray);
+	$TableInfoArray[6]["name"] = "status_date";
+	$TableInfoArray[6]["type"] = "datetime";
+	$TableInfoArray[6]["key"] = "";
+	$TableInfoArray[6]["default"] = "";
+
+	$TableInfoArray[7]["name"] = "deleted";
+	$TableInfoArray[7]["type"] = "int";
+	$TableInfoArray[7]["key"] = "";
+	$TableInfoArray[7]["default"] = "0";
+
+	$oDatabase->CreateTableFromArray($TableName, $TableInfoArray);
 }
 
 $ServerType = $oDNS->GetSetting("server_type");
 
-if($ServerType != "master")
-{
+if($ServerType != "master") {
 	header("location: index.php?Notes=Incorrect server type&NoteType=Error");
 	exit();
 }

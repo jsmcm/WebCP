@@ -12,6 +12,14 @@ if ($ClientID < 1) {
     exit();
 }
 
+$UserID = "";
+$FirstName = "";
+$Surname = "";
+$Password = "";
+$EmailAddress = "";
+$Action = "";
+$Username = "";
+
 
 $UserID = $_POST["UserID"];
 $FirstName = $_POST["FirstName"];
@@ -52,8 +60,12 @@ if ($Action == 'add') {
          $oReseller->AssignClientToReseller($ClientID, $NewUserID);
     }
 
-    //print "User added";
-    header("location: index.php?NoteType=Success&Notes=User ".$Username." added");
+    if ( $UserRole == "reseller" ) {
+        header("location: /users/EditReseller.php?ResellerID=".$NewUserID."&NoteType=Success&Notes=Reseller ".$Username." added<br>Please edit their account allocations");
+    } else {
+        header("location: index.php?NoteType=Success&Notes=User ".$Username." added");
+    }
+
 } else {
 
     if (($oUser->UserExistsByEmail($EmailAddress) > 0) && ($oUser->UserExistsByEmail($EmailAddress) != $UserID)) {

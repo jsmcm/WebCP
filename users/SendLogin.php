@@ -261,6 +261,3 @@ $somecontent = $somecontent."</html>";
             $mail->Send();
     
 print $message;
-
-?>
-

@@ -1,31 +1,22 @@
 <?php
 session_start();
 
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 $oDomain = new Domain();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
 $oUser = new User();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Utils.php");
 $oUtils = new Utils();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Settings.php");
 $oSettings = new Settings();
 
 require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 
-if($oUser->Role != "admin")
-{
-        header("Location: /index.php");
-        exit();
+if($oUser->Role != "admin") {
+	header("Location: /index.php");
+	exit();
 }
 
 
 $ClientID = $oUser->getClientId();
-if($ClientID < 1)
-{
+if($ClientID < 1) {
 	header("Location: /index.php");
 	exit();
 }
@@ -33,15 +24,19 @@ if($ClientID < 1)
 $DomainID = filter_input(INPUT_GET, "DomainID", FILTER_SANITIZE_NUMBER_INT);
 $DomainName = filter_input(INPUT_GET, "DomainName", FILTER_SANITIZE_STRING);
 
-if($oDomain->DomainExists($DomainName) != $DomainID)
-{
-        header("Location: index.php?NoteType=error&Notes=There was a problem with your request, please try again (id:cscid!id)");
-        exit();
+if($oDomain->DomainExists($DomainName) != $DomainID) {
+	header("Location: index.php?NoteType=error&Notes=There was a problem with your request, please try again (id:cscid!id)");
+	exit();
 }
 
 $CountryCodeArray = $oUtils->GetCountryCodeArray();
+//print "CountryCodeArray: ".print_r($CountryCodeArray, true)."<p>";
+
 $CountryCode = $oUtils->GetCountryCode($_SERVER["REMOTE_ADDR"]);
+///print "CountryCode: ".print_r($CountryCode, true)."<p>";
+
 $CountryName = $oUtils->GetCountryName($CountryCode);
+//print "CountryName: ".print_r($CountryName, true)."<p>";
 
 ?>
 

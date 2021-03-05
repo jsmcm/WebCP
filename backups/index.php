@@ -9,25 +9,28 @@ $oDomain = new Domain();
 $oUtils = new Utils();
 $oSettings = new Settings();
 $oReseller = new Reseller();
+$oSimpleNonce = new SimpleNonce();
 
 
 require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 
-if( ! file_exists("./weekly")) {
-        mkdir("./weekly", 0755);
+
+if( ! file_exists("../../backups/monthly")) {
+        mkdir("../../backups/monthly", 0755, true);
+}
+if( ! file_exists("../../backups/daily")) {
+        mkdir("../../backups/daily", 0755, true);
+}
+if( ! file_exists("../../backups/weekly")) {
+        mkdir("../../backups/weekly", 0755);
+}
+if( ! file_exists("../../backups/adhoc")) {
+        mkdir("../../backups/adhoc", 0755);
+}
+if( ! file_exists("../../backups/tmp")) {
+        mkdir("../../backups/tmp", 0755);
 }
 
-if( ! file_exists("./daily")) {
-        mkdir("./daily", 0755);
-}
-
-if( ! file_exists("./adhoc")) {
-        mkdir("./adhoc", 0755);
-}
-
-if( ! file_exists("./tmp")) {
-        mkdir("./tmp", 0755);
-}
 
 
 $ClientID = $oUser->getClientId();
@@ -247,7 +250,7 @@ $Role = $oUser->Role;
 
 	<?php
 	
-	if ($handle = opendir($_SERVER["DOCUMENT_ROOT"]."/backups/adhoc/"))
+	if ($handle = opendir($_SERVER["DOCUMENT_ROOT"]."/../backups/adhoc/"))
 	{
 
 		/* This is the correct way to loop over the directory. */
@@ -260,11 +263,18 @@ $Role = $oUser->Role;
 				{
 					print "<tr>";
 
-					print "<td><a href=\"/backups/adhoc/".$file."\">".$file."</a></td>";	
+					$metaDataArray = [
+						$ClientID,
+						$Role
+					];
+
+					$nonce = $oSimpleNonce->GenerateNonce("backups/download", $metaDataArray);
+
+					print "<td><a href=\"download.php?backupFile=/../backups/adhoc/".$file."&nonce=".$nonce["Nonce"]."&timeStamp=".$nonce["TimeStamp"]."\">".$file."</a></td>";	
       					
 
 					print "<td>".$oDomain->GetDomainName(substr($file, 0, strpos($file, "_")))."</td>";	
-					$fileSize = filesize($_SERVER["DOCUMENT_ROOT"]."/backups/adhoc/".$file); 
+					$fileSize = filesize($_SERVER["DOCUMENT_ROOT"]."/../backups/adhoc/".$file); 
 					print "<td>".$oUtils->ConvertFromBytes($fileSize)."</td>";	
 
 
@@ -274,7 +284,7 @@ $Role = $oUser->Role;
 					
 								if($Role == "admin")
 								{
-									print "<a href=\"/restore/DoRestore.php?URL=/backups/index.php&FileName=".$_SERVER["DOCUMENT_ROOT"]."/backups/adhoc/".$file."\" class=\"btn btn-green tooltips\" data-placement=\"top\" data-original-title=\"Restore File\"><i class=\"fa fa-cloud-upload fa fa-white\" style=\"color:white;\"></i></a>\n";
+									print "<a href=\"/restore/DoRestore.php?URL=/../backups/index.php&FileName=".$_SERVER["DOCUMENT_ROOT"]."/../backups/adhoc/".$file."\" class=\"btn btn-green tooltips\" data-placement=\"top\" data-original-title=\"Restore File\"><i class=\"fa fa-cloud-upload fa fa-white\" style=\"color:white;\"></i></a>\n";
 								}
 								print "<a href=\"DeleteBackup.php?File=".$file."\" onclick=\"return ValidateDelete('".$file."'); return false;\" class=\"btn btn-bricky tooltips\" data-placement=\"top\" data-original-title=\"Delete File\"><i class=\"fa fa-times fa fa-white\" style=\"color:white;\"></i></a>\n";
 
@@ -292,7 +302,7 @@ $Role = $oUser->Role;
 								if($Role == "admin")
 								{
 									print "<li role=\"presentation\">";
-									print "<a role=\"menuitem\" tabindex=\"-1\" href=\"/restore/DoRestore.php?FileName=".$_SERVER["DOCUMENT_ROOT"]."/backups/adhoc/".$file."\">";
+									print "<a role=\"menuitem\" tabindex=\"-1\" href=\"/restore/DoRestore.php?FileName=".$_SERVER["DOCUMENT_ROOT"]."/../backups/adhoc/".$file."\">";
 									print "<i class=\"fa fa-cloud-upload\"></i> Restore File";
 									print "</a>";
 									print "</li>";

@@ -1,23 +1,21 @@
 <?php
 session_start();
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 $oUser = new User();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Email.php");
 $oEmail = new Email();
 
+require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
+
 $ClientID = $oUser->getClientId();
-if($ClientID < 1)
-{
+if($ClientID < 1) {
         header("Location: /index.php");
         exit();
 }
 
 $Role = $oUser->Role;
 
-if($Role != "admin")
-{
+if($Role != "admin") {
 	header("location: /index.php");
 	exit();
 }
@@ -40,7 +38,4 @@ if(strpos($ReturnURL, "?") > -1)
 
 
 header("location: ./".$ReturnURL."?Notes=Email limits set to defaults&DomainName=".$_POST["DomainName"]);
-
-?>
-
 

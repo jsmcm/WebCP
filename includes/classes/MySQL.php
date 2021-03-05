@@ -83,6 +83,62 @@ class MySQL
 		return 1;
 	}
 	
+	
+	function unSuspendUserAccounts($domainUserName)
+	{
+
+		try {
+			$pdo_query = $this->DatabaseConnection->prepare("UPDATE mysql.user SET User = substr(User, 11) where User LIKE 'suspended_".$domainUserName."_%';");	
+			$pdo_query->execute();
+	
+		} catch(PDOException $e) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.MySQL.php -> unSuspendUserAccounts 1; Error = ".$e);
+		}	
+		
+
+
+		try {
+			$pdo_query = $this->DatabaseConnection->prepare("flush privileges");
+			
+			$pdo_query->execute();
+	
+		} catch(PDOException $e) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.MySQL.php -> unSuspendUserAccounts 2(); Error = ".$e);
+		}	
+		
+		return true;
+	}
+
+	function suspendUserAccounts($domainUserName)
+	{
+
+		try {
+			$pdo_query = $this->DatabaseConnection->prepare("UPDATE mysql.user SET User = concat('suspended_', User) where User LIKE '".$domainUserName."_%';");	
+			$pdo_query->execute();
+	
+		} catch(PDOException $e) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.MySQL.php -> suspendUserAccounts 1; Error = ".$e);
+		}	
+		
+
+
+		try {
+			$pdo_query = $this->DatabaseConnection->prepare("flush privileges");
+			
+			$pdo_query->execute();
+	
+		} catch(PDOException $e) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.MySQL.php -> suspendUserAccounts 2(); Error = ".$e);
+		}	
+		
+		return true;
+	}
+
+	
 	 
 	function DeleteUserNameHosts($UserName)
 	{
@@ -435,15 +491,25 @@ class MySQL
 	function CreateUserUserName($AccountPrefix, $Username, $Password, $Host)
 	{
 
-		try
-		{
-			$pdo_query = $this->DatabaseConnection->prepare( "CREATE USER '".trim($Username)."'@'".trim($Host)."' IDENTIFIED BY  '".filter_var($Password, FILTER_SANITIZE_STRING)."'");
-			
+
+		try {
+			//https://stackoverflow.com/questions/5555328/error-1396-hy000-operation-create-user-failed-for-jacklocalhost
+			$pdo_query = $this->DatabaseConnection->prepare( "DROP USER '".trim($Username)."'@'".trim($Host)."'");
+		
 			$pdo_query->execute();
 	
+		} catch(PDOException $e) {
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.MySQL.php -> CreateUserUserName0(); Error = ".$e);
 		}
-		catch(PDOException $e)
-		{
+
+
+		try {
+			$pdo_query = $this->DatabaseConnection->prepare( "CREATE USER '".trim($Username)."'@'".trim($Host)."' IDENTIFIED BY  '".filter_var($Password, FILTER_SANITIZE_STRING)."'");
+		
+			$pdo_query->execute();
+	
+		} catch(PDOException $e) {
 			$oLog = new Log();
 			$oLog->WriteLog("error", "/class.MySQL.php -> CreateUserUserName1(); Error = ".$e);
 		}
@@ -452,9 +518,8 @@ class MySQL
 	
 		try
 		{
-			$pdo_query = $this->DatabaseConnection->prepare("GRANT USAGE ON *.* TO  '".trim($Username)."'@'".trim($Host)."' IDENTIFIED BY :password WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0 ;");
-			
-			$pdo_query->bindParam(":password", $Password);
+			$pdo_query = $this->DatabaseConnection->prepare("GRANT USAGE ON *.* TO  '".trim($Username)."'@'".trim($Host)."' IDENTIFIED BY '".$Password."' WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0 ;");
+
 			$pdo_query->execute();
 	
 		}
@@ -519,26 +584,37 @@ class MySQL
 	
 	function AddMySQL($DomainID, $cpDatabaseName, $Username, $Password, $ClientID, $PackageID)
 	{
-                $oUser = new User();
-                $oDomain = new Domain();
-                $oPackage = new Package();
+		$oUser = new User();
+		$oDomain = new Domain();
+		$oPackage = new Package();
 
 		$DomainInfoArray = array();
-	        $oDomain->GetDomainInfo($DomainID, $DomainInfoArray);
+
+		
+		$random = random_int(1, 1000000);
+		$oUser = new User();
+		$oSimpleNonce = new SimpleNonce();
+		$nonceArray = [	
+			$oUser->Role,
+			$oUser->ClientID,
+			$DomainID,
+			$random
+		];
+		$nonce = $oSimpleNonce->GenerateNonce("getDomainInfo", $nonceArray);
+
+		$oDomain->GetDomainInfo($DomainID, $random, $DomainInfoArray, $nonce);
 		$PackageID = $DomainInfoArray["PackageID"];
 		$DomainUserName = $DomainInfoArray["UserName"];
 
-                $MySQLUsage = $oPackage->GetMySQLUsage($DomainUserName);
-                $MySQLAllowance = $oPackage->GetPackageAllowance("MySQL", $PackageID);
-              
-		if( (($MySQLAllowance - $MySQLUsage) < 1) && ($oUser->Role != "admin") )
-                {
-                        return -1;
-                }
+		$MySQLUsage = $oPackage->GetMySQLUsage($DomainUserName);
+		$MySQLAllowance = $oPackage->GetPackageAllowance("MySQL", $PackageID);
+			
+		if( (($MySQLAllowance - $MySQLUsage) < 1) && ($oUser->Role != "admin") ) {
+			return -1;
+		}
 
 
-		try
-		{
+		try {
 			$pdo_query = $this->DatabaseConnection->prepare("INSERT INTO mysql VALUES (0, :client_id, :domain_username, :username, :database_name, :password, '".date("Y-m-d H:i:s")."', 0);");
 			$pdo_query->bindParam(":client_id", $ClientID);
 			$pdo_query->bindParam(":domain_username", $DomainUserName);
@@ -548,9 +624,7 @@ class MySQL
 
 			$pdo_query->execute();
 	
-		}
-		catch(PDOException $e)
-		{
+		} catch(PDOException $e) {
 			$oLog = new Log();
 			$oLog->WriteLog("error", "/class.MySQL.php -> AddMySQL(); Error = ".$e);
 		}

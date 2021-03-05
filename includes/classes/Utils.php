@@ -7,71 +7,72 @@ class Utils
 
 
 
+	function __construct()
+	{
+
+		if ( ! file_exists("/tmp/webcp/") ) {
+			mkdir("/tmp/webcp");
+		}
+
+	}
+
+
+
+	function slugify($string)
+	{
+        return strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $string), '-'));
+	}
+	
+
 	function ValidateHash($Hash, $LicenseKey)
 	{
-		$oLog = new Log();
-		$oLog->WriteLog("debug", "Hash:  ".$Hash);
-		$oLog->WriteLog("debug", "LicenseKey:  ".$LicenseKey);
-		
 		$Formula = substr($Hash, strlen($Hash) - 2, 2);
 		$Hash = substr($Hash, 0, strlen($Hash) - 2);
-
 
 		$FormulaNumber = hexdec($Formula);
 		$FormulaNumber = $FormulaNumber & 0x03;
 
-                   if($FormulaNumber == 1)
-                   {
-                       $NewHash = "";
-
-                       for($x = strlen($Hash) - 1; $x >= 0; $x--)
-                       {
-                           $NewHash = $NewHash.$Hash[$x];
-                       }
-                      
-                   }
-                   else if($FormulaNumber == 2)
-                   {
-                       $NewHash = "";
-
-                       for($x = strlen($Hash) - 1; $x >= 0; $x--)
-                       {
-                           $NewHash = $NewHash.$Hash[$x];
-                       }
-
-                       $Hash = $NewHash;
+		if($FormulaNumber == 1) {
 			$NewHash = "";
 
-                       for($x = 0; $x < strlen($Hash); $x = $x + 2)
-                       {
-                            $NewHash = $NewHash.$Hash[$x + 1].$Hash[$x];
-                       }
+			for($x = strlen($Hash) - 1; $x >= 0; $x--) {
+				$NewHash = $NewHash.$Hash[$x];
+			}
+			
+		} else if($FormulaNumber == 2) {
+			$NewHash = "";
 
+			for($x = strlen($Hash) - 1; $x >= 0; $x--) {
+				$NewHash = $NewHash.$Hash[$x];
+			}
 
-                   }
-                   else if($FormulaNumber == 3)
-                   {
-                       $NewHash = "";
+			$Hash = $NewHash;
+			$NewHash = "";
 
-                       for($x = 0; $x < strlen($Hash); $x = $x + 2)
-                       {
-                            $NewHash = $NewHash.$Hash[$x + 1].$Hash[$x];
-                       }
+			for($x = 0; $x < strlen($Hash); $x = $x + 2) {
+			
+				if ( isset( $Hash[$x + 1] ) ) {
+					$NewHash = $NewHash.$Hash[$x + 1].$Hash[$x];
+				}
+			}
 
-                   }
-                   else
-                   {
-                       $NewHash = $Hash;
-                   }
-	
-		$RemoteIP = gethostbyname("bug.webcp.pw");
+		} else if($FormulaNumber == 3) {
+			$NewHash = "";
 
-		for($x = 1; $x < 11; $x++)
-		{
+			for($x = 0; $x < strlen($Hash); $x = $x + 2) {
+				$NewHash = $NewHash.$Hash[$x + 1].$Hash[$x];
+			}
+
+		} else {
+			$NewHash = $Hash;
+		}
+
+		$RemoteIP = gethostbyname("bug.webcp.io");
+
+		for($x = 1; $x < 11; $x++) {
 			$CalculatedHash = md5($LicenseKey.$RemoteIP.$_SERVER["SERVER_ADDR"].$x);
 
-			if($CalculatedHash == $NewHash)
-			{
+			if($CalculatedHash == $NewHash) {
 				return true;
 			}
 		}
@@ -80,36 +81,260 @@ class Utils
 				
 	}
  	
-	function GetValidationHash($LicenseKey)
+	function getValidationData($hash)
 	{
-		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
+		if ( file_exists("/tmp/webcp/getValidationData_".$hash) ) {
+			
+			if( (time() - filemtime("/tmp/webcp/getValidationData_".$hash)) > 3600 ) {
+				unlink("/tmp/webcp/getValidationData_".$hash);
+			} else {
+				$data = file_get_contents("/tmp/webcp/getValidationData_".$hash);
+				return $data;
+			}
+
+		}
+
+
+		
+		$LicenseKey = "free";
+
+		if ( file_exists($_SERVER["DOCUMENT_ROOT"]."/includes/license.conf")) {
+			$LicenseKey = file_get_contents($_SERVER["DOCUMENT_ROOT"]."/includes/license.conf");
+		}
+
+		$oDomain = new Domain();
+
+		$AccountsCreated = $oDomain->GetAccountsCreatedCount();
+
+		//if ($AccountsCreated < 6 && $LicenseKey == "free") {
+		if ($LicenseKey == "free") {
+		
+			$data = '{"allowed":0,"type":"free","date":"'.date("Y-m-d H:i:s").'","status":"failed","hash":"","message":"License not valid for free service"}';
+
+			if ($this->ValidateFreeKey($hash)) {
+				$data = '{"allowed":5,"type":"free","date":"'.date("Y-m-d H:i:s").'","status":"valid","hash":"16e2eebda7c4c0fcba6a253f79607ca2ab","message":""}';
+			}
+			
+
+		} else {
+
+			$options = array(
+			'uri' => 'https://api.webcp.io/',
+			'location' => 'https://api.webcp.io/updates/3.0.0/check.php',
+			'trace' => 1);
+
+			$client = new SoapClient(NULL, $options);
+			$data = $client->getValidationData($hash);
+
+		}
+
+		file_put_contents("/tmp/webcp/getValidationData_".$hash, $data);
+
+		return $data;
+	}
+ 	
+	function getValidationKey($LicenseKey)
+	{
+		if ( file_exists("/tmp/webcp/getValidationKey_".$LicenseKey) ) {
+
+			if( (time() - filemtime("/tmp/webcp/getValidationKey_".$LicenseKey)) > 3600 ) {
+				unlink("/tmp/webcp/getValidationKey_".$LicenseKey);
+			} else {
+				//print "returning from cache<p>";
+				return file_get_contents("/tmp/webcp/getValidationKey_".$LicenseKey);
+			}
+		}
+
 		$oDomain = new Domain();
 
 		$AccountsCreated = $oDomain->GetAccountsCreatedCount();
 
 		//print "AccountsCreated: ".$AccountsCreated."<p>";
-                $options = array(
-                'uri' => 'http://api.webcp.pw/',
-                'location' => 'http://api.webcp.pw/updates/check.php',
-                'trace' => 1);
 
-                $client = new SoapClient(NULL, $options);
-                return $client->GetValidationHash($LicenseKey, $AccountsCreated);
+		//if ($AccountsCreated < 6 && $LicenseKey == "free") {
+		if ($LicenseKey == "free") {
+		
+			// free, doesn't need license
+			$key = $this->makeFreeKey();
+		
+		} else {
+
+
+			//print "AccountsCreated: ".$AccountsCreated."<p>";
+			$options = array(
+			'uri' => 'https://api.webcp.io/',
+			'location' => 'https://api.webcp.io/updates/3.0.0/check.php',
+			'trace' => 1);
+
+			$client = new SoapClient(NULL, $options);
+			$key = $client->getValidationKey($LicenseKey);
+		
+		}
+
+		file_put_contents("/tmp/webcp/getValidationKey_".$LicenseKey, $key);
+		return $key;
 	}
 
-        
+	function ValidateFreeKey($key)
+	{
+
+		$free = $key[1].$key[5].$key[10].$key[16];
+
+		if ($free != "fee0") {
+			return false;
+		}
+
+		$date1 = "20".$key[3].$key[8]."-".$key[19].$key[25]."-".date("d");
+		
+		$date2 = date("Y-m-d");
+
+		$ts1 = strtotime($date1);
+		$ts2 = strtotime($date2);
+
+		$year1 = date('Y', $ts1);
+		$year2 = date('Y', $ts2);
+
+		$month1 = date('m', $ts1);
+		$month2 = date('m', $ts2);
+
+		$diff = (($year2 - $year1) * 12) + ($month2 - $month1);
+
+		if ($diff > 2) {
+			return false;
+		}
+
+		$number[0] = hexdec($key[2]);
+		$number[1] = hexdec($key[6]);
+		$number[2] = hexdec($key[12]);
+		$number[3] = hexdec($key[14]);
+		$number[4] = hexdec($key[18]);
+		$number[5] = hexdec($key[21]);
+		$number[6] = hexdec($key[23]);
+		$number[7] = hexdec($key[24]);
+		$number[8] = hexdec($key[27]);
+		$number[9] = hexdec($key[29]);
+		
+		$total = 0;
+		for ($x = 0; $x < 10; $x++) {
+				
+				if ( !($x == 3 || $x == 4 ) ) {
+				
+					//print "its ".$x.", doing<p>";
+		
+					if ($total > $number[$x]) {
+						$total = $total - $number[$x];
+					} else {
+						$total = $total + $number[$x];
+					}
+				}
+		
+		}
+		
+		if ($total > 2) {
+			$number[3] = intVal($total / 2);
+			$total = $total - $number[3];
+			$number[4] = $total;
+			$total = $total - $number[4];
+		
+		} else {
+			$number[3] = $total;
+			$number[4] = 0;
+			$total = $total - $number[3];
+			$total = $total - $number[4];
+		}
+		
+		if ($total == 0) {
+			return true;
+		}
+
+		return false;
+		
+	}
+
+
+	function makeFreeKey()
+	{
+
+		$number[0] = mt_rand(0, 15);
+		$number[1] = mt_rand(0, 15);
+		$number[2] = mt_rand(0, 15);
+		$number[3] = mt_rand(0, 15);
+		$number[4] = mt_rand(0, 15);
+		$number[5] = mt_rand(0, 15);
+		$number[6] = mt_rand(0, 15);
+		$number[7] = mt_rand(0, 15);
+		$number[8] = mt_rand(0, 15);
+		$number[9] = mt_rand(0, 15);
+				
+		//2[Ff][N0][y2]2[Ee][N1]5[y0]7[Ee]9[N2]f[N3]1[Zero0]e[N4][M0]6[N5]d[N6][N7][M8]f[N8]d[N9]6f
+		
+		$key = "";
+		for($x = 0; $x < 32; $x++) {
+		
+			$key = $key.dechex(mt_rand(0, 15));
+		
+		}
+		
+		
+		$total = 0;
+		for ($x = 0; $x < 10; $x++) {
+		
+				if ( !($x == 3 || $x == 4 ) ) {
+					if ($total > 0 && ($total - $number[$x] > 0) ) {
+						$total = $total - $number[$x];
+					} else {
+						$total = $total + $number[$x];
+					}
+				}
+		
+		}
+		
+		
+		if ($total > 2) {
+			$number[3] = intVal($total / 2);
+			$total = $total - $number[3];
+			$number[4] = $total;
+			$total = $total - $number[4];
+		
+		} else {
+			$number[3] = $total;
+			$number[4] = 0;
+			$total = $total - $number[3];
+			$total = $total - $number[4];
+		}
+		
+		$key[1] = 'f';
+		$key[2] = dechex($number[0]);
+		$key[3] = substr(date("Y"), 2,1);
+		$key[5] = 'e';
+		$key[6] = dechex($number[1]);
+		$key[8] = substr(date("Y"), 3,1);
+		$key[10] = 'e';
+		$key[12] = dechex($number[2]);
+		$key[14] = dechex($number[3]);
+		$key[16] = '0';
+		$key[18] = dechex($number[4]);
+		$key[19] = substr(date("m"), 0,1);
+		$key[21] = dechex($number[5]);
+		$key[23] = dechex($number[6]);
+		$key[24] = dechex($number[7]);
+		$key[25] = substr(date("m"), 1,1);
+		$key[27] = dechex($number[8]);
+		$key[29] = dechex($number[9]);
+		
+		return $key;
+
+	}
+
+
 	function GetTrafficStats(&$TotalTraffic, &$TotalUsed, &$TotalAvailable, &$PercentageUsed)
         {
-		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Package.php");
 		$oPackage = new Package();
 
-		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Settings.php");
 		$oSettings = new Settings();
 
-		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
 		$oDomain = new Domain();
 
-		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Utils.php");
 		$oUtils = new Utils();
 		
 		$TotalTraffic = $oSettings->GetServerTrafficAllowance();
@@ -124,13 +349,10 @@ class Utils
 
 	function GetDiskSpaceStats(&$TotalDiskSpace, &$TotalUsed, &$TotalAvailable, &$PercentageUsed)
 	{
-		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Package.php");
 		$oPackage = new Package();
 
-		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
 		$oDomain = new Domain();
 
-		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Utils.php");
 		$oUtils = new Utils();
 
 		$TotalDiskSpace = $oPackage->GetTotalDiskSpace();                                                   
@@ -406,13 +628,14 @@ class Utils
 
 	function GetCountryCode($IPAddress)
 	{
-      		$options = array(
-                'uri' => 'http://webcp.pw/api',
-                'location' => 'http://webcp.pw/api/Country.php',
-                'trace' => 1);
-
-                $client = new SoapClient(NULL, $options);
-                return $client->GetCountryCode($IPAddress);
+		$options = array(
+			'uri' => 'https://api.webcp.io',
+			'location' => 'https://api.webcp.io/Country.php',
+			'trace' => 1);
+	
+			$client = new SoapClient(NULL, $options);
+		
+		return $client->GetCountryCode($IPAddress);
 	}
 
 	function GetCountryName($CountryCode)
@@ -420,6 +643,21 @@ class Utils
 		$Countries = $this->GetCountryCodeArray();
 		return $Countries[strtoupper($CountryCode)];
 	}
+	
+
+
+    function generateRandomString($length = 10)
+    {
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $charactersLength = strlen($characters);
+        $randomString = '';
+        for ($i = 0; $i < $length; $i++) {
+            $randomString .= $characters[rand(0, $charactersLength - 1)];
+        }
+        return $randomString;
+    }
+
+
 	
 
 	function GetCountryCodeArray()

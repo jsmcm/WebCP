@@ -3,8 +3,8 @@ session_start();
 
 include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 
-if (!file_exists($_SERVER["DOCUMENT_ROOT"]."/backups/tmp/")) {
-    mkdir($_SERVER["DOCUMENT_ROOT"]."/backups/tmp/", 0755);
+if (!file_exists($_SERVER["DOCUMENT_ROOT"]."/../backups/tmp/")) {
+    mkdir($_SERVER["DOCUMENT_ROOT"]."/../backups/tmp/", 0755);
 }
 
 
@@ -62,8 +62,19 @@ $XMLContent = new SimpleXMLElement('<?xml version="1.0" ?><BackupScript />');
 
 $oDomain = new Domain();
 
+
+$random = random_int(1, 1000000);
+$nonceArray = [	
+	$oUser->Role,
+	$oUser->ClientID,
+	$DomainID,
+	$random
+];
+$oSimpleNonce = new SimpleNonce();
+$nonce = $oSimpleNonce->GenerateNonce("getDomainInfo", $nonceArray);
+
 $DomainArray = array();
-$oDomain->GetDomainInfo($DomainID, $DomainArray);
+$oDomain->GetDomainInfo($DomainID, $random, $DomainArray, $nonce);
 
 
 $oPackage = new Package();
@@ -204,7 +215,7 @@ if ($RandomString == "") {
     $RandomString = $RandomString.rand(0,9);
     $RandomString = $RandomString.rand(0,9);
 
-    while (is_dir($_SERVER["DOCUMENT_ROOT"]."/backups/tmp/".$RandomString)) {
+    while (is_dir($_SERVER["DOCUMENT_ROOT"]."/../backups/tmp/".$RandomString)) {
         $RandomString = date("Y-m-d_H-i-s")."_";
         $RandomString = $RandomString.rand(0,9);
 	$RandomString = $RandomString.rand(0,9);
@@ -216,10 +227,10 @@ if ($RandomString == "") {
 }
 
 //print "<p>Making: '".$_SERVER["DOCUMENT_ROOT"]."/backups/tmp/".$RandomString."'<p>";
-mkdir($_SERVER["DOCUMENT_ROOT"]."/backups/tmp/".$RandomString, 0755);
-chmod($_SERVER["DOCUMENT_ROOT"]."/backups/tmp/".$RandomString, 0755);
+mkdir($_SERVER["DOCUMENT_ROOT"]."/../backups/tmp/".$RandomString, 0755);
+chmod($_SERVER["DOCUMENT_ROOT"]."/../backups/tmp/".$RandomString, 0755);
 
-$fp = fopen($_SERVER["DOCUMENT_ROOT"]."/backups/tmp/".$RandomString."/".$DomainArray["UserName"].".xml", "w");
+$fp = fopen($_SERVER["DOCUMENT_ROOT"]."/../backups/tmp/".$RandomString."/".$DomainArray["UserName"].".xml", "w");
 fwrite($fp, $XMLContent->asXML());
 fclose($fp);
 
@@ -275,4 +286,3 @@ fclose($fp);
 if ($ReturnURL != "") {
     header("Location: ".$ReturnURL."?".$Notes);
 }
-?>

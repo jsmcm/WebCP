@@ -4,44 +4,59 @@ session_start();
 include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 
 $oUser = new User();
-
 $oPackage = new Package();
-
 $oSettings = new Settings();
+$oSimpleNonce = new SimpleNonce();
 
 require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 
 $ClientID = $oUser->getClientId();
-if($ClientID < 1)
-{
+if($ClientID < 1) {
 	header("Location: /index.php");
 	exit();
 }
 	
 $DomainID = 0;
-if(isset($_REQUEST["DomainID"]))
-{
-	$DomainID = $_REQUEST["DomainID"];
+if(isset($_REQUEST["DomainID"])) {
+	$DomainID = intVal($_REQUEST["DomainID"]);
 }
 
-if( (! is_numeric($DomainID)) || ($DomainID < 1) )
-{
+if( (! is_numeric($DomainID)) || ($DomainID < 1) ) {
 	header("Location: /index.php");
 	exit();
 }
 
 	$oDomain = new Domain();
-        $ClientID = $oUser->ClientID;
-        $DomainOwnerClientID = $oDomain->GetDomainOwner($DomainID);
-        $PrimaryDomainName = $oDomain->GetDomainNameFromDomainID($DomainID);
+	$ClientID = $oUser->ClientID;
+
+	$random = random_int(1, 100000);
+	$nonceArray = [
+		$oUser->Role,
+		$oUser->ClientID,
+		$DomainID,
+		$random
+	];
+	
+	$nonce = $oSimpleNonce->GenerateNonce("getDomainOwner", $nonceArray);
+	$DomainOwnerClientID = $oDomain->GetDomainOwner($DomainID, $random, $nonce);
+
+	$random = random_int(1,100000);
+	$nonceArray = [
+		$oUser->Role,
+		$oUser->getClientId(),
+		$DomainID,
+		$random
+	];
+	
+	$nonce = $oSimpleNonce->GenerateNonce("getDomainNameFromDomainID", $nonceArray);
+	$PrimaryDomainName = $oDomain->GetDomainNameFromDomainID($DomainID, $random, $nonce);
 
 	//print "ClientID: ".$ClientID."<p>";
 	//print "DomainOwnerClientID: ".$DomainOwnerClientID."<p>";
 	//print "Role: ".$oUser->Role."<p>";
 
-	if( ($DomainOwnerClientID != $ClientID) && ($oUser->Role != 'admin') )
-	{
-		die("You do not have permission to be here...");
+	if( ($DomainOwnerClientID != $ClientID) && ($oUser->Role != 'admin') ) {
+		throw new Exception("You do not have permission to be here...");
 	}
 
 
@@ -51,8 +66,18 @@ if( (! is_numeric($DomainID)) || ($DomainID < 1) )
 
         if($DomainID > -1)
         {
-                $DomainInfoArray = array();
-                $oDomain->GetDomainInfo($DomainID, $DomainInfoArray);
+				$DomainInfoArray = array();
+				
+
+				$random = random_int(1, 1000000);
+				$nonceArray = [	
+					$oUser->Role,
+					$oUser->ClientID,
+					$DomainID,
+					$random
+				];
+				$nonce = $oSimpleNonce->GenerateNonce("getDomainInfo", $nonceArray);		
+                $oDomain->GetDomainInfo($DomainID, $random, $DomainInfoArray, $nonce);
 
                 $DomainUserName = $DomainInfoArray["UserName"];
                 $ParkedDomainAllowance = $oPackage->GetPackageAllowance("ParkedDomains", $DomainInfoArray["PackageID"]);
@@ -106,6 +131,9 @@ if( (! is_numeric($DomainID)) || ($DomainID < 1) )
 		<link rel="stylesheet" href="/assets/plugins/DataTables/media/css/DT_bootstrap.css" />
 		<!-- end: CSS REQUIRED FOR THIS PAGE ONLY -->
 		<link rel="shortcut icon" href="/favicon.ico" />
+
+                <link rel="stylesheet" href="/assets/plugins/x-editable/css/bootstrap-editable.css">
+
 		
 		
 		<script language="javascript">
@@ -292,6 +320,7 @@ if( (! is_numeric($DomainID)) || ($DomainID < 1) )
 										<thead>
 											<tr>
 												<th>Parked Domain</th>
+												<th>Redirect <a href="https://webcp.io/parked-redirect/" target="_new"><img src="/img/help.png" width="20px"></a></th>
 												<th>Parked On</th>
 												<th>&nbsp;</th>
 											</tr>
@@ -308,11 +337,21 @@ if( (! is_numeric($DomainID)) || ($DomainID < 1) )
 										{
 											print "<tr>";
 											print "<td><a href=\"http://".$Array[$x]["ParkedDomain"]."\" target=\"_new\">".$Array[$x]["ParkedDomain"]."</a></td>\r\n";
+
+                                                                                        $parkedRedirect = "";
+                                                                                        $domainSettings = $oDomain->getDomainSettings($Array[$x]["ID"]);
+
+                                                                                        if (isset($domainSettings["parked_redirect"]["value"])) {
+                                                                                                $parkedRedirect = $domainSettings["parked_redirect"]["value"];
+                                                                                        }
+
+											print "<td><a href=\"#\" id=\"parked_redirect_".$Array[$x]["ID"]."\" data-type=\"select\" data-pk=\"".$Array[$x]["ID"]."\" data-value=\"".$parkedRedirect."\" data-original-title=\"Select Redirect\"></a></td>\r\n";
+
 											print "<td>".$Array[$x]["ParkedOn"]."</td>\r\n";
 
 											print "<td class=\"center\">";
 											print "<div class=\"visible-md visible-lg hidden-sm hidden-xs\">";
-											print "<a href=\"DeleteParkedDomain.php?ParkedDomainID=".$Array[$x]["ID"]."\" onclick=\"return ConfirmDelete('".$Array[$x]["ParkedDomain"]."'); return false;\" class=\"btn btn-bricky tooltips\" data-placement=\"top\" data-original-title=\"Delete Parked Domain\"><i class=\"fa fa-times fa fa-white\" style=\"color:white;\"></i></a>\n";
+											print "<a href=\"DeleteParkedDomain.php?parentDomainId=".$DomainID."&ParkedDomainID=".$Array[$x]["ID"]."\" onclick=\"return ConfirmDelete('".$Array[$x]["ParkedDomain"]."'); return false;\" class=\"btn btn-bricky tooltips\" data-placement=\"top\" data-original-title=\"Delete Parked Domain\"><i class=\"fa fa-times fa fa-white\" style=\"color:white;\"></i></a>\n";
 											print "</div>";
 											print "<div class=\"visible-xs visible-sm hidden-md hidden-lg\">";
 											print "<div class=\"btn-group\">";
@@ -322,7 +361,7 @@ if( (! is_numeric($DomainID)) || ($DomainID < 1) )
 											print "<ul role=\"menu\" class=\"dropdown-menu pull-right\">";
 															
 											print "<li role=\"presentation\">";
-											print "<a role=\"menuitem\" tabindex=\"-1\" href=\"DeleteParkedDomain.php?ParkedDomainID=".$Array[$x]["ID"]."\" onclick=\"return ConfirmDelete('".$Array[$x]["ParkedDomain"]."'); return false;\">";
+											print "<a role=\"menuitem\" tabindex=\"-1\" href=\"DeleteParkedDomain.php?parentDomainId=".$DomainID."&ParkedDomainID=".$Array[$x]["ID"]."\" onclick=\"return ConfirmDelete('".$Array[$x]["ParkedDomain"]."'); return false;\">";
 											print "<i class=\"fa fa-times\"></i> Delete Parked Domain";
 											print "</a>";
 											print "</li>";																
@@ -407,6 +446,28 @@ if( (! is_numeric($DomainID)) || ($DomainID < 1) )
 		<script type="text/javascript" src="/assets/plugins/DataTables/media/js/jquery.dataTables.min.js"></script>
 		<script type="text/javascript" src="/assets/plugins/DataTables/media/js/DT_bootstrap.js"></script>
 		<script src="/assets/js/table-data.js"></script>
+
+
+
+
+
+                <script src="/assets/plugins/bootstrap-modal/js/bootstrap-modal.js"></script>
+
+                <script src="/assets/plugins/bootstrap-modal/js/bootstrap-modalmanager.js"></script>
+
+                <script src="/assets/js/ui-modals.js"></script>
+
+                <script src="/assets/plugins/jquery-mockjax/jquery.mockjax.js"></script>
+
+                <script src="/assets/plugins/x-editable/js/bootstrap-editable.min.js"></script>
+
+                <script src="/assets/plugins/x-editable/parked-redirect.js"></script>
+
+                <script src="/assets/plugins/x-editable/demo.js"></script>
+
+
+
+
 		<!-- end: JAVASCRIPTS REQUIRED FOR THIS PAGE ONLY -->
 		<script>
 			jQuery(document).ready(function() {

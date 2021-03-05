@@ -34,7 +34,7 @@ class SendMail
 		$BCC = $oSettings->GetForwardSystemEmailsTo();
 
 
-                $MailFrom = $_SERVER["SERVER_NAME"];
+                $MailFrom = gethostname(); //$_SERVER["SERVER_NAME"];
 
                 if(strstr($MailFrom, "www."))
                 {
@@ -207,9 +207,9 @@ class SendMail
                 $mail->IsHTML(true);
 
 
-                $mail->AddReplyTo("noreply@".$MailFrom, $_SERVER["SERVER_NAME"]);
+                $mail->AddReplyTo("noreply@".$MailFrom, $MailFrom);
                 $mail->From = "noreply@".$MailFrom;
-                $mail->FromName = $_SERVER["SERVER_NAME"];
+                $mail->FromName = $MailFrom;
 
                 $mail->AddAddress($EmailAddress);
 		

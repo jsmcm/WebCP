@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 $oUser = new User();
 
 $ClientID = $oUser->getClientId();
@@ -39,57 +39,6 @@ if(substr($Path, strlen($Path) - 1) != "/")
 }
 
 $LeftNavPath = substr($Path, 0, strpos($Path, "public_html") + 12);
-
-function PrintDirectories($Path, $Iteration, $URL)
-{
-
-	$ULPrinted = false;
-
-	if ($handle = opendir($Path))	
-	{
-
-		/* This is the correct way to loop over the directory. */
-	        while (false !== ($file = readdir($handle)))
-	        {
-	                if($file != "." && $file != "..")
-	                {
-	                        if(is_dir($Path.$file))
-	                        {
-					if($ULPrinted == false)
-					{
-						if($Iteration == 0)
-						{
-							print "<ul id=\"browser\" class=\"filetree\">";
-						}
-						else
-						{
-							print "<ul>";
-						}
-					}
- 
-	                                print "<li class=\"closed\" ondblclick=\"ExpandFolder('".$URL."', '".$Path.$file."/');\"><span class=\"folder\" ondblclick=\"ExpandFolder('".$URL."', '".$Path.$file."/');\">".$file."</span>";
-	
-					PrintDirectories($Path.$file."/", $Iteration++, $URL);
-
-					print "</li>";
-
-					if($ULPrinted == false)
-					{
-						$ULPrinted = true;
-					}
-	                        }
-	                }
-	        }
-
-	        closedir($handle);
-	}
-
-	if($ULPrinted == true)
-	{
-		print "</ul>";
-	}
-}
-	
 
 ?>
 		
@@ -312,20 +261,6 @@ function PrintDirectories($Path, $Iteration, $URL)
 
 	<table border="0" cellpadding="0" cellspacing="0" width="100%" height="100%">
 	<tr>
-	<td width="300" valign="top" style="padding: 10px 5px 5px; border-right-width: 1px; border-right-color: black; border-right-style: solid;">
-		<div style="width:300px; overflow:auto;">		 
-
-		<?php
-		
-
-		print "<b><img src=\"./js/images/folder-closed.gif\"> ".$LeftNavPath."</b><br>";
-		PrintDirectories($LeftNavPath, 0, $URL);
-		?>
-
-
-
-		</div> 
-	 </td>
 	<td width="*" valign="top" style="color:#0000cc; font-size:14px;padding:10px 10px 10px; line-height:200%;">
 
 

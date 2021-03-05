@@ -66,6 +66,13 @@ if($ClientID < 1)
 
 		<link href="/assets/plugins/bootstrap-modal/css/bootstrap-modal.css" rel="stylesheet" type="text/css"/>
 
+
+                <link rel="stylesheet" type="text/css" href="/assets/plugins/select2/select2.css" />
+                <link rel="stylesheet" href="/assets/plugins/DataTables/media/css/DT_bootstrap.css" />
+
+
+		<link rel="stylesheet" href="/assets/plugins/x-editable/css/bootstrap-editable.css">
+
 		<!-- end: CSS REQUIRED FOR THIS PAGE ONLY -->
 		<link rel="shortcut icon" href="/favicon.ico" />
 		
@@ -205,13 +212,15 @@ if($ClientID < 1)
 								<div class="panel-body">
 
 									<?php
-									if( (file_exists("/etc/letsencrypt")) && (file_exists("/etc/nginx/ssl/letsencrypt")) )
+									//if( (file_exists("/etc/letsencrypt")) && (file_exists("/etc/nginx/ssl/letsencrypt")) )
+									if( (file_exists("/etc/letsencrypt"))  )
 									{
 									?>
 									<table class="table table-bordered table-full-width table-hover table-striped" id="sample_1">
 										<thead>
 											<tr>
 												<th>Domain</th>
+												<th>SSL Redirect <a href="https://webcp.io/ssl-redirect/" target="_new"><img src="/img/help.png" width="20px"></a></th>
 												<th>&nbsp;</th>
 												
 											</tr>
@@ -247,8 +256,19 @@ if($ClientID < 1)
 												continue;
 											}
 	
-											$InfoArray = array();								
-											$oDomain->GetDomainInfo($DomainID, $InfoArray);	
+											$InfoArray = array();
+											
+											$random = random_int(1, 1000000);
+											$oUser = new User();
+											$oSimpleNonce = new SimpleNonce();
+											$nonceArray = [	
+												$oUser->Role,
+												$oUser->ClientID,
+												$DomainID,
+												$random
+											];
+											$nonce = $oSimpleNonce->GenerateNonce("getDomainInfo", $nonceArray);			
+											$oDomain->GetDomainInfo($DomainID, $random, $InfoArray, $nonce);	
 											$PrimaryDomainID = $InfoArray["AncestorDomainID"];		
 
 											if($PrimaryDomainID < 1)
@@ -257,6 +277,16 @@ if($ClientID < 1)
 											}
 											print "<tr>";
 											print "<td><a href=\"https://".$Domain."\" target=\"_new\">".$Domain."</a></td>\r\n";	
+
+											$sslRedirect = "";
+                                                                                        $domainSettings = $oDomain->getDomainSettings($DomainID);
+
+                                                                                        if (isset($domainSettings["ssl_redirect"]["value"])) {
+                                                                                        	$sslRedirect = $domainSettings["ssl_redirect"]["value"];
+                                                                                        }
+
+
+											print "<td><a href=\"#\" id=\"ssl_redirect_".$DomainID."\" data-type=\"select\" data-pk=\"".$DomainID."\" data-value=\"".$sslRedirect."\" data-original-title=\"SSL Redirect\"></a></td>\r\n";
 
 													print "<td class=\"center\">";
 													print "<div class=\"visible-md visible-lg hidden-sm hidden-xs\">";
@@ -386,8 +416,15 @@ if($ClientID < 1)
 
 		<script src="/assets/plugins/bootstrap-modal/js/bootstrap-modalmanager.js"></script>
 
-		<script src="/assets/js/ui-modals.js"></script>
 
+                <script src="/assets/plugins/jquery-mockjax/jquery.mockjax.js"></script>
+
+
+                <script src="/assets/plugins/x-editable/js/bootstrap-editable.min.js"></script>
+
+                <script src="/assets/plugins/x-editable/ssl-redirect.js"></script>
+
+                <script src="/assets/plugins/x-editable/demo.js"></script>
 
 
 		<script>
@@ -395,6 +432,7 @@ if($ClientID < 1)
 				Main.init();
 				TableData.init();
 				UIModals.init();
+				Index.init();
 			});
 		</script>
 	</body>

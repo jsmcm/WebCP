@@ -1,10 +1,12 @@
 <?php
+
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
+
 class Provisioning
 { 
 
 	private function ValidateUser($UserName, $Password)
 	{
-		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
         	$oUser = new User();
 
 		$UserID = $oUser->CheckLoginCredentials($UserName, $Password);		
@@ -66,10 +68,8 @@ class Provisioning
 			return $ReturnArray;
 		}
 		
-     		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
         	$oDomain = new Domain();
      		
-		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
         	$oUser = new User();
 
 		/*****************************************************************************
@@ -96,8 +96,17 @@ class Provisioning
 
 		
 		$InfoArray = array();
-		$oDomain->GetDomainInfo($DomainID, $InfoArray);
 
+		$random = random_int(1, 1000000);
+		$nonceArray = [	
+				$oUser->Role,
+				$oUser->ClientID,
+				$DomainID,
+				$random
+		];
+		$nonce = $oSimpleNonce->GenerateNonce("getDomainInfo", $nonceArray);
+		$oDomain->GetDomainInfo($DomainID, $random, $InfoArray, $nonce);
+	
 		if($DomainUserName != $InfoArray["UserName"])
 		{
 			$ReturnArray["Status"] = "false";
@@ -124,11 +133,7 @@ class Provisioning
 			return $ReturnArray;
 		}
 
-
-		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Package.php");
 		$oPackage = new Package();
-		
-		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.FTP.php");
 		$oFTP = new FTP();
 
 
@@ -183,10 +188,7 @@ class Provisioning
 			return $ReturnArray;
 		}
 		
-     		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
         	$oDomain = new Domain();
-     		
-		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
         	$oUser = new User();
 
 		/*****************************************************************************
@@ -213,8 +215,16 @@ class Provisioning
 
 		
 		$InfoArray = array();
-		$oDomain->GetDomainInfo($DomainID, $InfoArray);
-
+		$random = random_int(1, 1000000);
+		$nonceArray = [	
+				$oUser->Role,
+				$oUser->ClientID,
+				$DomainID,
+				$random
+		];
+		$nonce = $oSimpleNonce->GenerateNonce("getDomainInfo", $nonceArray);
+		$oDomain->GetDomainInfo($DomainID, $random, $InfoArray, $nonce);
+	
 		if($DomainUserName != $InfoArray["UserName"])
 		{
 			$ReturnArray["Status"] = "false";
@@ -275,11 +285,7 @@ class Provisioning
 			return $ReturnArray;
 		}
 		
-		
-     		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
         	$oDomain = new Domain();
-     		
-		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
         	$oUser = new User();
 
 		/*****************************************************************************
@@ -306,8 +312,16 @@ class Provisioning
 
 		
 		$InfoArray = array();
-		$oDomain->GetDomainInfo($DomainID, $InfoArray);
-
+		$random = random_int(1, 1000000);
+		$nonceArray = [	
+				$oUser->Role,
+				$oUser->ClientID,
+				$DomainID,
+				$random
+		];
+		$nonce = $oSimpleNonce->GenerateNonce("getDomainInfo", $nonceArray);
+		$oDomain->GetDomainInfo($DomainID, $random, $InfoArray, $nonce);
+	
 		if($DomainUserName != $InfoArray["UserName"])
 		{
 			$ReturnArray["Status"] = "false";
@@ -374,10 +388,7 @@ class Provisioning
 		}
 		
 		
-     		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
         	$oDomain = new Domain();
-     		
-		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
         	$oUser = new User();
 
 		/*****************************************************************************
@@ -404,8 +415,16 @@ class Provisioning
 
 		
 		$InfoArray = array();
-		$oDomain->GetDomainInfo($DomainID, $InfoArray);
-
+		$random = random_int(1, 1000000);
+		$nonceArray = [	
+				$oUser->Role,
+				$oUser->ClientID,
+				$DomainID,
+				$random
+		];
+		$nonce = $oSimpleNonce->GenerateNonce("getDomainInfo", $nonceArray);
+		$oDomain->GetDomainInfo($DomainID, $random, $InfoArray, $nonce);
+	
 		if($DomainUserName != $InfoArray["UserName"])
 		{
 			$ReturnArray["Status"] = "false";
@@ -448,7 +467,8 @@ class Provisioning
         public function ProvisionAccount($LoginEmailAddress, $LoginPassword, $FirstName, $Surname, $EmailAddress, $Password, $PackageName, $DomainName, $DomainUserName)
         {  
 
-     		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Log.php");
+		//file_put_contents(dirname(__FILE__)."/log.log", "loginEmailAddress: ".$LoginEmailAddress."\r\nLoginPassword: ".$LoginPassword."\r\nFirstName: ".$FirstName."\r\nSurname: ".$Surname."\r\nEmailAddress: ".$EmailAddress."\r\nPassword: ".$Password."\r\nPackageName: ".$PackageName."\r\nDomainName: ".$DomainName."\r\nDomainUserName: ".$DomainUserName."\r\n\r\n", FILE_APPEND);
+
         	$oLog = new Log();
 
 		$ReturnArray = array();
@@ -466,7 +486,8 @@ class Provisioning
 			return $ReturnArray;
 		}
 		
-
+	
+		
 		/*****************************************************************************
 		*	
 		* CHECK IF REMOTE SERVER IS ALLOWED HERE!
@@ -488,7 +509,6 @@ class Provisioning
 		* CHECK IF WE HAVE A VALID PACKAGE NAME
 		*
 		*****************************************************************************/
-     		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Package.php");
         	$oPackage = new Package();
 
         	$PackageID = $oPackage->GetPackageID($PackageName);
@@ -510,7 +530,6 @@ class Provisioning
 		* ADD NEW USER IF NOT EXISTS
 		*
 		*****************************************************************************/
-     		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
         	$oUser = new User();
 
         	$UserID = $oUser->UserExistsByEmail($EmailAddress);
@@ -544,7 +563,6 @@ class Provisioning
 		* FINALLY, ADD THE DOMAIN!
 		*
 		*****************************************************************************/
-     		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
         	$oDomain = new Domain();
 
 		if($oDomain->ValidateDomainName($DomainName) < 1)
@@ -594,9 +612,19 @@ class Provisioning
 			return $ReturnArray;
 		}
 
-		$InfoArray = array();
-		$oDomain->GetDomainInfo($DomainID, $InfoArray);
+		$oSimpleNonce = new SimpleNonce();
 
+		$InfoArray = array();
+		$random = random_int(1, 1000000);
+		$nonceArray = [	
+				$oUser->Role,
+				$oUser->ClientID,
+				$DomainID,
+				$random
+		];
+		$nonce = $oSimpleNonce->GenerateNonce("getDomainInfo", $nonceArray);
+		$oDomain->GetDomainInfo($DomainID, $random, $InfoArray, $nonce);
+	
 		$ReturnArray["DomainUserName"] = $InfoArray["UserName"];
 
 		/*****************************************************************************
@@ -612,4 +640,3 @@ class Provisioning
 		return $ReturnArray;
         }
 }
-?>

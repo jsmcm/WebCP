@@ -1,16 +1,10 @@
 <?php
 session_start();
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 $oUser = new User();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Package.php");
 $oPackage = new Package();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
 $oDomain = new Domain();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Settings.php");
 $oSettings = new Settings();
 
 require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
@@ -51,7 +45,18 @@ $DomainOwnerClientID = -1;
 if($DomainID > -1)
 {
 	$DomainInfoArray = array();
-	$oDomain->GetDomainInfo($DomainID, $DomainInfoArray);
+
+	$random = random_int(1, 1000000);
+	$oUser = new User();
+	$oSimpleNonce = new SimpleNonce();
+	$nonceArray = [	
+		$oUser->Role,
+		$oUser->ClientID,
+		$DomainID,
+		$random
+	];
+	$nonce = $oSimpleNonce->GenerateNonce("getDomainInfo", $nonceArray);
+	$oDomain->GetDomainInfo($DomainID, $random, $DomainInfoArray, $nonce);
 
 	$DomainUserName = $DomainInfoArray["UserName"];
 	$SubDomainAllowance = $oPackage->GetPackageAllowance("SubDomains", $DomainInfoArray["PackageID"]);

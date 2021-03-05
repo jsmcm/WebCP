@@ -1,19 +1,14 @@
 <?php
 session_start();
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.User.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 $oUser = new User();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Email.php");
 $oEmail = new Email();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Domain.php");
 $oDomain = new Domain();
-
-require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.Package.php");
 $oPackage = new Package();
 
-  
+require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
+
 
 $ClientID = $oUser->getClientId();
 if($ClientID < 1)
@@ -33,10 +28,21 @@ $Role = $oUser->Role;
 
 if($DomainID > -1)
 {
-        $DomainInfoArray = array();
-        $oDomain->GetDomainInfo($DomainID, $DomainInfoArray);
+		$DomainInfoArray = array();
 		
-	$DomainName = $DomainInfoArray["DomainName"];	
+		$random = random_int(1, 1000000);
+		$oUser = new User();
+		$oSimpleNonce = new SimpleNonce();
+		$nonceArray = [	
+			$oUser->Role,
+			$oUser->ClientID,
+			$DomainID,
+			$random
+		];
+		$nonce = $oSimpleNonce->GenerateNonce("getDomainInfo", $nonceArray);
+        $oDomain->GetDomainInfo($DomainID, $random, $DomainInfoArray, $nonce);
+		
+		$DomainName = $DomainInfoArray["DomainName"];	
         $DomainUserName = $DomainInfoArray["UserName"];
         $EmailAllowance = $oPackage->GetPackageAllowance("Emails", $DomainInfoArray["PackageID"]);
         $EmailUsage = $oPackage->GetEmailUsage($DomainID);
@@ -114,27 +120,24 @@ for($x = 0; $x < strlen($LocalPart); $x++)
 
 
 
-if($oEmail->EmailExists($LocalPart, $DomainID) > 0)
-{
+if($oEmail->EmailExists($LocalPart, $DomainID) > 0) {
 	header("location: index.php?Notes=Email name already exists");
 	exit();
 }
 
 $Reply = $oEmail->AddEmail($LocalPart, $DomainID, $Password, $ClientID);
 
-if($Reply < 1)
-{
+if($Reply < 1) {
 	$Message = "Cannot add email address";
 
-	if($Reply == -1)
-	{
+	if($Reply == -1) {
 		$Message = "No more emails left on this hosting plan";
 	}
 	header("location: index.php?Notes=".$Message);
 	exit();
 }
+
 header("location: index.php?Notes=Email added");
 
-?>
 
 
