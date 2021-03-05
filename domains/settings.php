@@ -315,15 +315,22 @@ if (isset($domainSettings["php_version"]["value"])) {
 								<label class="col-sm-2 control-label">
 								<b>PHP Version</b>:
 								</label>
-								<div class="col-sm-8">
+								<div class="col-sm-4">
 									<span class="input-icon">
 									<select name="phpVersion" id="form-field-11" class="form-control">
-									<option value="7.4" <?php if($sslRedirect == "7.4") print " selected "; ?>>7.4</option>
-									<option value="7.2" <?php if($sslRedirect == "7.2") print " selected "; ?>>7.2</option>
-									<option value="7.1" <?php if($sslRedirect == "7.1") print " selected "; ?>>7.1</option>
+									<option value="7.4" <?php if($phpVersion == "7.4") print " selected "; ?>>7.4</option>
+									<option value="7.2" <?php if($phpVersion == "7.2") print " selected "; ?>>7.2</option>
+									<option value="7.1" <?php if($phpVersion == "7.1") print " selected "; ?>>7.1</option>
 									<option value="5.6" <?php if($phpVersion == "5.6") print " selected "; ?>>5.6</option>
 									</select>
 									</span>
+								</div>
+								<div class="col-sm-4">
+									<a href="/server/php/settings.php?nonce=&timeStamp=&version=<?php print $phpVersion; ?>&domain=<?php print $domainName; ?>" data-style="expand-right" class="btn btn-teal ladda-button">
+                                        <span class="ladda-label"> Edit Config </span>
+                                        <i class="fa fa-arrow-circle-right"></i>
+                                        <span class="ladda-spinner"></span>
+                                    <span class="ladda-spinner"></span></a>
 								</div>
 							</div>
 

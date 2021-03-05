@@ -1,3 +1,30 @@
+* 3.2.0 *
+= release: 2021-02-17
+ - Added PM settings to php config screens
+
+* 3.1.2 *
+= release: 2021-02-16
+ - Added php config screen
+ - added back in assets/plugins/jquery-cookie
+
+* 3.1.1 *
+= release: 2021-02-12
+ - Removed debug output from Firewall
+ - Removed jquery file uploader plugin vulnerability
+
+* 3.1.0 *
+= release: 2021-01-14
+ - User passwords now use password_hash (bcrypted)
+ - FTP passwords now use sha512
+
+* 3.0.8 *
+= release: 2020-10-23
+ - Added nonce to the deleteDomainSeeting call in freessl/DeleteSSL.php
+
+* 3.0.7 *
+= release: 2020-10-20
+ - Fixed links to webcp license validation
+
 * 3.0.6 *
 = release: 2020-09-29
  - Fixed bought SSL installation process

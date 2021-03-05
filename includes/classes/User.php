@@ -234,22 +234,20 @@ class User
 		$password = $password.rand(0,9);
 		$password = $password.rand(0,9);
 
-		try
-		{
+		try {
 			$query = $this->DatabaseConnection->prepare("UPDATE admin SET password = :password WHERE email_address = :email_address AND deleted = 0");
 			
-			$md5Password = md5($password);
+			$hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
-			$query->bindParam(":password", $md5Password);
+			$query->bindParam(":password", $hashedPassword);
 			$query->bindParam(":email_address", $EmailAddress);
 			$query->execute();
 	
-		}
-		catch(PDOException $e)
-		{
+		} catch (PDOException $e) {
 			$oLog = new Log();
 			$oLog->WriteLog("error", "/class.User.php -> ResetPassword(); Error = ".$e);
 		}
+
 		return $password;
 
 	}
@@ -434,38 +432,38 @@ class User
 	
 	
 
-	function CheckLoginCredentials($EmailAddress, $Password) 
+	function CheckLoginCredentials($EmailAddress, $password) 
 	{
-		
 
 		try
 		{
-			$query = $this->DatabaseConnection->prepare("SELECT * FROM admin WHERE (email_address = :email_address OR username = :user_name) AND password = :password AND deleted = 0");
+			$query = $this->DatabaseConnection->prepare("SELECT * FROM admin WHERE (email_address = :email_address OR username = :user_name) AND deleted = 0");
 
-			$Password = md5($Password);
 			$query->bindParam(":email_address", $EmailAddress);
 			$query->bindParam(":user_name", $EmailAddress);
-			$query->bindParam(":password", $Password);
 			$query->execute();
 	
-			if($result = $query->fetch(PDO::FETCH_ASSOC))
-			{
-				$this->ClientID = $result["id"];
-				$_SESSION["client_id"] = $this->ClientID;
+			if($result = $query->fetch(PDO::FETCH_ASSOC)) {
+
+				if (password_verify($password, $result["password"])) {
+			
+					$this->ClientID = $result["id"];
+					$_SESSION["client_id"] = $this->ClientID;
 				
 		
-				$this->GetUserInfo($this->ClientID);
+					$this->GetUserInfo($this->ClientID);
 
-				touch($_SERVER["DOCUMENT_ROOT"]."/tmp/".session_id(), 0755);
+					touch($_SERVER["DOCUMENT_ROOT"]."/tmp/".session_id(), 0755);
 	
-				return $this->ClientID;
+					return $this->ClientID;
+				}
+
 			}
-			else
-			{
+
+			
 	
-				$this->Logout();
-				return -1;
-			}			
+			$this->Logout();
+			return -1;
 	
 		}
 		catch(PDOException $e)
@@ -880,7 +878,7 @@ class User
 	function AddUser($FirstName, $Surname, $EmailAddress, $Password, $UserRole, $Username, $ClientID)
 	{
 
-		$Password = md5($Password);
+		$Password = password_hash($Password, PASSWORD_DEFAULT);
 
 		try
 		{
@@ -914,7 +912,7 @@ class User
 		try {
 			$query = $this->DatabaseConnection->prepare("UPDATE admin SET password = :password WHERE email_address = :email");
 
-			$password = md5($password);
+			$password = password_hash($password, PASSWORD_DEFAULT);
 
 			$query->bindParam(":email", $email);
 			$query->bindParam(":password", $password);
@@ -953,7 +951,7 @@ class User
 		
 	}
 	
-	function EditUser($FirstName, $Surname, $EmailAddress, $Password, $UserRole, $UserIDToChange, $Username, $ClientID)
+	function EditUser($FirstName, $Surname, $EmailAddress, $password, $UserRole, $UserIDToChange, $Username, $ClientID)
 	{
 		if ($UserRole == "") {
                     $UserRole = $this->GetUserRole($ClientID);
@@ -968,7 +966,7 @@ class User
 		{
 
 
-			if(trim($Password) == "")
+			if(trim($password) == "")
 			{
 				$query = $this->DatabaseConnection->prepare("UPDATE admin SET username = :user_name, role = :user_role, first_name = :first_name, surname = :surname, email_address = :email_address WHERE id = :user_id");
 				
@@ -983,9 +981,9 @@ class User
 			{
 				$query = $this->DatabaseConnection->prepare("UPDATE admin SET username = :user_name, role = :user_role, first_name = :first_name, surname = :surname, email_address = :email_address, password = :password WHERE id = :user_id");
 			
-				$Password = md5($Password);
+				$password = password_hash($password, PASSWORD_DEFAULT);
 
-				$query->bindParam(":password", $Password);
+				$query->bindParam(":password", $password);
 				$query->bindParam(":user_name", $Username);
 				$query->bindParam(":user_role", $UserRole);
 				$query->bindParam(":first_name", $FirstName);

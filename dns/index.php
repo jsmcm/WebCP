@@ -20,6 +20,7 @@ $ClientID = $oUser->getClientId();
 include dirname(__FILE__)."/dns_db.php";
 
 
+
 if($ClientID < 1) {
 	$oLog->WriteLog("DEBUG", "/dns/index.php -> client_id not set, redirecting to /index.php");
 	header("Location: /index.php");

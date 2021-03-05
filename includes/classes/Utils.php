@@ -108,7 +108,7 @@ class Utils
 
 			$options = array(
 			'uri' => 'https://api.webcp.io/',
-			'location' => 'https://api.webcp.io/updates/2.0.0/check.php',
+			'location' => 'https://api.webcp.io/updates/3.0.0/check.php',
 			'trace' => 1);
 
 			$client = new SoapClient(NULL, $options);

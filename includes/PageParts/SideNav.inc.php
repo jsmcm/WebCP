@@ -913,6 +913,23 @@
 				</li>
 
 
+				<?php
+				if(strstr($_SERVER["SCRIPT_FILENAME"], "/server/php/index.php"))
+				{
+					print "<li class=\"active open\">";
+				}
+				else
+				{
+						print "<li>";
+				}
+				?>
+				<a href="/server/php/index.php">
+					<span class="title"> PHP Config </span>
+				</a>
+				</li>
+
+
+
 			<?php
 			}
 			?>

@@ -12,7 +12,7 @@ if ( file_exists($_SERVER["DOCUMENT_ROOT"]."/includes/license.conf")) {
 }
 
 //print "count: ".$oDomains->GetAccountsCreatedCount()."<p>";
-//print "LicenseKey: ".$LicenseKey."<p>";
+///print "LicenseKey: ".$LicenseKey."<p>";
 $key = $oUtils->getValidationKey($LicenseKey);
 
 //print "key: ".$key."<p>";
@@ -34,7 +34,6 @@ $validationData = $oUtils->getValidationData($key);
 $validationArray = json_decode($validationData, true);
 
 //print "validationArray: ".print_r($validationArray, true)."<p>";
-
 
 if ($validationArray["type"] != "free") {
     if ( ($oUtils->ValidateHash($validationArray["hash"], $LicenseKey) !== true) || $validationArray["status"] != "valid" ) {

@@ -179,13 +179,20 @@ class Database
                $TableName
           ];
 
+          //print "in class<p>";
+          //print "role: ".$oUser->Role."<p>";
+          //print "ClientID: ".$ClientID."<p>";
+          //print "Table: ".$TableName."<p>";
+
           $oSimpleNonce = new SimpleNonce();
           $nonceResult = $oSimpleNonce->VerifyNonce($nonceArray["Nonce"], "tableExists", $nonceArray["TimeStamp"], $nonceMeta);
+
+          //print "nonceArray: ".print_r($nonceArray, true)."<p>";
 
           if ( ! $nonceResult ) {
                $oLog = new Log();
                $oLog->WriteLog("error", "/class.Database.php -> TableExists(); Nonce failed");
-               throw new Exception("<p><b>Nonce failed in Database::TableExists</b><p>");
+               throw new Exception("<p><b>Nonce failed in Database::TableExists (".$TableName.")</b><p>");
           }
 
 
