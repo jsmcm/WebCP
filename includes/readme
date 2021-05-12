@@ -1,6 +1,6 @@
 * 3.2.1 *
-= release: 2021-02-23
  - Added backups to AWS S3
+ - Licensing used EDD license API now
 
 * 3.2.0 *
 = release: 2021-02-17
