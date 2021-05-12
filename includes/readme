@@ -1,3 +1,7 @@
+* 3.2.1 *
+= release: 2021-05-12
+ - Licensing used EDD license API now
+
 * 3.2.0 *
 = release: 2021-02-17
  - Added PM settings to php config screens
