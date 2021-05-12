@@ -11,21 +11,30 @@ $oLog = new Log();
 require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 
 $serverAccountsCreated = $oDomain->GetAccountsCreatedCount();
-$serverAccountsAllowed = $validationArray["allowed"];
-$serverLicenseType = $validationArray["type"];
+
+
+$serverAccountsAllowed = 5;
+if (isset($license->allowed)) {
+	$serverAccountsAllowed = $license->allowed;
+}
+
+$serverLicenseType = "free";
+if (isset($license->type)) {
+	$serverLicenseType = $license->type;
+}
+
 
 
 if ( $serverLicenseType == "free" && ($serverAccountsCreated >= $serverAccountsAllowed) ) {
-        header("Location: index.php?Notes=".htmlentities("You are on a free license. Please upgrade to add more accounts")."&NoteType=error");
-        exit();
+	header("Location: index.php?Notes=".htmlentities("You are on a free license. Please upgrade to add more accounts")."&NoteType=error");
+	exit();
 }
 
 
 $ClientID = $oUser->getClientId();
-if($ClientID < 1)
-{
-        header("Location: /index.php");
-        exit();
+if($ClientID < 1) {
+	header("Location: /index.php");
+	exit();
 }
 
 $ClientID_requesting_domain = $_REQUEST["ClientID"];
@@ -34,49 +43,42 @@ $Role = $oUser->Role;
 
 $PackageID = $_REQUEST["PackageID"];
 
-if( ($ClientID != $ClientID_requesting_domain) && ($Role == 'client'))
-{
+if( ($ClientID != $ClientID_requesting_domain) && ($Role == 'client')) {
 	header("location: index.php?NoteType=Error&Notes=Permission denied");
 	exit();
 }
 
-if($oDomain->ValidateDomainName($DomainName) < 1)
-{
+if($oDomain->ValidateDomainName($DomainName) < 1) {
 	header("Location: index.php?NoteType=Error&Notes=Incorrectly formatted domain name - <b>".$DomainName."</b>");
 	exit();
 }
 
-if(substr($DomainName, 0, 7) == "http://")
-{
+if(substr($DomainName, 0, 7) == "http://") {
 	$DomainName = substr($DomainName, 7);
 }
 
-if(substr($DomainName, 0, 4) == "www.")
-{
+if(substr($DomainName, 0, 4) == "www.") {
 	$DomainName = substr($DomainName, 4);
 }
 
 
-for($x = 0; $x < strlen($DomainName); $x++)
-{
+for($x = 0; $x < strlen($DomainName); $x++) {
 				
-		
-	if(!ctype_alnum($DomainName[$x]))
-	{
-		if($DomainName[$x] != '_' && $DomainName[$x] != '-' && $DomainName[$x] != '.')
-		{
+	if(!ctype_alnum($DomainName[$x])) {
+	
+		if($DomainName[$x] != '_' && $DomainName[$x] != '-' && $DomainName[$x] != '.') {
 			header("location: index.php?NoteType=Error&Notes=Incorrectly formatted domain name");
 			exit();
 		}
 		
 	}
+
 }
 
 
 
 
-if($oDomain->DomainExists($DomainName) > 0)
-{
+if($oDomain->DomainExists($DomainName) > 0) {
 	header("location: index.php?NoteType=Error&Notes=Domain name already exists");
 	exit();
 }

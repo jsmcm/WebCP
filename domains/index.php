@@ -197,8 +197,16 @@ if($ClientID < 1) {
 $oLog->WriteLog("DEBUG", "/domains/index.php -> client_id set, continuing");
 
 $serverAccountsCreated = $oDomain->GetAccountsCreatedCount();
-$serverAccountsAllowed = $validationArray["allowed"];
-$serverLicenseType = $validationArray["type"];
+
+$serverAccountsAllowed = 5;
+if (isset($license->allowed)) {
+	$serverAccountsAllowed = $license->allowed;
+}
+
+$serverLicenseType = "free";
+if (isset($license->type)) {
+	$serverLicenseType = $license->type;
+}
 
 $Accounts = 0;
 if($oUser->Role == "admin") {
@@ -749,26 +757,46 @@ if($Traffic == 0)
 									if( ($oUser->Role == "admin") || ($oUser->Role == "reseller") )
 									{
 										$BlockReason = "";
-										if($DiskSpaceUsageBuffer >= $DiskSpaceBuffer)
-										{
+										if($DiskSpaceUsageBuffer >= $DiskSpaceBuffer) {
 											$BlockReason = $BlockReason."No more disk space<br>";
 										}
 
-										if($TrafficUsageBuffer >= $TrafficBuffer)
-										{
+										if($TrafficUsageBuffer >= $TrafficBuffer) {
 											$BlockReason = $BlockReason."No more traffic<br>";
 										}
 
 										
-										if( ($oUser->Role == "reseller") && ($AccountsCreated >= $Accounts) )
-										{
+										if( ($oUser->Role == "reseller") && ($AccountsCreated >= $Accounts) ) {
 											$BlockReason = $BlockReason."Max number of accounts created<br>";
 										}
 
+										//print "<p>serverLicenseType: ".$serverLicenseType."</p>";
+										//print "<p>serverAccountsCreated: ".$serverAccountsCreated."</p>";
+										//print "<p>serverAccountsAllowed: ".$serverAccountsAllowed."</p>";
+										//print "<p>license: ".print_r($license, true)."</p>";
+										
 										if ( $serverLicenseType == "free" && ($serverAccountsCreated >= $serverAccountsAllowed) ) {
 											$BlockReason = "You can only create ".$serverAccountsAllowed." accounts on the free plan. Please <a href=\"/enter_license.php\">upgrade</a> if you need to add more accounts";
 										}
 
+										if (isset($license->license)) {
+									
+											if( $license->license == "expired" ) {
+
+												$BlockReason = "License is expired. Please renew or contact support: <a href=\"https://webcp.io\">webcp.io</a>";
+												
+											} else if ($license->license == "not-found" ) {
+											
+												$BlockReason = "License not found. Please register for one at: <a href=\"https://webcp.io\">webcp.io</a><p><a href=\"/enter_license.php\">Enter License Key</a>";
+											
+											} else if ($license->license != "valid") {
+											
+												$BlockReason = "License not valid. Please register for one at: <a href=\"https://webcp.io\">webcp.io</a><p><a href=\"/enter_license.php\">Enter License Key</a>";
+											
+											}
+
+										}
+										
 										if($BlockReason == "")
 										{		
 										?>
