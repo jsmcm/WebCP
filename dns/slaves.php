@@ -76,7 +76,15 @@ if($oDatabase->TableExists("dns_slaves", $nonce) == false) {
 	$TableInfoArray[7]["key"] = "";
 	$TableInfoArray[7]["default"] = "0";
 
-	$oDatabase->CreateTableFromArray($TableName, $TableInfoArray);
+
+	$nonceArray = [
+		$oUser->Role,
+		$ClientID,
+		$TableName
+	];
+	$nonce = $oSimpleNonce->GenerateNonce("createTableFromArray", $nonceArray);
+
+	$oDatabase->CreateTableFromArray($TableName, $TableInfoArray, $nonce);
 }
 
 $ServerType = $oDNS->GetSetting("server_type");
