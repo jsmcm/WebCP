@@ -1,3 +1,8 @@
+* 3.3.0 *
+= release: 2021-09-23
+ - Added Webp support
+ - Added fastcgi cache
+
 * 3.2.0 *
 = release: 2021-02-17
  - Added PM settings to php config screens
