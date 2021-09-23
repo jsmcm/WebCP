@@ -1,3 +1,8 @@
+* 3.3.0 *
+= release: 2021-09-23
+ - Added Webp support
+ - Added fastcgi cache
+
 * 3.2.2 *
  - Fixed dns/slaves call to createTable to include nonce
 
