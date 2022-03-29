@@ -506,8 +506,8 @@ class FTP
 		{
 			$query = $this->DatabaseConnection->prepare("DELETE FROM ftpd WHERE client_id = :client_id AND domain_id = :domain_id");
 			
-			$query->bindParam(":client_id", $DomainID);
-			$query->bindParam(":domain_id", $ClientID);
+			$query->bindParam(":client_id", $ClientID);
+			$query->bindParam(":domain_id", $DomainID);
 			
 			$query->execute();
 	

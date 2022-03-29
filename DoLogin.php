@@ -74,9 +74,13 @@ if($ClientID > 0) {
 	$oLog->WriteLog("DEBUG", "/DoLogin.php -> Log in suceeded, redirecting to /domains/index.php");
 
 	if($emailAddress == "admin@admin.admin") {
+
 		header("Location: /users/AddUser.php?NoteType=Error&Notes=Please update your profile before continuing...&ClientID=".$ClientID);
+
 	} else {
+
 		header("Location: /domains/index.php");
+
 	}
 
 	exit();

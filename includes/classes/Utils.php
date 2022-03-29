@@ -24,7 +24,7 @@ class Utils
 	}
 	
 
-	function ValidateHash($Hash, $LicenseKey)
+	function DELETED_ValidateHash($Hash, $LicenseKey)
 	{
 		$Formula = substr($Hash, strlen($Hash) - 2, 2);
 		$Hash = substr($Hash, 0, strlen($Hash) - 2);
@@ -81,7 +81,7 @@ class Utils
 				
 	}
  	
-	function getValidationData($hash)
+	function DELETED_getValidationData($hash)
 	{
 		if ( file_exists("/tmp/webcp/getValidationData_".$hash) ) {
 			
@@ -118,13 +118,7 @@ class Utils
 
 		} else {
 
-			$options = array(
-			'uri' => 'https://api.webcp.io/',
-			'location' => 'https://api.webcp.io/updates/3.0.0/check.php',
-			'trace' => 1);
 
-			$client = new SoapClient(NULL, $options);
-			$data = $client->getValidationData($hash);
 
 		}
 
@@ -132,18 +126,25 @@ class Utils
 
 		return $data;
 	}
- 	
-	function getValidationKey($LicenseKey)
-	{
-		if ( file_exists("/tmp/webcp/getValidationKey_".$LicenseKey) ) {
+	 
+	
 
-			if( (time() - filemtime("/tmp/webcp/getValidationKey_".$LicenseKey)) > 3600 ) {
-				unlink("/tmp/webcp/getValidationKey_".$LicenseKey);
+	function getLicense($licenseKey)
+	{
+
+		$licenseCacheTime = 900;
+		$license = "";
+
+
+		if ( file_exists("/tmp/webcp/getLicense_".$licenseKey) ) {
+
+			if( (time() - filemtime("/tmp/webcp/getLicense_".$licenseKey)) > $licenseCacheTime ) {
+				unlink("/tmp/webcp/getLicense_".$licenseKey);
 			} else {
-				//print "returning from cache<p>";
-				return file_get_contents("/tmp/webcp/getValidationKey_".$LicenseKey);
+				return json_decode(file_get_contents("/tmp/webcp/getLicense_".$licenseKey));
 			}
 		}
+
 
 		$oDomain = new Domain();
 
@@ -151,31 +152,190 @@ class Utils
 
 		//print "AccountsCreated: ".$AccountsCreated."<p>";
 
-		//if ($AccountsCreated < 6 && $LicenseKey == "free") {
-		if ($LicenseKey == "free") {
-		
+		if ($AccountsCreated <= 5 && $licenseKey == "free") {
+
 			// free, doesn't need license
-			$key = $this->makeFreeKey();
-		
+			$license = new stdClass();
+
+			$license->success = "1";
+			$license->license = "valid";
+			$license->item_id = "";
+			$license->item_name = "WebCP";
+			$license->checksum = "";
+			$license->expires = "lifetime";
+			$license->payment_id = "";
+			$license->customer_name = "";
+			$license->customer_email = "";
+			$license->license_limit = 1;
+			$license->site_count = 1;
+			$license->activations_left = 0;
+			$license->price_id = "";
+			$license->error = "";
+			$license->type = "free";
+			$license->allowed = 5;
+
+
 		} else {
 
-
-			//print "AccountsCreated: ".$AccountsCreated."<p>";
-			$options = array(
-			'uri' => 'https://api.webcp.io/',
-			'location' => 'https://api.webcp.io/updates/3.0.0/check.php',
-			'trace' => 1);
-
-			$client = new SoapClient(NULL, $options);
-			$key = $client->getValidationKey($LicenseKey);
-		
+			//print "<P>getting license from remote<p>";
+			$license = $this->getRemoteLicense($licenseKey);
+			//print "<P>license: ".print_r($license, true)."<p>";
 		}
 
-		file_put_contents("/tmp/webcp/getValidationKey_".$LicenseKey, $key);
-		return $key;
+		file_put_contents("/tmp/webcp/getLicense_".$licenseKey, json_encode($license));
+		return $license;
+
 	}
 
-	function ValidateFreeKey($key)
+
+
+
+
+	function activateLicense($licenseKey) 
+	{
+	
+	
+		$store_url = 'https://webcp.io';
+		$item_name = "WebCP";
+	
+		// data to send in our API request
+		$api_params = array(
+			'edd_action'	=> 'activate_license',
+			'license'    	=> $licenseKey,
+			'item_name' 	=> urlencode( $item_name ),
+			'url' 			=> $_SERVER["SERVER_ADDR"]
+		);
+	
+		// Call the custom API.
+		$license_data = $this->postToWebCP( $store_url, array('body' => $api_params ) );
+	
+		if ( false === $license_data->success ) {
+	
+			switch( $license_data->error ) {
+	
+				case 'expired' :
+	
+					$message = sprintf(
+						__( 'Your license key expired on %s.' ),
+						date_i18n( get_option( 'date_format' ), strtotime( $license_data->expires, current_time( 'timestamp' ) ) )
+					);
+					break;
+	
+				case 'revoked' :
+	
+					$message = __( 'Your license key has been disabled.' );
+					break;
+	
+				case 'missing' :
+	
+					$message = __( 'Invalid license.' );
+					break;
+	
+				case 'invalid' :
+				case 'site_inactive' :
+	
+					$message = __( 'Your license is not active for this URL.' );
+					break;
+	
+				case 'item_name_mismatch' :
+	
+					$message = 'This appears to be an invalid license key for '.$item_name.'.';
+					break;
+	
+				case 'no_activations_left':
+	
+					$message = __( 'Your license key has reached its activation limit.' );
+					break;
+	
+				default :
+	
+					$message = __( 'An error occurred, please try again.' );
+					break;
+			}
+	
+		}
+	
+	
+		// Check if anything passed on a message constituting a failure
+		if ( ! empty( $message ) ) {
+	
+			return $message;
+		
+		}
+	
+		if (!isset($license_data->type)) {
+			$license_data->type = "paid";
+		}
+
+		return $license_data;
+	
+	}
+	
+	
+	function postToWebCP($url, $post_array)
+	{
+	
+		$c = curl_init();
+	
+		curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($c, CURLOPT_URL, $url);
+		curl_setopt($c, CURLOPT_POSTFIELDS, $post_array["body"]);
+	
+	
+		$resultString = curl_exec($c);
+		curl_close($c);
+	
+		if ($resultString != "" && strstr($resultString, "success") ) {
+		
+			return json_decode($resultString);
+	
+		}
+	
+		return false;
+	
+		
+	
+	}
+	
+	
+	function getRemoteLicense($licenseKey)
+	{
+		$store_url = 'https://webcp.io';
+		$item_name = 'WebCP';
+		
+		$api_params = array(
+			'edd_action' => 'check_license',
+			'license' => $licenseKey,
+			'item_name' => urlencode( $item_name ),
+			'url' => $_SERVER["SERVER_ADDR"]
+		);
+	
+		$license_data = $this->postToWebCP( $store_url, array( 'body' => $api_params ) );
+	
+		if ($license_data === false) {
+	
+			return false;
+	
+		}
+	
+	
+		if( $license_data->license == 'inactive' ) {
+	
+			$license_data = $this->activateLicense($licenseKey);
+
+		} 
+	
+
+		return $license_data;
+		
+	
+	
+	}
+
+	
+
+
+	function DELETED_ValidateFreeKey($key)
 	{
 
 		$free = $key[1].$key[5].$key[10].$key[16];
@@ -252,7 +412,7 @@ class Utils
 	}
 
 
-	function makeFreeKey()
+	function DELETED_makeFreeKey()
 	{
 
 		$number[0] = mt_rand(0, 15);

@@ -85,6 +85,16 @@ if (isset($domainSettings["ssl_redirect"]["value"])) {
 	$sslRedirect = $domainSettings["ssl_redirect"]["value"];
 }
 
+$autoWebp = "none";
+if (isset($domainSettings["auto_webp"]["value"])) {
+	$autoWebp = $domainSettings["auto_webp"]["value"];
+}
+
+$fastCgiCache = "false";
+if (isset($domainSettings["fastcgi_cache"]["value"])) {
+	$fastCgiCache = $domainSettings["fastcgi_cache"]["value"];
+}
+
 
 $phpVersion = "7.2";
 if (isset($domainSettings["php_version"]["value"])) {
@@ -310,7 +320,39 @@ if (isset($domainSettings["php_version"]["value"])) {
 									</span>
 								</div>
 							</div>
-							
+
+
+							<div class="form-group" style="padding-bottom: 50px;">
+								<label class="col-sm-2 control-label">
+								<b>Use FastCGI Cache</b>:
+								</label>
+								<div class="col-sm-8">
+									<span class="input-icon">
+									<select name="fastcgi_cache" id="form-field-11" class="form-control">
+									<option value="false" <?php if($fastCgiCache == "false") print " selected "; ?>>Do not use FastCGI cache</option>
+									<option value="true" <?php if($fastCgiCache == "true") print " selected "; ?>>Use FastCGI cache</option>
+									</select>
+									</span>
+								</div>
+							</div>
+
+
+							<div class="form-group" style="padding-bottom: 50px;">
+								<label class="col-sm-2 control-label">
+								<b>Auto Webp</b>:
+								</label>
+								<div class="col-sm-8">
+									<span class="input-icon">
+									<select name="auto_webp" id="form-field-11" class="form-control">
+									<option value="none" <?php if($autoWebp == "none") print " selected "; ?>>Do not create WebP</option>
+									<option value="auto" <?php if($autoWebp == "auto") print " selected "; ?>>Auto create WebP</option>
+									</select>
+									</span>
+								</div>
+							</div>
+
+
+
 							<div class="form-group" style="padding-bottom: 50px;">
 								<label class="col-sm-2 control-label">
 								<b>PHP Version</b>:

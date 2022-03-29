@@ -86,6 +86,7 @@ $nonceArray = [
 $nonce = $oSimpleNonce->GenerateNonce("saveDomainSetting", $nonceArray);
 $oDomain->saveDomainSetting($domainId, "domain_redirect", $domainRedirect, "", "", $nonce);
 
+
 $sslRedirect = filter_var($_POST["sslRedirect"], FILTER_SANITIZE_STRING);
 $nonceArray = [
     $oUser->Role,
@@ -98,6 +99,7 @@ $nonceArray = [
 $nonce = $oSimpleNonce->GenerateNonce("saveDomainSetting", $nonceArray);
 $oDomain->saveDomainSetting($domainId, "ssl_redirect", $sslRedirect, "", "", $nonce);
 
+///////////////////////////////////////////////////////
 $phpVersion = filter_var($_POST["phpVersion"], FILTER_SANITIZE_STRING);
 $nonceArray = [
     $oUser->Role,
@@ -109,6 +111,37 @@ $nonceArray = [
 
 $nonce = $oSimpleNonce->GenerateNonce("saveDomainSetting", $nonceArray);
 $oDomain->saveDomainSetting($domainId, "php_version", $phpVersion, "", "", $nonce);
+
+///////////////////////////////////////////
+$autoWebp = filter_var($_POST["auto_webp"], FILTER_SANITIZE_STRING);
+$nonceArray = [
+    $oUser->Role,
+    $ClientID,
+	$domainId,
+	"auto_webp",
+	$autoWebp
+];
+
+$nonce = $oSimpleNonce->GenerateNonce("saveDomainSetting", $nonceArray);
+$oDomain->saveDomainSetting($domainId, "auto_webp", $autoWebp, "", "", $nonce);
+
+
+///////////////////////////////////////////
+$fastCgiCache = filter_var($_POST["fastcgi_cache"], FILTER_SANITIZE_STRING);
+$nonceArray = [
+    $oUser->Role,
+    $ClientID,
+	$domainId,
+	"fastcgi_cache",
+	$fastCgiCache
+];
+
+$nonce = $oSimpleNonce->GenerateNonce("saveDomainSetting", $nonceArray);
+$oDomain->saveDomainSetting($domainId, "fastcgi_cache", $fastCgiCache, "", "", $nonce);
+
+
+
+
 
 
 touch($_SERVER["DOCUMENT_ROOT"]."/nm/".$domainId.".subdomain", 0755);
