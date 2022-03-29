@@ -1114,6 +1114,10 @@ class DNS
 
 		if($ServerType == "master")
 		{
+			$SlaveArray = array();
+			$SlaveArrayCount = 0;
+			$this->GetSlaveList($SlaveArray, $SlaveArrayCount);
+			
 			$DomainNameArray = array();
 			$Count = 0;
 	
@@ -1122,6 +1126,9 @@ class DNS
 			for($x = 0; $x < $Count; $x++)
 			{
 				$Domain = $DomainNameArray[$x]["Domain"];
+				
+			        $this->CreateZoneOnSlaves($Domain, $SlaveArray, $SlaveArrayCount);
+				
 				//print "Domain: ".$this->RemoveLastPeriod($Domain)."<br>";
 				
 				$this->MakeZoneFile($Domain);
