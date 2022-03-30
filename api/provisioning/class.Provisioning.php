@@ -27,12 +27,12 @@ class Provisioning
 
 	private function RemoteAddressAllowed($RemoteAddress)
 	{
-		if( ! file_exists($_SERVER["DOCUMENT_ROOT"]."/API/WHMCS/server_list.txt"))
+		if( ! file_exists($_SERVER["DOCUMENT_ROOT"]."/api/WHMCS/server_list.txt"))
 		{
 			return false;
 		}
 
-		$DomainArray = file($_SERVER["DOCUMENT_ROOT"]."/API/WHMCS/server_list.txt");
+		$DomainArray = file($_SERVER["DOCUMENT_ROOT"]."/api/WHMCS/server_list.txt");
 
 		for($x = 0; $x < count($DomainArray); $x++)
 		{

@@ -198,7 +198,7 @@ class Utils
 		$store_url = 'https://webcp.io';
 		$item_name = "WebCP";
 	
-		// data to send in our API request
+		// data to send in our api request
 		$api_params = array(
 			'edd_action'	=> 'activate_license',
 			'license'    	=> $licenseKey,
@@ -206,7 +206,7 @@ class Utils
 			'url' 			=> $_SERVER["SERVER_ADDR"]
 		);
 	
-		// Call the custom API.
+		// Call the custom api.
 		$license_data = $this->postToWebCP( $store_url, array('body' => $api_params ) );
 	
 		if ( false === $license_data->success ) {

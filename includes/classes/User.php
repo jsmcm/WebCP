@@ -423,6 +423,42 @@ class User
 		
 	}
 	
+	function getUserBy($field, $value)
+	{
+		
+		try
+		{
+			$query = $this->DatabaseConnection->prepare("SELECT * FROM admin WHERE ".$field." = :value AND deleted = 0");
+
+			$query->bindParam(":value", $value);
+			$query->execute();
+	
+			if($result = $query->fetch(PDO::FETCH_ASSOC))
+			{
+				return [
+					"id" => $result["id"],
+					"firstName" => $result["first_name"],
+					"surname" => $result["surname"],
+					"email" => $result["email_address"],
+					"role" => $result["role"],
+					"userName" => $result["username"]
+				];
+	
+			}
+	
+		}
+		catch(PDOException $e)
+		{
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.User.php -> getUserBy(); Error = ".$e);
+		}
+	
+
+		return false;
+		
+	}
+	
+	
 	
 	
 	function GetLoggedInclient_id()

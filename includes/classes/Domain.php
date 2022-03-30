@@ -2360,7 +2360,7 @@ class Domain
 			$ServerType = $oDNS->GetSetting("server_type");
 
 			if($ServerType == "master") {
-				$x = $oDNS->AddZone($ParkedDomain, $oDNS->GetDomainIP($DomainName), "");	
+				$x = $oDNS->AddZone($ParkedDomain, $oDNS->GetDomainIP($DomainName), "", "", $ClientID);	
 				if($x < 1) {
 					$oLog->WriteLog("DEBUG", "Error registering DNS, return code: ".$x);
 					$Error = "<p><b>Domain DNS could not be registered, return code: ".$x.". Please contact support</b>";
@@ -2481,7 +2481,7 @@ class Domain
 				
 				}
 
-				$x = $oDNS->AddZone($DomainName, $oDNS->GetDomainIP($DomainName), "", $dkimKey);	
+				$x = $oDNS->AddZone($DomainName, $oDNS->GetDomainIP($DomainName), "", $dkimKey, $ClientID);	
 				if($x < 1) {
 					$oLog->WriteLog("DEBUG", "Error registering DNS, return code: ".$x);
 					$Error = "<p><b>Domain DNS could not be registered, return code: ".$x.". Please contact support</b>";
@@ -2927,7 +2927,7 @@ class Domain
 
                                 $options = array(
 					'uri' => $IPAddress,
-					'location' => 'http://'.$HostName.':8880/API/dns/DNS.php',
+					'location' => 'http://'.$HostName.':8880/api/dns/DNS.php',
 					'trace' => 1
 				);
 
@@ -3138,7 +3138,7 @@ class Domain
 
                                 $options = array(
                                 'uri' => $IPAddress,
-                                'location' => 'http://'.$HostName.':8880/API/dns/DNS.php',
+                                'location' => 'http://'.$HostName.':8880/api/dns/DNS.php',
                                 'trace' => 1);
 
                                 $Message = json_encode(array("Password" => $Password, "SubDomain" => $SubDomain, "ParentDomainName" => $ParentDomainName));
@@ -3277,7 +3277,7 @@ class Domain
 
                                 $options = array(
                                 'uri' => $IPAddress,
-                                'location' => 'http://'.$HostName.':8880/API/dns/DNS.php',
+                                'location' => 'http://'.$HostName.':8880/api/dns/DNS.php',
                                 'trace' => 1);
 
                                 $Message = json_encode(array("Password" => $Password, "DomainName" => $DomainName));

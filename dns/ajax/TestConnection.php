@@ -47,7 +47,7 @@ if($oDNS->GetSlaveData($ID, $HostName, $IPAddress, $Password, $PublicKey) != $ID
         {
                 $options = array(
                 'uri' => $ipAddress,
-                'location' => 'http'.(($port=="8443")?'s':'').'://'.$hostName.':'.$port.'/API/dns/DNS.php',
+                'location' => 'http'.(($port=="8443")?'s':'').'://'.$hostName.':'.$port.'/api/dns/DNS.php',
                 'trace' => 1);
 
                 $EncryptedPassword = "";

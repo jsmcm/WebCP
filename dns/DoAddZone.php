@@ -74,7 +74,7 @@ if($oDNS->DomainExists($ZoneName) > 0) {
 
 $Error = "";
 
-if($oDNS->AddZone($ZoneName, $IPv4, $IPv6) < 1) {
+if($oDNS->AddZone($ZoneName, $IPv4, $IPv6, "", $ClientID) < 1) {
 	header("location: index.php?NoteType=Error&Notes=Cannot add domain");
 	exit();
 }

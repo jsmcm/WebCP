@@ -6,7 +6,7 @@
     "autoload": {
         "psr-4": {
             "":"includes/classes",
-	        "WebCP\\API\\Controllers\\":"API/2.0.0/controllers"
+	        "WebCP\\API\\Controllers\\":"api/v1/controllers"
         }
     }
 }

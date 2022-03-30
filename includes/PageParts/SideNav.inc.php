@@ -1184,11 +1184,11 @@
 	if($oUser->Role == "admin") {
 		if( strstr($_SERVER["SCRIPT_FILENAME"], "/modules/") )
 		{
-			print "<!--li class=\"active\">";
+			print "<li class=\"active\">";
 		}
 		else
 		{
-			print "<!--li>";
+			print "<li>";
 		}
 		?>
 			<a href="javascript:void(0)"><i class="clip-tree"></i>
@@ -1211,7 +1211,7 @@
 					</a>
 				</li>
 			</ul>
-		</li-->
+		</li>
 	<?php
 	}
 	?>	

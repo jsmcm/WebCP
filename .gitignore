@@ -35,3 +35,6 @@ includes/PageParts/WebCPLink.inc
 includes/PageParts/WebCPName.inc
 includes/PageParts/WebCPTitle.inc
 skel/public_html/
+api/v1/log.log
+composer.lock
+api/conf/server_list.txt

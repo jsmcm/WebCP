@@ -327,19 +327,17 @@ class DNS
 
         }
 
-	function GetRRSList($SOAID, &$RRSArray, &$RRSArrayCount)
+	function GetRRSList($SOAID, &$RRSArray=null, &$RRSArrayCount=0)
         {
 		$RRSArray = array();
 		$RRSArrayCount = 0;
 
-                try
-                {
+                try {
                         $query = $this->DatabaseConnection->prepare("SELECT * FROM rrs WHERE deleted = 0 AND soa_id = :soa_id");
 			$query->bindParam(":soa_id", $SOAID);
                         $query->execute();
 
-                        while($result = $query->fetch(PDO::FETCH_ASSOC))
-                        {
+                        while($result = $query->fetch(PDO::FETCH_ASSOC)) {
 				$RRSArray[$RRSArrayCount]["ID"] = $result["id"];
 				$RRSArray[$RRSArrayCount]["Domain"] = $result["domain"];
 				$RRSArray[$RRSArrayCount]["TTL"] = $result["ttl"];
@@ -356,12 +354,12 @@ class DNS
 				$RRSArray[$RRSArrayCount]["Value9"] = $result["value9"];
 				$RRSArray[$RRSArrayCount++]["Value10"] = $result["value10"];
                         }
-                }
-                catch(PDOException $e)
-                {
+                } catch(PDOException $e) {
                         $oLog = new Log();
                         $oLog->WriteLog("error", "/class.DNS.php -> GetRRSList(); Error = ".$e);
                 }
+
+		return $RRSArray;
 
         }
 
@@ -1140,22 +1138,20 @@ class DNS
        
 
 
-	function GetSOAList(&$SOAArray, &$ArrayCount)
+	function GetSOAList(&$SOAArray=null, &$ArrayCount=0)
         {
                 $SOAArray = array();
 
                 $ArrayCount = 0;
 		
 
-		try
-		{
+		try {
 			$query = $this->DatabaseConnection->prepare("SELECT * FROM soa WHERE deleted = 0 ORDER BY domain;");
-			
-			
+				
 			$query->execute();
 	
-			while($result = $query->fetch(PDO::FETCH_ASSOC))
-			{
+			while($result = $query->fetch(PDO::FETCH_ASSOC)) {
+			
 				$SOAArray[$ArrayCount]["ID"] = $result["id"];
 				$SOAArray[$ArrayCount]["Domain"] = $result["domain"];
 				$SOAArray[$ArrayCount]["TTL"] = $result["ttl"];
@@ -1170,13 +1166,12 @@ class DNS
 
 			}
 	
-		}
-		catch(PDOException $e)
-		{
+		} catch(PDOException $e) {
 			$oLog = new Log();
 			$oLog->WriteLog("error", "/class.DNS.php -> GetSOAList(); Error = ".$e);
 		}
 
+		return $SOAArray;
 
         }
 	
@@ -1466,7 +1461,7 @@ class DNS
 	{
 		$options = array(
 		'uri' => $ipAddress,
-		'location' => 'http'.(($port=="8443")?'s':'').'://'.$hostName.':'.$port.'/API/dns/DNS.php',
+		'location' => 'http'.(($port=="8443")?'s':'').'://'.$hostName.':'.$port.'/api/dns/DNS.php',
 		'trace' => 1);
 
 		$message = json_encode(array("Password" => $password, "Domain" => $domainName));
@@ -1502,7 +1497,7 @@ class DNS
 
 		$options = array(
 			'uri' => $ipAddress,
-			'location' => 'http'.(($port=="8443")?'s':'').'://'.$hostName.':'.$port.'/API/dns/DNS.php',
+			'location' => 'http'.(($port=="8443")?'s':'').'://'.$hostName.':'.$port.'/api/dns/DNS.php',
 			'trace' => 1
 		);
 
@@ -1561,7 +1556,7 @@ class DNS
 
 		$options = array(
 			'uri' => $ipAddress,
-			'location' => 'http'.(($port=="8443")?'s':'').'://'.$hostName.':'.$port.'/API/dns/DNS.php',
+			'location' => 'http'.(($port=="8443")?'s':'').'://'.$hostName.':'.$port.'/api/dns/DNS.php',
 			'trace' => 1
 		);
 
@@ -1614,7 +1609,7 @@ class DNS
 
 
 
-	function AddZone($DomainName, $IPv4Address, $IPv6Address, $dkimKey="")
+	function AddZone($DomainName, $IPv4Address="", $IPv6Address="", $dkimKey="", $userId=1)
 	{
 	
 		$TTL = $this->GetSetting("ttl");
@@ -1681,7 +1676,7 @@ class DNS
 			sleep(3);
 
 			$SerialNumber = date("Ymd")."01";
-			$SOAID = $this->__AddSOA(1, $DomainName, $TTL, $PrimaryNameServer.".", $EmailAddress, $SerialNumber, $Refresh, $Retry, $Expire, $NegativeTTL);
+			$SOAID = $this->__AddSOA($userId, $DomainName, $TTL, $PrimaryNameServer.".", $EmailAddress, $SerialNumber, $Refresh, $Retry, $Expire, $NegativeTTL);
 
 			if($SOAID > 0) {
 
@@ -1740,6 +1735,34 @@ class DNS
 	}
 
 
+   
+	function getRRS($id) 
+	{
+		
+		try
+		{
+			$query = $this->DatabaseConnection->prepare("SELECT * FROM rrs WHERE id = :id AND deleted = 0");
+			
+			$query->bindParam(":id", $id);
+			
+			$query->execute();
+	
+			if($result = $query->fetch(PDO::FETCH_ASSOC))
+			{
+				return $result;
+			}
+	
+		}
+		catch(PDOException $e)
+		{
+			$oLog = new Log();
+			$oLog->WriteLog("error", "/class.DNS.php -> getRRS(); Error = ".$e);
+		}
+		
+		return false;
+		
+	}
+	
 	function DeleteRRS($ID)
         {
                 try
@@ -1748,11 +1771,14 @@ class DNS
                         $query->bindParam(":id", $ID);
                         $query->execute();
 
+			return true;
+
                 }
                 catch(PDOException $e)
                 {
                         $oLog = new Log();
-                        $oLog->WriteLog("error", "/class.DNS.php -> DeleteRRS(); Error = ".$e);
+			$oLog->WriteLog("error", "/class.DNS.php -> DeleteRRS(); Error = ".$e);
+			return false;
                 }
         }
 
@@ -1985,7 +2011,7 @@ class DNS
 		
 	}
 	
-	function GetSOAInfo($SOAID, &$SOAInfoArray) 
+	function GetSOAInfo($SOAID, &$SOAInfoArray=null) 
 	{
 		$SOAInfoArray = array();
 		
@@ -2002,16 +2028,14 @@ class DNS
 		$SOAInfoArray["Status"] = "";
 		
 
-		try
-		{
+		try {
 			$query = $this->DatabaseConnection->prepare("SELECT * FROM soa WHERE id = :soa_id AND deleted = 0");
 			
 			$query->bindParam(":soa_id", $SOAID);
 			
 			$query->execute();
 	
-			if($result = $query->fetch(PDO::FETCH_ASSOC))
-			{
+			if($result = $query->fetch(PDO::FETCH_ASSOC)) {
 				$SOAInfoArray["ID"] = $result["id"];
 				$SOAInfoArray["Domain"] = $result["domain"];
 				$SOAInfoArray["TTL"] = $result["ttl"];
@@ -2023,14 +2047,16 @@ class DNS
 				$SOAInfoArray["Expire"] = $result["expire"];
 				$SOAInfoArray["NegativeTTL"] = $result["negative_ttl"];
 				$SOAInfoArray["Status"] = $result["status"];
+				
+				return $SOAInfoArray;
 			}
 	
-		}
-		catch(PDOException $e)
-		{
+		} catch(PDOException $e) {
 			$oLog = new Log();
 			$oLog->WriteLog("error", "/class.DNS.php -> GetSOAInfo(); Error = ".$e);
 		}
+
+		return false;
 	
 	}
 	
@@ -2143,7 +2169,7 @@ class DNS
 	{
 		$options = array(
 			'uri' => $ipAddress,
-			'location' => 'http'.(($port=="8443")?'s':'').'://'.$hostName.':'.$port.'/API/dns/DNS.php',
+			'location' => 'http'.(($port=="8443")?'s':'').'://'.$hostName.':'.$port.'/api/dns/DNS.php',
 			'trace' => 1
 		);
 
