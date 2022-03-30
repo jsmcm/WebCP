@@ -1,77 +1,5 @@
 <?php
 
-	function FetchIconListFromRemoteServer()
-	{
-		$LocalMD5 = "";
-		$RemoteMD5 = md5_file("http://localhost:8880/Editor/icon_list.txt");
-
-		if( file_exists($_SERVER["DOCUMENT_ROOT"]."/skel/editor/images/icon_list.txt"))
-		{
-			$LocalMD5 = md5_file($_SERVER["DOCUMENT_ROOT"]."/skel/editor/images/icon_list.txt");
-		}
-		
-		if($LocalMD5 == $RemoteMD5)
-		{
-			// file unchanged...
-			touch($_SERVER["DOCUMENT_ROOT"]."/skel/editor/images/icon_list.txt");
-			return;
-		}
-		
-		// got here, download new list!
-
-		if( file_exists($_SERVER["DOCUMENT_ROOT"]."/skel/editor/images/icon_list.txt"))
-		{
-			unlink($_SERVER["DOCUMENT_ROOT"]."/skel/editor/images/icon_list.txt");
-		}
-
-		file_put_contents($_SERVER["DOCUMENT_ROOT"]."/skel/editor/images/icon_list.txt", file_get_contents("http://localhost:8880/Editor/icon_list.txt"));
-
-                $IconArray = file($_SERVER["DOCUMENT_ROOT"]."/skel/editor/images/icon_list.txt");
-
-                for($x = 1; $x < count($IconArray); $x++) // ignore first element as its the date!
-                {
-                        $val = trim($IconArray[$x]);
-
-                        if(file_exists($_SERVER["DOCUMENT_ROOT"]."/skel/editor/images/icons/".$val))
-                        {
-                                unlink($_SERVER["DOCUMENT_ROOT"]."/skel/editor/images/icons/".$val);
-                        }
-
-                        file_put_contents($_SERVER["DOCUMENT_ROOT"]."/skel/editor/images/icons/".$val, file_get_contents("http://localhost:8880/Editor/icons/".$val));
-                }
-
-
-	}
-
-	
-	function FetchEditableListFromRemoteServer()
-	{
-		$LocalMD5 = "";
-		$RemoteMD5 = md5_file("http://localhost:8880/Editor/editable_list.txt");
-
-
-		if( file_exists($_SERVER["DOCUMENT_ROOT"]."/skel/editor/editable_list.txt"))
-		{
-			$LocalMD5 = md5_file($_SERVER["DOCUMENT_ROOT"]."/skel/editor/editable_list.txt");
-		}
-		
-		if($LocalMD5 == $RemoteMD5)
-		{
-			// file unchanged...
-			touch($_SERVER["DOCUMENT_ROOT"]."/skel/editor/editable_list.txt");
-			return;
-		}
-		
-		// got here, download new list!
-
-		if( file_exists($_SERVER["DOCUMENT_ROOT"]."/skel/editor/editable_list.txt"))
-		{
-			unlink($_SERVER["DOCUMENT_ROOT"]."/skel/editor/editable_list.txt");
-		}
-
-		file_put_contents($_SERVER["DOCUMENT_ROOT"]."/skel/editor/editable_list.txt", file_get_contents("http://localhost:8880/Editor/editable_list.txt"));
-		
-	}
 
 	function GetExtension($FileName)
 	{
@@ -92,20 +20,6 @@
 
 		$Extension = GetExtension($FileName);
 
-		if( ! file_exists($_SERVER["DOCUMENT_ROOT"]."/skel/editor/editable_list.txt"))
-		{
-			FetchEditableListFromRemoteServer();
-			return false;
-		}
-
-		$datetime1 = new DateTime(date("Y-m-d", filemtime($_SERVER["DOCUMENT_ROOT"]."/skel/editor/editable_list.txt")));
-		$datetime2 = new DateTime(date("Y-m-d"));
-		$interval = $datetime1->diff($datetime2);
-		if( (int)$interval->format('%a') > 0)
-		{
-			FetchEditableListFromRemoteServer();
-		}
-		
 		$a = array();
 	
 		$a = file($_SERVER["DOCUMENT_ROOT"]."/skel/editor/editable_list.txt");
@@ -125,20 +39,6 @@
 	{
 		$Extension = GetExtension($FileName);
 		
-		if( ! file_exists($_SERVER["DOCUMENT_ROOT"]."/skel/editor/images/icon_list.txt"))
-		{
-			FetchIconListFromRemoteServer();
-			return "file.gif";
-		}
-
-		$datetime1 = new DateTime(date("Y-m-d", filemtime($_SERVER["DOCUMENT_ROOT"]."/skel/editor/images/icon_list.txt")));
-		$datetime2 = new DateTime(date("Y-m-d"));
-		$interval = $datetime1->diff($datetime2);
-		if( (int)$interval->format('%a') > 1)
-		{
-			FetchIconListFromRemoteServer();
-		}
-
 		if(file_exists($_SERVER["DOCUMENT_ROOT"]."/skel/editor/images/icons/".$Extension.".png"))
 		{
 			return $Extension.".png";
