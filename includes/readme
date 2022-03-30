@@ -1,3 +1,7 @@
+* 3.3.1 *
+= release: 2022-03-30
+ - Added DNS API
+
 * 3.3.0 *
 = release: 2021-09-23
  - Added Webp support
