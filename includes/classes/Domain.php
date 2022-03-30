@@ -2360,7 +2360,7 @@ class Domain
 			$ServerType = $oDNS->GetSetting("server_type");
 
 			if($ServerType == "master") {
-				$x = $oDNS->AddZone($ParkedDomain, $oDNS->GetDomainIP($DomainName), "", "", $ClientID);	
+				$x = $oDNS->AddZone($ParkedDomain, $oDNS->GetDomainIP($DomainInfoArray["DomainName"]), "", "", $ClientID);	
 				if($x < 1) {
 					$oLog->WriteLog("DEBUG", "Error registering DNS, return code: ".$x);
 					$Error = "<p><b>Domain DNS could not be registered, return code: ".$x.". Please contact support</b>";
