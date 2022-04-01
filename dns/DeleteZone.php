@@ -39,4 +39,4 @@ if($oDNS->DeleteZone($ZoneName) < 1)
 }
 
 
-header("location: index.php?NoteType=Message&Notes=Zone deleted<br>".$Error);
+header("location: index.php?NoteType=Message&Notes=Zone deleted");
