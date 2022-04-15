@@ -54,9 +54,7 @@ $oSettings = new Settings();
 		<link href="/assets/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
 
 		<link rel="stylesheet" href="/assets/plugins/font-awesome/css/font-awesome.min.css">
-
 		<link rel="stylesheet" href="/assets/fonts/style.css">
-
 		<link rel="stylesheet" href="/assets/css/main.css">
 
 		<link rel="stylesheet" href="/assets/css/main-responsive.css">
