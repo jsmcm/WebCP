@@ -25,6 +25,5 @@ switch( $file_extension ) {
     default:
 }
 
-
 header('Content-type: ' . $ctype);
 echo file_get_contents($imagePath);
