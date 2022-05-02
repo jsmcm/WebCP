@@ -197,25 +197,25 @@ if( ! is_numeric($TTL))
 			}
 
 			if( isNaN(TTL.value)) {
-				TTL.style.border = "2px red solid";
+				TTL.style.border = "2px blue solid";
 				Return = false;
 			} else if(TTL.value == "") {
-				TTL.style.border = "2px red solid";
+				TTL.style.border = "2px yellow solid";
 				Return = false;
 			} else if(parseInt(TTL.value) < 0) {
-				TTL.style.border = "2px red solid";
+				TTL.style.border = "2px green solid";
 				Return = false;
 			}
 
 			if(Type.value == "A" || Type.value == "AAAA") {
 				if(Type.value == "A") {
 					if(ValidateIPv4(Record.value) == false) {
-						Record.style.border = "2px red solid";
+						Record.style.border = "2px orange solid";
 						Return = false;
 					}
 				} else if(Type.value == "AAAA") {
 					if(ValidateIPv6(Record.value) == false) {
-						Record.style.border = "2px red solid";
+						Record.style.border = "2px brown solid";
 						Return = false;
 					}
 				}		
@@ -228,12 +228,12 @@ if( ! is_numeric($TTL))
 						}
 					
 						if(ValidateDomain(Record.value, true) == false) {
-							Record.style.border = "2px red solid";
+							Record.style.border = "2px purple solid";
 							Return = false;
 						}
 					}
 				} else {
-					Record.style.border = "2px red solid";
+					Record.style.border = "2px black solid";
 					Return = false;	
 				}
 			}
@@ -242,13 +242,13 @@ if( ! is_numeric($TTL))
 				// priority must be a non negative number
 				if( isNaN(Priority.value)) {
 					Priority.value = 0;									
-					Priority.style.border = "2px red solid";
+					Priority.style.border = "2px pink solid";
 					Return = false;
 				} else if(Priority.value == "") {
 					Priority.value = 0;									
 				} else if(parseInt(Priority.value) < 0) {
 					Priority.value = 0;									
-					Priority.style.border = "2px red solid";
+					Priority.style.border = "2px cyan solid";
 					Return = false;
 				}
 			}

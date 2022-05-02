@@ -816,7 +816,7 @@ class DNS
 
 
 
-	function ValidateDomainName($DomainName, $FQDN=true)
+	function ValidateDomainName($DomainName, $FQDN=true, $allowUnderscoreFirstCharacter=false)
 	{
 		if ( $DomainName == "@" ) {
 			return true;
@@ -831,7 +831,9 @@ class DNS
 		// First char must be alphanum
 		if( (substr($DomainName, 0, 1) < 'a') || (substr($DomainName, 0, 1) > 'z') ) {
 			if( (substr($DomainName, 0, 1) < '0') || (substr($DomainName, 0, 1) > '9') ) {
-				return -2;
+				if ($allowUnderscoreFirstCharacter == false) {
+					return -2;
+				}
 			}
 		}
 
