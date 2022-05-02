@@ -48,6 +48,7 @@ foreach($_POST as $key => $val) {
 		$Priority = filter_var($_POST[$New."Priority_".$ID], FILTER_SANITIZE_NUMBER_INT);
 		$Record = htmlspecialchars_decode(filter_var($_POST[$New."Record_".$ID], FILTER_SANITIZE_STRING));
 
+
 		if($Name == "" && $Record == "") {
 			if($New == "") {
 				$oDNS->DeleteRRS($ID);
@@ -63,6 +64,7 @@ foreach($_POST as $key => $val) {
 			if($oDNS->ValidateDomainName($Name, false, $allowUnderscore) < 1) {
 				$Error = true;
 			}
+
 
 			if(intVal($TTL) < 0) {	
 				$Error = true;
@@ -89,8 +91,8 @@ foreach($_POST as $key => $val) {
 				if ( $last != "\"" ) {
 					$Record = $Record."\"";
 				}
-				
-			}else {
+		   	
+			} else {
 				if($Type != "TXT") {
 					if($oDNS->ValidateDomainName($Record) < 1) {
 						$Error = true;
@@ -127,6 +129,7 @@ $Notes = "DNS settings saved.";
 if($ErrorString != "") {
 	$Notes = $Notes." There were some errors and these lines were skipped:<p>".$ErrorString;
 	$NoteType = "Error";
-}	
+}
+
 header("Location: EditZone.php?ID=".$SOAID."&Notes=".$Notes."&NoteType=".$NoteType);
 
