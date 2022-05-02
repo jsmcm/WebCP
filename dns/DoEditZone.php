@@ -54,8 +54,13 @@ foreach($_POST as $key => $val) {
 			}
 		} else {
 
+			$allowUnderscore = false;
+                        if ($Type == "TXT") {
+                                $allowUnderscore = true;
+                        }
+
 			
-			if($oDNS->ValidateDomainName($Name, false) < 1) {
+			if($oDNS->ValidateDomainName($Name, false, $allowUnderscore) < 1) {
 				$Error = true;
 			}
 

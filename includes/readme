@@ -1,3 +1,8 @@
+* 3.3.2 *
+= release: 
+ - Fixed domain name validation in DNS for txt records when domain has leading underscore
+ - rrs table's value1 column was too short. Made it a text
+
 * 3.3.1 *
 = release: 2022-03-30
  - Added DNS API

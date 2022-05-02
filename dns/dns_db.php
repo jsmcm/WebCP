@@ -135,7 +135,7 @@ if($oDatabase->TableExists("rrs", $nonce) == false) {
 	$TableInfoArray[5]["default"] = "";
 
 	$TableInfoArray[6]["name"] = "value1";
-	$TableInfoArray[6]["type"] = "tinytext";
+	$TableInfoArray[6]["type"] = "text";
 	$TableInfoArray[6]["key"] = "";
 	$TableInfoArray[6]["default"] = "";
 
