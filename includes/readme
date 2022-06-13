@@ -1,3 +1,7 @@
+* 4.0.0 *
+= release: 2022-06-13
+ - Opensourced! Changed license lookup to return a true license always
+
 * 3.3.2 *
 = release: 
  - Fixed domain name validation in DNS for txt records when domain has leading underscore

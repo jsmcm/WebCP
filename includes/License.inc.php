@@ -5,15 +5,16 @@ include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 $oUtils = new Utils();
 $oDomains = new Domain();
 
-$LicenseKey = "free";
+//$license = $oUtils->getLicense($LicenseKey);
 
-if ( file_exists($_SERVER["DOCUMENT_ROOT"]."/includes/license.conf")) {
-    $LicenseKey = file_get_contents($_SERVER["DOCUMENT_ROOT"]."/includes/license.conf");
-}
-
-//print "count: ".$oDomains->GetAccountsCreatedCount()."<p>";
-//print "LicenseKey: ".$LicenseKey."<p>";
-$license = $oUtils->getLicense($LicenseKey);
-//print "license: ".print_r($license, true)."<p>";
+// open source now, just give access...
+// This is the quickest way of "removing" the license requirement until the checks have been removed from all the sites pages.
+$license = new stdClass();
+$license->success = "sucess";
+$license->type = "free";
+$license->allowed = 1000000000;
+$license->item_id = 0;
+$license->item_name = "WebCP";
+$license->checksum = "";
 
 
