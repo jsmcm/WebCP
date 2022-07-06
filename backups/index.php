@@ -12,8 +12,6 @@ $oReseller = new Reseller();
 $oSimpleNonce = new SimpleNonce();
 
 
-require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
-
 
 if( ! file_exists("../../backups/monthly")) {
         mkdir("../../backups/monthly", 0755, true);

@@ -11,8 +11,6 @@ $oSettings = new Settings();
 $oReseller = new Reseller();
 $oSimpleNonce = new SimpleNonce();
 
-require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
-
 $oDNS->GenerateKeyFiles();
 
 $ClientID = $oUser->getClientId();

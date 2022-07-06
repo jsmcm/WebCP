@@ -7,7 +7,6 @@ $oUser = new User();
 $oDomain = new Domain();
 $oSettings = new Settings();
 
-require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 
 if($oUser->Role != "admin")
 {

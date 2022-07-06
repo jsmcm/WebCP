@@ -6,7 +6,6 @@ $oDomain = new Domain();
 $oUser = new User();
 $oSettings = new Settings();
 
-require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 
 if($oUser->Role != "admin")
 {
@@ -48,4 +47,3 @@ $OutPut = $OutPut."EmailAddress=".$EmailAddress."\n";
 file_put_contents($_SERVER["DOCUMENT_ROOT"]."/nm/".$DomainName.".ssl", $OutPut);
 sleep(6);
 header("Location: index.php?NoteType=success&Notes=CSR generated for ".$DomainName.". If you don't see it in the list below please wait a few seconds then refresh the page. Once it appears here you can click on the green button to view the CSR");
-?>

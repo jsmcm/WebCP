@@ -8,7 +8,6 @@ $oPackage = new Package();
 $oUser = new User();
 
 
-require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 
 $ClientID = $oUser->getClientId();
 $Role = $oUser->Role;

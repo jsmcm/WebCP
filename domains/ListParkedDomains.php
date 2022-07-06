@@ -8,8 +8,6 @@ $oPackage = new Package();
 $oSettings = new Settings();
 $oSimpleNonce = new SimpleNonce();
 
-require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
-
 $ClientID = $oUser->getClientId();
 if($ClientID < 1) {
 	header("Location: /index.php");

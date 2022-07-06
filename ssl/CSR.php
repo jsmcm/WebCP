@@ -7,8 +7,6 @@ $oUser = new User();
 $oUtils = new Utils();
 $oSettings = new Settings();
 
-require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
-
 if($oUser->Role != "admin") {
 	header("Location: /index.php");
 	exit();

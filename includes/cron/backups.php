@@ -41,11 +41,6 @@ if($oDNS->IPExists($_SERVER["REMOTE_ADDR"]) == false) {
 
 
 
-if( ($_SERVER["REMOTE_ADDR"] != "127.0.0.1") && ($_SERVER["REMOTE_ADDR"] != "::1") )
-{
-	require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
-}
-
 
 if( file_exists($_SERVER["DOCUMENT_ROOT"]."/includes/cron/tmp/auto_backups_".date("Ymd")) )
 {

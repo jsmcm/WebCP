@@ -7,7 +7,6 @@ $oSimpleNonce = new SimpleNonce();
 $oSettings = new Settings();
 $oReseller = new Reseller();
 
-require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 
 $oDomain = new Domain();
 

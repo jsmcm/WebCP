@@ -10,7 +10,6 @@ $oUtils = new Utils();
 $oDatabase = new Database();
 $oLog = new Log();
 
-require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 
 $ServerType = $oDNS->GetSetting("server_type");
 

@@ -9,7 +9,6 @@ $oDomain = new Domain();
 $oSettings = new Settings(); 
 $oReseller = new Reseller();
 
-require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 
 $ClientID = $oUser->getClientId();
 if($ClientID < 1) {

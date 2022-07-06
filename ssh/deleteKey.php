@@ -9,7 +9,6 @@ $oSimpleNonce = new SimpleNonce();
 $oReseller = new Reseller();
 $oSSH = new SSH();
 
-require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 
 $ClientID = $oUser->getClientId();
 if($ClientID < 1) {

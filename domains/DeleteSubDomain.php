@@ -5,8 +5,6 @@ include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 $oUser = new User();
 $oReseller = new Reseller();
 
-require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
-
 $Role = $oUser->Role;
 $ClientID = $oUser->getClientId();
 if($ClientID < 1)
