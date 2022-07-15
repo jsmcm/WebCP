@@ -49,8 +49,10 @@ $resellerId = $oReseller->GetClientResellerID($domainOwnerId, $random, $nonce);
 
 if ( $ClientID != $domainOwnerId ) {
 	if ( $resellerId != $ClientID ) {
-		header("Location: index.php?Notes=You don't have permission to edit that domain&NoteType=error");
-		exit();
+		if ($oUser->Role != "admin") {
+			header("Location: index.php?Notes=You don't have permission to edit that domain&NoteType=error");
+			exit();
+		}
 	}
 }
 

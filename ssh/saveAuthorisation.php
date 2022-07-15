@@ -50,8 +50,12 @@ $resellerId = $oReseller->GetClientResellerID($domainOwnerId, $random, $nonce);
 
 if ( $ClientID != $domainOwnerId ) {
 	if ( $resellerId != $ClientID ) {
-		header("Location: index.php?Notes=You don't have permission to edit that domain&NoteType=error");
-		exit();
+		
+		if ($oUser->Role != "admin") {
+			header("Location: index.php?Notes=You don't have permission to edit that domain&NoteType=error");
+			exit();
+		}
+
 	}
 }
 
@@ -81,6 +85,7 @@ $nonceArray = [
 $nonce = $oSimpleNonce->GenerateNonce("changeKeyAuthorisation", $nonceArray);
 
 if ($oSSH->changeKeyAuthorisation($publicKeyId, $domainId, $authorisation, $nonce) == true ) {
+    touch($_SERVER["DOCUMENT_ROOT"]."/nm/".$domainId.".authorise_domain_pub_key");    
     print "success: key ".(($authorisation==0)?"un":"")."authorised";
     exit();
 }
