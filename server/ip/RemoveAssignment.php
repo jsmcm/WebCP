@@ -2,7 +2,6 @@
 
 include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 
-require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 
 $oSSL = new SSL();
 $oDNS = new DNS();

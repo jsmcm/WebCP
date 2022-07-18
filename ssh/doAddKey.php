@@ -9,8 +9,6 @@ $oSimpleNonce = new SimpleNonce();
 $oReseller = new Reseller();
 $oSSH = new SSH();
 
-require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
-
 $ClientID = $oUser->getClientId();
 if($ClientID < 1) {
     header("Location: /index.php");
@@ -76,9 +74,12 @@ $resellerId = $oReseller->GetClientResellerID($domainOwnerId, $random, $nonce);
 
 if ( $ClientID != $domainOwnerId ) {
 	if ( $resellerId != $ClientID ) {
-		sleep(1);
-		header("Location: keys.php?domainId=".$domainId."&Notes=You don't have permission to edit that domain&NoteType=Error");
-		exit();
+
+		if ($oUser->Role != "admin") {
+			sleep(1);
+			header("Location: keys.php?domainId=".$domainId."&Notes=You don't have permission to edit that domain&NoteType=Error");
+			exit();
+		}
 	}
 }
 

@@ -8,7 +8,6 @@ $oUser = new User();
 $oDomain = new Domain();
 $oSimpleNonce = new SimpleNonce();
 
-require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 
 
 $Role = $oUser->Role;

@@ -9,7 +9,6 @@ $oUtils = new Utils();
 $oSimpleNonce = new SimpleNonce();
 $oDomain = new Domain();
 
-require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 
 $ClientID = $oUser->getClientId();
 if($ClientID < 1) {

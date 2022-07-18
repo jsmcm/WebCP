@@ -2,7 +2,6 @@
 
 session_start();
 include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
-require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 
 $oUser = new User();
 $oUtils = new Utils();

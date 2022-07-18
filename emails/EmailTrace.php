@@ -14,7 +14,6 @@ $Role = $oUser->Role;
 
 $oSettings = new Settings();
 
-require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 ?>
 
 <!DOCTYPE html>

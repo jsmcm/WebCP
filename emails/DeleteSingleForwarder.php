@@ -10,7 +10,6 @@ $oSimpleNonce = new SimpleNonce();
 $ClientID = $oUser->GetClientID();
 $Role = $oUser->Role;
 
-require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 
 $loggedInId = $ClientID;
 

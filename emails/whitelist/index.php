@@ -7,9 +7,6 @@ $oDomains = new Domain();
 $oSettings = new Settings();
 $oEmail = new Email();
 
-require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
-
-
 
 
 

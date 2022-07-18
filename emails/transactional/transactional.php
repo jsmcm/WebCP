@@ -12,7 +12,6 @@ $oSettings = new Settings();
 $oReseller = new Reseller();
 $oDatabase = new Database();
 
-require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 
 $ClientID = $oUser->getClientId();
 if ($ClientID < 1) {

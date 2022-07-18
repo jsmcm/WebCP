@@ -1,6 +1,21 @@
+<<<<<<< HEAD:includes/readme
 * 4.0.0 *
 = release: 2022-06-13
  - Opensourced! Changed license lookup to return a true license always
+=======
+# WebCP this is the front end php portion of WebCP
+# The front end php files at https://github.com/jsmcm/WebCP
+# The setup scripts at https://github.com/jsmcm/WebCP-Setup
+# The scripts which run the server at https://github.com/jsmcm/WebCP-Scripts
+
+# Website: https://webcp.io. If you simply want to install WebCP on an ubuntu server: https://webcp.io/get-it/
+
+
+
+* 4.0.0 *
+= release: 6 July 2022
+ - Removed license code - open sourced
+>>>>>>> dab20597cfd68406b8caade0614632c952fb7f42:readme
 
 * 3.3.2 *
 = release: 

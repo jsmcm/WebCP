@@ -11,8 +11,6 @@ $oLog = new Log();
 $oSimpleNonce = new SimpleNonce();
 
 
-require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
-
 $ClientID = $oUser->getClientId();
 if($ClientID < 1) {
 	$oLog->WriteLog("DEBUG", "/ssh/index.php -> client_id not set, redirecting to /index.php");

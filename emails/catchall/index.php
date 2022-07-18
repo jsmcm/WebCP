@@ -8,8 +8,6 @@ $oUser = new User();
 $oSettings = new Settings();
 $oDomain = new Domain();
 
-require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
-
 $ClientID = $oUser->getClientId();
 if($ClientID < 1)
 {

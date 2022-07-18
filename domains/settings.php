@@ -10,8 +10,6 @@ $oDomain = new Domain();
 $oSimpleNonce = new SimpleNonce();
 $oReseller = new Reseller();
 
-require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
-
 $ClientID = $oUser->getClientId();
 if($ClientID < 1) {
 	header("Location: /index.php");

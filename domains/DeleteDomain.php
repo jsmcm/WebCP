@@ -7,8 +7,6 @@ $oEmail = new Email();
 $oSimpleNonce = new SimpleNonce();
 $oDomain = new Domain();
 
-require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
-
 if ( $oUser->Role == "client" ) {
     header("location: /domains/index.php?Notes=Sorry, you can't delete domains!!!&NoteType=Error");
     exit(); 

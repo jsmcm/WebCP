@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-require($_SERVER["DOCUMENT_ROOT"]."/includes/License.inc.php");
 
 $FirstName = "";
 if(isset($_POST["FirstName"]))
