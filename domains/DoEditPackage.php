@@ -8,6 +8,7 @@ $oDomain = new Domain();
 $oPackage = new Package();
 $oLog = new Log();
 $oFTP = new FTP();
+$oSimpleNonce = new SimpleNonce();
 
 
 $ClientID = $oUser->getClientId();

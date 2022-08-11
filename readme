@@ -1,8 +1,3 @@
-<<<<<<< HEAD:includes/readme
-* 4.0.0 *
-= release: 2022-06-13
- - Opensourced! Changed license lookup to return a true license always
-=======
 # WebCP this is the front end php portion of WebCP
 # The front end php files at https://github.com/jsmcm/WebCP
 # The setup scripts at https://github.com/jsmcm/WebCP-Setup
@@ -10,12 +5,16 @@
 
 # Website: https://webcp.io. If you simply want to install WebCP on an ubuntu server: https://webcp.io/get-it/
 
+* 4.0.1 *
+= release: 2022-08-11
+ - Missing create simplenonce object in DoEditPackage.php fixed
+ - Install WP was not obeying unlimited mysql package settings
 
 
 * 4.0.0 *
-= release: 6 July 2022
+= release: 2022-07-06
  - Removed license code - open sourced
->>>>>>> dab20597cfd68406b8caade0614632c952fb7f42:readme
+ - Opensourced! Changed license lookup to return a true license always
 
 * 3.3.2 *
 = release: 

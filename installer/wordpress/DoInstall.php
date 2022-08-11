@@ -56,6 +56,7 @@ $oSimpleNonce = new SimpleNonce();
 $nonce = $oSimpleNonce->GenerateNonce("getDomainInfo", $nonceArray);
 $oDomain->GetDomainInfo($DomainID, $random, $DomainInfoArray, $nonce);
 
+define("UNLIMITED", -1);
 
 $WP_DomainUserName = $DomainInfoArray["UserName"];
 $WP_Path = $DomainInfoArray["Path"];
@@ -88,8 +89,8 @@ print "WP_DomainName = ".$WP_DomainName."<br>";
 print "DomainID: ".$DomainID."<p>";
 */
 
-if( ($WP_MySQLAllowance - $WP_MySQLUsage) > 0)
-{
+if( ( ($WP_MySQLAllowance - $WP_MySQLUsage) > 0) || ($WP_MySQLAllowance == UNLIMITED) ) { 
+
 	$WP_Password = generatePassword(15,1);
 	$WP_DatabaseUserName = "un".generatePassword(3,0);
 	$WP_DatabaseName = $WP_DomainUserName."_db".generatePassword(3,0);
