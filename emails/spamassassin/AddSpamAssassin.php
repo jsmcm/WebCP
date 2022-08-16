@@ -8,6 +8,7 @@ $oEmail = new Email();
 $oDomain = new Domain();
 $oSettings = new Settings();
 
+$version = trim(file_get_contents($_SERVER["DOCUMENT_ROOT"]."/includes/version.inc"));
 
 
 $ClientID = $oUser->GetClientID();
@@ -71,7 +72,7 @@ $SpamSubjectModifier = $oEmail->GetSpamSubjectModifier($EmailAddress);
 		<link href="/assets/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
 		<link rel="stylesheet" href="/assets/plugins/font-awesome/css/font-awesome.min.css">
 		<link rel="stylesheet" href="/assets/fonts/style.css">
-		<link rel="stylesheet" href="/assets/css/main.css">
+		<link rel="stylesheet" href="/assets/css/main.css?cb=<?= $version; ?>">
 		<link rel="stylesheet" href="/assets/css/main-responsive.css">
 		<link rel="stylesheet" href="/assets/plugins/iCheck/skins/all.css">
 		<link rel="stylesheet" href="/assets/plugins/bootstrap-colorpalette/css/bootstrap-colorpalette.css">
