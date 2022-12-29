@@ -11,6 +11,10 @@
  - Install WP was not obeying unlimited mysql package settings
 
 
+* 4.1.0 *
+= release 29 December 2022
+ - Added support for PHP8.[1/2]
+
 * 4.0.0 *
 = release: 2022-07-06
  - Removed license code - open sourced
