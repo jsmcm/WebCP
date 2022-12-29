@@ -5,15 +5,15 @@
 
 # Website: https://webcp.io. If you simply want to install WebCP on an ubuntu server: https://webcp.io/get-it/
 
-* 4.0.1 *
-= release: 2022-08-11
- - Missing create simplenonce object in DoEditPackage.php fixed
- - Install WP was not obeying unlimited mysql package settings
-
 
 * 4.1.0 *
 = release 29 December 2022
  - Added support for PHP8.[1/2]
+
+* 4.0.1 *
+= release: 2022-08-11
+ - Missing create simplenonce object in DoEditPackage.php fixed
+ - Install WP was not obeying unlimited mysql package settings
 
 * 4.0.0 *
 = release: 2022-07-06
