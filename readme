@@ -7,6 +7,10 @@
 
 
 
+* 4.1.0 *
+= release 29 December 2022
+ - Added support for PHP8.[1/2]
+
 * 4.0.0 *
 = release: 6 July 2022
  - Removed license code - open sourced
