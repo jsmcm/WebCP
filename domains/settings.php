@@ -94,7 +94,7 @@ if (isset($domainSettings["fastcgi_cache"]["value"])) {
 }
 
 
-$phpVersion = "7.2";
+$phpVersion = "8.2";
 if (isset($domainSettings["php_version"]["value"])) {
 	$phpVersion = $domainSettings["php_version"]["value"];
 }
@@ -358,6 +358,8 @@ if (isset($domainSettings["php_version"]["value"])) {
 								<div class="col-sm-4">
 									<span class="input-icon">
 									<select name="phpVersion" id="form-field-11" class="form-control">
+									<option value="8.2" <?php if($phpVersion == "8.2") print " selected "; ?>>8.2</option>
+									<option value="8.1" <?php if($phpVersion == "8.1") print " selected "; ?>>8.1</option>
 									<option value="7.4" <?php if($phpVersion == "7.4") print " selected "; ?>>7.4</option>
 									<option value="7.2" <?php if($phpVersion == "7.2") print " selected "; ?>>7.2</option>
 									<option value="7.1" <?php if($phpVersion == "7.1") print " selected "; ?>>7.1</option>
