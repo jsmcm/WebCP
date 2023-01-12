@@ -467,8 +467,6 @@ class DNS
 		{
 			$query = $this->DatabaseConnection->prepare("SELECT COUNT(*) as count FROM dns_options WHERE deleted = 0");
 			
-			$query->bindParam(":email_address", $EmailAddress);
-			
 			$query->execute();
 	
 			if($result = $query->fetch(PDO::FETCH_ASSOC))

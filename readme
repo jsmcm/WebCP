@@ -5,6 +5,9 @@
 
 # Website: https://webcp.io. If you simply want to install WebCP on an ubuntu server: https://webcp.io/get-it/
 
+* 4.1.1 *
+= release 12 January 2023
+ - BugFixes. Removed extranous bindParams in certain functions causing sql to fail
 
 * 4.1.0 *
 = release 29 December 2022
