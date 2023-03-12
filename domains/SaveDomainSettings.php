@@ -164,9 +164,13 @@ $nonceArray = [
         $accessControlAllowOrigin
 ];
 
-$nonce = $oSimpleNonce->GenerateNonce("saveDomainSetting", $nonceArray);
-$oDomain->saveDomainSetting($domainId, "access_control_allow_origin", $accessControlAllowOrigin, "", "", $nonce);
-
+if ($accessControlAllowOrigin == "") {
+	$nonce = $oSimpleNonce->GenerateNonce("deleteDomainSetting", $nonceArray);
+	$oDomain->deleteDomainSetting($domainId, "access_control_allow_origin", $nonce);
+} else {
+	$nonce = $oSimpleNonce->GenerateNonce("saveDomainSetting", $nonceArray);
+	$oDomain->saveDomainSetting($domainId, "access_control_allow_origin", $accessControlAllowOrigin, "", "", $nonce);
+}
 
 
 
@@ -182,9 +186,14 @@ $nonceArray = [
         $accessControlAllowMethods
 ];
 
-$nonce = $oSimpleNonce->GenerateNonce("saveDomainSetting", $nonceArray);
-$oDomain->saveDomainSetting($domainId, "access_control_allow_methods", $accessControlAllowMethods, "", "", $nonce);
 
+if ($accessControlAllowMethods == "") {
+	$nonce = $oSimpleNonce->GenerateNonce("deleteDomainSetting", $nonceArray);
+	$oDomain->deleteDomainSetting($domainId, "access_control_allow_methods", $nonce);
+} else {
+	$nonce = $oSimpleNonce->GenerateNonce("saveDomainSetting", $nonceArray);
+	$oDomain->saveDomainSetting($domainId, "access_control_allow_methods", $accessControlAllowMethods, "", "", $nonce);
+}
 
 
 
@@ -201,9 +210,13 @@ $nonceArray = [
         $accessControlAllowHeaders
 ];
 
-$nonce = $oSimpleNonce->GenerateNonce("saveDomainSetting", $nonceArray);
-$oDomain->saveDomainSetting($domainId, "access_control_allow_headers", $accessControlAllowHeaders, "", "", $nonce);
-
+if ($accessControlAllowHeaders == "") {
+	$nonce = $oSimpleNonce->GenerateNonce("deleteDomainSetting", $nonceArray);
+	$oDomain->deleteDomainSetting($domainId, "access_control_allow_headers", $nonce);
+} else {
+	$nonce = $oSimpleNonce->GenerateNonce("saveDomainSetting", $nonceArray);
+	$oDomain->saveDomainSetting($domainId, "access_control_allow_headers", $accessControlAllowHeaders, "", "", $nonce);
+}
 
 
 
@@ -220,9 +233,14 @@ $nonceArray = [
         $accessControlExposeHeaders
 ];
 
-$nonce = $oSimpleNonce->GenerateNonce("saveDomainSetting", $nonceArray);
-$oDomain->saveDomainSetting($domainId, "access_control_expose_headers", $accessControlExposeHeaders, "", "", $nonce);
 
+if ($accessControlExposeHeaders == "") {
+	$nonce = $oSimpleNonce->GenerateNonce("deleteDomainSetting", $nonceArray);
+	$oDomain->deleteDomainSetting($domainId, "access_control_expose_headers", $nonce);
+} else {
+	$nonce = $oSimpleNonce->GenerateNonce("saveDomainSetting", $nonceArray);
+	$oDomain->saveDomainSetting($domainId, "access_control_expose_headers", $accessControlExposeHeaders, "", "", $nonce);
+}
 
 
 
