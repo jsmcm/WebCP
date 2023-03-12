@@ -126,6 +126,19 @@ $oDomain->saveDomainSetting($domainId, "auto_webp", $autoWebp, "", "", $nonce);
 
 
 ///////////////////////////////////////////
+$publicPath = filter_var($_POST["public_path"], FILTER_UNSAFE_RAW);
+$nonceArray = [
+    $oUser->Role,
+    $ClientID,
+	$domainId,
+	"public_path",
+	$publicPath
+];
+
+$nonce = $oSimpleNonce->GenerateNonce("saveDomainSetting", $nonceArray);
+$oDomain->saveDomainSetting($domainId, "public_path", $publicPath, "", "", $nonce);
+
+///////////////////////////////////////////
 $fastCgiCache = filter_var($_POST["fastcgi_cache"], FILTER_SANITIZE_STRING);
 $nonceArray = [
     $oUser->Role,
@@ -137,6 +150,81 @@ $nonceArray = [
 
 $nonce = $oSimpleNonce->GenerateNonce("saveDomainSetting", $nonceArray);
 $oDomain->saveDomainSetting($domainId, "fastcgi_cache", $fastCgiCache, "", "", $nonce);
+
+
+
+
+///////////////////////////////////////////
+$accessControlAllowOrigin = filter_var($_POST["access_control_allow_origin"], FILTER_UNSAFE_RAW);
+$nonceArray = [
+    $oUser->Role,
+    $ClientID,
+        $domainId,
+        "access_control_allow_origin",
+        $accessControlAllowOrigin
+];
+
+$nonce = $oSimpleNonce->GenerateNonce("saveDomainSetting", $nonceArray);
+$oDomain->saveDomainSetting($domainId, "access_control_allow_origin", $accessControlAllowOrigin, "", "", $nonce);
+
+
+
+
+
+
+///////////////////////////////////////////
+$accessControlAllowMethods = filter_var($_POST["access_control_allow_methods"], FILTER_UNSAFE_RAW);
+$nonceArray = [
+    $oUser->Role,
+    $ClientID,
+        $domainId,
+        "access_control_allow_methods",
+        $accessControlAllowMethods
+];
+
+$nonce = $oSimpleNonce->GenerateNonce("saveDomainSetting", $nonceArray);
+$oDomain->saveDomainSetting($domainId, "access_control_allow_methods", $accessControlAllowMethods, "", "", $nonce);
+
+
+
+
+
+
+
+///////////////////////////////////////////
+$accessControlAllowHeaders = filter_var($_POST["access_control_allow_headers"], FILTER_UNSAFE_RAW);
+$nonceArray = [
+    $oUser->Role,
+    $ClientID,
+        $domainId,
+        "access_control_allow_headers",
+        $accessControlAllowHeaders
+];
+
+$nonce = $oSimpleNonce->GenerateNonce("saveDomainSetting", $nonceArray);
+$oDomain->saveDomainSetting($domainId, "access_control_allow_headers", $accessControlAllowHeaders, "", "", $nonce);
+
+
+
+
+
+
+
+///////////////////////////////////////////
+$accessControlExposeHeaders = filter_var($_POST["access_control_expose_headers"], FILTER_UNSAFE_RAW);
+$nonceArray = [
+    $oUser->Role,
+    $ClientID,
+        $domainId,
+        "access_control_expose_headers",
+        $accessControlExposeHeaders
+];
+
+$nonce = $oSimpleNonce->GenerateNonce("saveDomainSetting", $nonceArray);
+$oDomain->saveDomainSetting($domainId, "access_control_expose_headers", $accessControlExposeHeaders, "", "", $nonce);
+
+
+
 
 
 
