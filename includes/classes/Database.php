@@ -76,7 +76,7 @@ class Database
                     // so far, so good, now check if it matches the field type...
                     for($x = 0; $x < count($AllowedTypesArray); $x++)
                     {
-                         if($AllowedTypesArray[$x] == $result["data_type"])
+                         if( (isset($result["data_type"])) && ($AllowedTypesArray[$x] == $result["data_type"]) )
                          {
                               return 1;
                          }
