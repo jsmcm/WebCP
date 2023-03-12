@@ -1651,8 +1651,8 @@ class Domain
 		{
 			$query = $this->DatabaseConnection->prepare("SELECT * FROM domains WHERE deleted = 0 AND domain_type = 'subdomain' AND client_id = :client_id AND parent_domain_id = :domain_id");
 
-			$query->bindParam(":domain_id", $DomainID);
 			$query->bindParam(":client_id", $ClientID);
+			$query->bindParam(":domain_id", $DomainID);
 
 			$query->execute();
 
@@ -1676,8 +1676,8 @@ class Domain
 		{
 			$query = $this->DatabaseConnection->prepare("SELECT id FROM domains WHERE deleted = 0 AND domain_type != 'primary' AND client_id = :client_id AND parent_domain_id = :domain_id");
 
-			$query->bindParam(":domain_id", $DomainID);
 			$query->bindParam(":client_id", $ClientID);
+			$query->bindParam(":domain_id", $DomainID);
 
 			$query->execute();
 
@@ -2121,7 +2121,6 @@ class Domain
 		{
 			$query = $this->DatabaseConnection->prepare("SELECT UserName FROM domains WHERE UserName = '".$UserName."' AND deleted = 0 AND domain_type = 'primary';");
 			
-			$query->bindParam(":domain_id", $domain_id);
 			
 			$query->execute();
 	
@@ -2147,9 +2146,6 @@ class Domain
 		try
 		{
 			$query = $this->DatabaseConnection->prepare("SELECT Uid FROM domains ORDER BY Uid DESC LIMIT 1");
-			
-			$query->bindParam(":domain_id", $domain_id);
-			
 			$query->execute();
 	
 			if($result = $query->fetch(PDO::FETCH_ASSOC))

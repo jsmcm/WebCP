@@ -6,9 +6,14 @@
 # Website: https://webcp.io. If you simply want to install WebCP on an ubuntu server: https://webcp.io/get-it/
 
 * 4.1.1 *
+<<<<<<< HEAD
 = release: 12 March 2023
  - Domain settings tab has input to specify public folder (useful for apps like laravel)
  - Domain settings tab has inputs to add CORS headers to nginx
+=======
+= release 12 January 2023
+ - BugFixes. Removed extranous bindParams in certain functions causing sql to fail
+>>>>>>> master
 
 * 4.1.0 *
 = release 29 December 2022
