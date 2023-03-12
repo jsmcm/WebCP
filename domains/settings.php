@@ -99,6 +99,32 @@ if (isset($domainSettings["php_version"]["value"])) {
 	$phpVersion = $domainSettings["php_version"]["value"];
 }
 
+$publicPath = "public_html";
+if (isset($domainSettings["public_path"]["value"])) {
+	$publicPath = $domainSettings["public_path"]["value"];
+}
+
+$accessControlAllowOrigin = "";
+if (isset($domainSettings["access_control_allow_origin"]["value"])) {
+	$accessControlAllowOrigin = $domainSettings["access_control_allow_origin"]["value"];
+}
+
+$accessControlAllowMethods = "";
+if (isset($domainSettings["access_control_allow_methods"]["value"])) {
+        $accessControlAllowMethods = $domainSettings["access_control_allow_methods"]["value"];
+}
+
+$accessControlAllowHeaders = "";
+if (isset($domainSettings["access_control_allow_headers"]["value"])) {
+        $accessControlAllowHeaders = $domainSettings["access_control_allow_headers"]["value"];
+}
+
+$accessControlExposeHeaders = "";
+if (isset($domainSettings["access_control_expose_headers"]["value"])) {
+        $accessControlExposeHeaders = $domainSettings["access_control_expose_headers"]["value"];
+}
+
+
 ?>
 
 <!DOCTYPE html>
@@ -334,7 +360,6 @@ if (isset($domainSettings["php_version"]["value"])) {
 								</div>
 							</div>
 
-
 							<div class="form-group" style="padding-bottom: 50px;">
 								<label class="col-sm-2 control-label">
 								<b>Auto Webp</b>:
@@ -345,6 +370,19 @@ if (isset($domainSettings["php_version"]["value"])) {
 									<option value="none" <?php if($autoWebp == "none") print " selected "; ?>>Do not create WebP</option>
 									<option value="auto" <?php if($autoWebp == "auto") print " selected "; ?>>Auto create WebP</option>
 									</select>
+									</span>
+								</div>
+							</div>
+
+
+
+							<div class="form-group" style="padding-bottom: 50px;">
+								<label class="col-sm-2 control-label">
+								<b>Public Path</b>:
+								</label>
+								<div class="col-sm-8">
+									<span class="input-icon">
+									<input type name="public_path" id="form-field-11" class="form-control" value="<?php print $publicPath; ?>">
 									</span>
 								</div>
 							</div>
@@ -382,6 +420,76 @@ if (isset($domainSettings["php_version"]["value"])) {
 					</div>
 					
 
+					<div class="col-md-12">
+
+						<div class="panel panel-default">
+
+							<div class="panel-body">
+	
+							<h1>Nginx add_headers</h1>
+						
+
+							<div class="form-group" style="padding-bottom: 50px;">
+								<label class="col-sm-2 control-label">
+								<b>Access-Control-Allow-Origin</b>:
+								</label>
+								<div class="col-sm-8">
+									<span class="input-icon">
+									<input type name="access_control_allow_origin" id="form-field-11" class="form-control" value="<?php print $accessControlAllowOrigin; ?>">
+									</span>
+								</div>
+							</div>
+
+
+                                                        <div class="form-group" style="padding-bottom: 50px;">
+                                                                <label class="col-sm-2 control-label">
+                                                                <b>Access-Control-Allow-Methods</b>:
+                                                                </label>
+                                                                <div class="col-sm-8">
+                                                                        <span class="input-icon">
+                                                                        <input type name="access_control_allow_methods" id="form-field-11" class="form-control" value="<?php print
+ $accessControlAllowMethods; ?>">
+                                                                        </span>
+                                                                </div>
+                                                        </div>
+
+
+
+
+
+
+                                                        <div class="form-group" style="padding-bottom: 50px;">
+                                                                <label class="col-sm-2 control-label">
+                                                                <b>Access-Control-Allow-Headers</b>:
+                                                                </label>
+                                                                <div class="col-sm-8">
+                                                                        <span class="input-icon">
+                                                                        <input type name="access_control_allow_headers" id="form-field-11" class="form-control" value="<?php print
+ $accessControlAllowHeaders; ?>">
+                                                                        </span>
+                                                                </div>
+                                                        </div>
+
+
+
+
+
+                                                        <div class="form-group" style="padding-bottom: 50px;">
+                                                                <label class="col-sm-2 control-label">
+                                                                <b>Access-Control-Expose-Headers</b>:
+                                                                </label>
+                                                                <div class="col-sm-8">
+                                                                        <span class="input-icon">
+                                                                        <input type name="access_control_expose_headers" id="form-field-11" class="form-control" value="<?php print
+ $accessControlExposeHeaders; ?>">
+                                                                        </span>
+                                                                </div>
+                                                        </div>
+
+
+						</div>
+
+					</div>
 
 					<div class="col-md-12">
 
