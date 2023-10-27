@@ -6,6 +6,9 @@ if(!isset($_SESSION))  {
 }
 
 include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
 
 class Domain
 {
@@ -1128,8 +1131,6 @@ class Domain
 	function SendNewDomainEmail($DomainName, $FirstName, $Surname, $EmailAddress)
 	{
 
-		require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.phpmailer.php");
-	
 		$oSettings = new Settings();
 
 		$SendSystemEmails = $oSettings->GetSendSystemEmails();
@@ -1373,9 +1374,17 @@ class Domain
 		}
 
 
-		$mail = new PHPMailer();
+		$mail = new PHPMailer(true);
 
 		$mail->IsSMTP();
+		
+		$mail->SMTPOptions = [
+    'ssl' => [
+        'verify_peer' => false,
+        'verify_peer_name' => false,
+        'allow_self_signed' => true,
+    ]
+];
 		$mail->ClearAddresses();
 		$mail->ClearAttachments();
 		$mail->IsHTML(true);

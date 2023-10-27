@@ -8,6 +8,12 @@ if(!isset($_SESSION))
 
 include_once("/var/www/html/webcp/vendor/autoload.php");
 
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
+
+
+
 class SendMail
 {
 	
@@ -21,7 +27,6 @@ class SendMail
         function SendEmail($EmailAddress, $Subject, $Message)
         {
 
-                require_once($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.phpmailer.php");
 		$oSettings = new Settings();
 
 		$SendSystemEmails = $oSettings->GetSendSystemEmails();
@@ -199,9 +204,18 @@ class SendMail
                 $AltMessage = strip_tags($Message);
 
 
-                $mail = new PHPMailer();
+                $mail = new PHPMailer(true);
 
-		//$mail->IsSMTP();
+		$mail->IsSMTP();
+
+		$mail->SMTPOptions = [
+    'ssl' => [
+        'verify_peer' => false,
+        'verify_peer_name' => false,
+        'allow_self_signed' => true,
+    ]
+];
+
                 $mail->ClearAddresses();
                 $mail->ClearAttachments();
                 $mail->IsHTML(true);

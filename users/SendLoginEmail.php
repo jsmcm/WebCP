@@ -44,8 +44,11 @@ if(isset($_POST["Domain"]))
 }
 
 
-    //set_include_path("../");
-    require($_SERVER["DOCUMENT_ROOT"]."/includes/classes/class.phpmailer.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
 
 
 
@@ -279,9 +282,19 @@ $somecontent = $somecontent."</html>";
 		$PlainTextMail = $PlainTextMail.$_SERVER["SERVER_NAME"]."";
 
             
-            $mail = new PHPMailer();
+            $mail = new PHPMailer(true);
             
-            $mail->IsSMTP();
+		$mail->IsSMTP();
+
+			$mail->SMTPOptions = [
+				'ssl' => [
+					'verify_peer' => false,
+					'verify_peer_name' => false,
+					'allow_self_signed' => true,
+				]
+			];
+
+
             $mail->ClearAddresses();	    
             $mail->ClearAttachments();
             $mail->IsHTML(true); 

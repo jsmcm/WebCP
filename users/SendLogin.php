@@ -43,9 +43,12 @@ if(isset($_POST["Domain"]))
 	$Domain = $_POST["Domain"];
 }
 
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 
-    //set_include_path("../");
-    require("/var/www/html/webcp/includes/classes/class.phpmailer.php");
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
+
 
 
 
@@ -241,9 +244,19 @@ $somecontent = $somecontent."</html>";
     
 
             
-            $mail = new PHPMailer();
+            $mail = new PHPMailer(true);
             
-	    $mail->IsSMTP();
+		$mail->IsSMTP();
+
+			$mail->SMTPOptions = [
+				'ssl' => [
+					'verify_peer' => false,
+					'verify_peer_name' => false,
+					'allow_self_signed' => true,
+				]
+			];
+
+
             $mail->ClearAddresses(); 
             $mail->ClearAttachments();
             $mail->IsHTML(true); 

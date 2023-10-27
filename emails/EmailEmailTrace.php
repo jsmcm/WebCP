@@ -1,5 +1,12 @@
 <?php
 
+include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
+
+
 $HostName = $_SERVER["SERVER_NAME"];
 $EmailAddress = $_POST["EmailAddress"];
 $Body = $_POST["Body"];
@@ -279,16 +286,20 @@ $Mail = $Mail."</html>";
 	$PlainTextMessage = strip_tags($Body);
 
 
-    //set_include_path("../");
- 	require_once($_SERVER["DOCUMENT_ROOT"]."/includes/class.phpmailer.php");
-
             
-            $mail = new PHPMailer();
+            $mail = new PHPMailer(true);
             
             $mail->ClearAddresses(); 
             $mail->ClearAttachments();
             
 	    $mail->IsSMTP();
+	    $mail->SMTPOptions = [
+    'ssl' => [
+        'verify_peer' => false,
+        'verify_peer_name' => false,
+        'allow_self_signed' => true,
+    ]
+];
             $mail->AddReplyTo("noreply@".$HostName, $HostName);
             $mail->From = "noreply@".$HostName;
             $mail->FromName = $HostName;

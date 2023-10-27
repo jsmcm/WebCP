@@ -6,6 +6,12 @@ $HostName = $_REQUEST["HostName"];
 
 include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
+
+
+
 $oDomain = new Domain();
 $oSettings = new Settings();
 $oUser = new User();
@@ -305,15 +311,23 @@ $PlainTextMail = "Good day ".$FirstName.",\r\nYour disk usage on domain ".$Domai
 
 
     //set_include_path("../");
- 	require_once($_SERVER["DOCUMENT_ROOT"]."/includes/class.phpmailer.php");
 
             
-            $mail = new PHPMailer();
+            $mail = new PHPMailer(true);
             
             $mail->ClearAddresses(); 
             $mail->ClearAttachments();
             
 	    $mail->IsSMTP();
+			$mail->SMTPOptions = [
+				'ssl' => [
+					'verify_peer' => false,
+					'verify_peer_name' => false,
+					'allow_self_signed' => true,
+				]
+			];
+
+
             $mail->AddReplyTo("noreply@".$HostName, $HostName);
             $mail->From = "noreply@".$HostName;
             $mail->FromName = $HostName;

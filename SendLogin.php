@@ -5,6 +5,11 @@ $somecontent = "";
 
 include_once($_SERVER["DOCUMENT_ROOT"]."/vendor/autoload.php");
 
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
+
+
 $oUser = new User();
 $TempPassword = $oUser->ResetPassword($_POST["email"]);
 $UserName = $oUser->GetUserName($oUser->UserExistsByEmail($_POST["email"]));
@@ -15,7 +20,6 @@ if($UserName != "")
 	$BCC = $oSettings->GetForwardSystemEmailsTo();
 
     	//set_include_path("../");
-   	 require($_SERVER["DOCUMENT_ROOT"]."/includes/class.phpmailer.php");
 
    	// Send Client Email
     	$somecontent = $somecontent."Your login to the ".$_SERVER["SERVER_NAME"]." admin panel is:<p><b>Username:</b> ".$UserName."<br><b>Password:</b> ".$TempPassword."<p>&nbsp;<p>Please login at <a href=\"http://".$_SERVER["SERVER_NAME"]."/webcp\">http://".$_SERVER["SERVER_NAME"]."/webcp</a> using this password to change this temporary password to a new one";
@@ -24,9 +28,19 @@ if($UserName != "")
           
 	$PlainTextMail = "Your login to the ".$_SERVER["SERVER_NAME"]." admin panel is:\r\n\r\nUsername: ".$UserName."\r\nPassword: ".$TempPassword."\r\n\r\nPlease login at http://".$_SERVER["SERVER_NAME"]."/webcp using this password to change this temporary password to a new one";
       
-     	$mail = new PHPMailer();
+    	$mail = new PHPMailer(true);
             
-	//$mail->IsSMTP();
+	$mail->IsSMTP();
+
+			$mail->SMTPOptions = [
+				'ssl' => [
+					'verify_peer' => false,
+					'verify_peer_name' => false,
+					'allow_self_signed' => true,
+				]
+			];
+
+
         $mail->ClearAddresses(); 
         $mail->ClearAttachments();
         $mail->IsHTML(true);
